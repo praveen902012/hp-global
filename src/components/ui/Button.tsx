@@ -1,13 +1,13 @@
-import * as React from "react";
+import { forwardRef, type ButtonHTMLAttributes } from "react";
 import { NavLink } from "react-router-dom";
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   to?: string;
 }
 
-export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className = '', variant = 'primary', size = 'md', to, children, ...props }, ref) => {
     
     // Minimalist sharp corners, premium interactions
