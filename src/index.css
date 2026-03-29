@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@theme {
+  /* Deep Navy/Charcoal for a modern, sleek background contrast */
+  --color-brand-charcoal: #0F172A; 
+  /* Crisp, clean off-white background */
+  --color-brand-beige: #F8FAFC; 
+  /* Sophisticated, muted gold accent */
+  --color-brand-champagne: #D4AF37; 
+  /* Absolute white and light slate for subtle contrast layered cards */
+  --color-brand-white: #FFFFFF;
+  --color-brand-light-grey: #F1F5F9;
+  
+  --font-sans: "Inter", sans-serif;
+  --font-heading: "Playfair Display", serif;
+}
+
+@layer base {
+  body {
+    @apply bg-brand-white text-brand-charcoal antialiased font-sans flex flex-col min-h-screen selection:bg-brand-champagne selection:text-white;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading tracking-tight text-brand-charcoal font-medium;
+  }
+  
+  p {
+    @apply text-slate-600 font-light leading-relaxed;
+  }
+}
+
+@layer utilities {
+  .subtle-border {
+    @apply border border-slate-200/60;
+  }
+  
+  .image-overlay {
+    @apply absolute inset-0 bg-brand-charcoal/20 transition-opacity duration-700 hover:opacity-10;
+  }
+
+  .hover-lift {
+    @apply transition-all duration-500 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-brand-charcoal/5;
+  }
+  
+  .glass {
+    @apply bg-white/70 backdrop-blur-lg border border-white/20 shadow-sm;
+  }
+  
+  .glass-dark {
+    @apply bg-brand-charcoal/80 backdrop-blur-xl border border-white/10 shadow-lg;
+  }
+
+  .text-gradient-gold {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#D4AF37] via-[#F3E5AB] to-[#D4AF37];
+  }
+  
+  .bg-gradient-gold {
+    @apply bg-gradient-to-r from-[#D4AF37] to-[#B8972E] text-white;
+  }
+}
