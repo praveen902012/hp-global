@@ -60,9 +60,9 @@ export function Footer() {
         <div className="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center text-[10px] tracking-[0.2em] uppercase text-gray-400 font-semibold gap-6">
           <p>© 2025 HP Global Infra. All Rights Reserved.</p>
           <div className="flex space-x-10">
-            <a href="#" className="hover:text-brand-charcoal transition-colors duration-500">Instagram</a>
-            <a href="#" className="hover:text-brand-charcoal transition-colors duration-500">LinkedIn</a>
-            <NavLink to="/privacy" className="hover:text-brand-charcoal transition-colors duration-500">Privacy</NavLink>
+            <a href="https://www.instagram.com/hpglobalinfra/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-charcoal transition-colors duration-500">Instagram</a>
+            <a href="https://www.facebook.com/hpglobalinfra/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-charcoal transition-colors duration-500">Facebook</a>
+            <NavLink to="/privacy" onClick={() => window.scrollTo(0, 0)} className="hover:text-brand-charcoal transition-colors duration-500">Privacy Policy</NavLink>
           </div>
         </div>
       </div>

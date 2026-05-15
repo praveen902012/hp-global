@@ -30,9 +30,12 @@ export function Navbar() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center">
-            <NavLink to="/" className="text-xl font-heading font-medium tracking-widest uppercase flex items-center gap-1 group">
-              <span className="text-brand-champagne">HP</span>
-              <span className="text-white group-hover:text-brand-champagne transition-colors duration-500">Global Infra</span>
+            <NavLink to="/" className="flex items-center group">
+              <img 
+                src="/images/hp-global-infra-logo.png" 
+                alt="HP Global Infra" 
+                className="h-10 w-auto object-contain transition-transform duration-500 group-hover:scale-105" 
+              />
             </NavLink>
           </div>
 
