@@ -6,18 +6,18 @@ export function Footer() {
     <footer className="bg-brand-light-grey border-t border-gray-200 text-brand-charcoal pt-32 pb-16 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-16 mb-24">
-          
+
           {/* Brand & Intro */}
           <div className="md:col-span-5 pr-8">
             <h3 className="text-2xl font-heading font-normal mb-8 uppercase tracking-widest text-brand-charcoal">
               <span className="text-brand-champagne">HP</span> Global Infra
             </h3>
             <p className="text-gray-500 max-w-sm mb-10 leading-loose font-light">
-              Shaping the Future of Real Estate.<br/>
+              Shaping the Future of Real Estate.<br />
               Partner in Vision. Invest in Growth.
             </p>
-            <a href="mailto:info@hpglobalinfra.com" className="inline-block text-sm uppercase tracking-widest font-semibold border-b border-brand-charcoal pb-1 hover:text-brand-champagne hover:border-brand-champagne transition-colors duration-500">
-              info@hpglobalinfra.com
+            <a href="mailto:info@HP Globallobalinfra.com" className="inline-block text-sm uppercase tracking-widest font-semibold border-b border-brand-charcoal pb-1 hover:text-brand-champagne hover:border-brand-champagne transition-colors duration-500">
+              info@HP Globallobalinfra.com
             </a>
           </div>
 
@@ -27,8 +27,8 @@ export function Footer() {
             <ul className="space-y-6">
               {['Services', 'Investments', 'About', 'Journal'].map((item) => (
                 <li key={item}>
-                  <NavLink 
-                    to={item === 'Journal' ? '/blog' : `/${item.toLowerCase()}`} 
+                  <NavLink
+                    to={item === 'Journal' ? '/blog' : `/${item.toLowerCase()}`}
                     className="group inline-flex items-center text-gray-500 hover:text-brand-charcoal transition-colors duration-500"
                   >
                     <span className="text-sm font-light tracking-wide">{item}</span>
@@ -44,8 +44,8 @@ export function Footer() {
             <h4 className="text-xs font-semibold mb-8 text-brand-charcoal tracking-[0.2em] uppercase">Headquarters</h4>
             <ul className="space-y-8">
               <li className="text-gray-500 font-light leading-relaxed">
-                B-302, T-3, NX-One,<br/>
-                Tech Zone - 4, Amrapali Dream Valley,<br/>
+                B-302, T-3, NX-One,<br />
+                Tech Zone - 4, Amrapali Dream Valley,<br />
                 Greater Noida, UP, India
               </li>
               <li className="text-gray-500 font-light">
@@ -60,8 +60,8 @@ export function Footer() {
         <div className="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center text-[10px] tracking-[0.2em] uppercase text-gray-400 font-semibold gap-6">
           <p>© 2025 HP Global Infra. All Rights Reserved.</p>
           <div className="flex space-x-10">
-            <a href="https://www.instagram.com/hpglobalinfra/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-charcoal transition-colors duration-500">Instagram</a>
-            <a href="https://www.facebook.com/hpglobalinfra/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-charcoal transition-colors duration-500">Facebook</a>
+            <a href="https://www.instagram.com/HP Globallobalinfra/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-charcoal transition-colors duration-500">Instagram</a>
+            <a href="https://www.facebook.com/HP Globallobalinfra/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-charcoal transition-colors duration-500">Facebook</a>
             <NavLink to="/privacy" onClick={() => window.scrollTo(0, 0)} className="hover:text-brand-charcoal transition-colors duration-500">Privacy Policy</NavLink>
           </div>
         </div>

@@ -22,7 +22,7 @@ export default function Footer() {
               <a href="#" className="text-brand-300 hover:text-white transition-colors"><MessageCircle className="w-5 h-5" /></a>
             </div>
           </div>
-          
+
           <div>
             <h3 className="text-white font-medium text-lg mb-6 tracking-wide">Properties</h3>
             <ul className="space-y-3 text-sm text-brand-300">
@@ -48,7 +48,7 @@ export default function Footer() {
             <ul className="space-y-4 text-sm text-brand-300">
               <li className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-accent-500 shrink-0" />
-                <span>B-302, T-3, NX-One, Tech Zone - 4<br/>Amrapali Dream Valley, Greater Noida, UP, India</span>
+                <span>B-302, T-3, NX-One, Tech Zone - 4<br />Amrapali Dream Valley, Greater Noida, UP, India</span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-accent-500 shrink-0" />
@@ -56,12 +56,12 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-accent-500 shrink-0" />
-                <a href="mailto:info@hpglobalinfra.com" className="hover:text-white transition-colors">info@hpglobalinfra.com</a>
+                <a href="mailto:info@HP Globallobalinfra.com" className="hover:text-white transition-colors">info@HP Globallobalinfra.com</a>
               </li>
             </ul>
           </div>
         </div>
-        
+
         <div className="pt-8 border-t border-brand-800 flex flex-col md:flex-row justify-between items-center text-sm text-brand-400">
           <p>&copy; {new Date().getFullYear()} HP Global Infra. All rights reserved.</p>
           <div className="flex space-x-6 mt-4 md:mt-0">

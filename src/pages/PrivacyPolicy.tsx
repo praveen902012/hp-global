@@ -2,11 +2,11 @@ export function PrivacyPolicy() {
   return (
     <div className="pt-40 pb-32 bg-brand-white min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         <div className="mb-16">
           <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-brand-champagne mb-6 block">Legal Information</span>
           <div className="w-12 h-[1px] bg-brand-charcoal mb-10"></div>
-          
+
           <h1 className="text-4xl md:text-5xl font-heading font-light text-brand-charcoal mb-8 tracking-tight">
             Privacy Policy
           </h1>
@@ -16,7 +16,7 @@ export function PrivacyPolicy() {
         </div>
 
         <div className="prose prose-slate max-w-none font-light leading-loose text-gray-600">
-          
+
           <p className="mb-8">
             This Privacy Policy is to help the audience of HP Global Infra to understand what data we gather, how we use it, and what securities are in place to protect your data on the Sites. This Privacy Policy also applies to information collected offline through trade shows, seminars, conferences, or other activities.
           </p>
@@ -43,13 +43,13 @@ export function PrivacyPolicy() {
 
           <h2 className="text-sm font-bold tracking-[0.2em] uppercase text-brand-charcoal mt-16 mb-6">Your Rights</h2>
           <p className="mb-8">
-            As permitted, you may have the right to obtain confirmation of the existence of data related to you, to verify its content, origin, and accuracy, as well as the right to access, review, delete or stop or withdraw consent to the processing of certain personal data, by contacting us at <a href="mailto:info@hpglobalinfra.com" className="text-brand-champagne border-b border-brand-champagne/30 hover:border-brand-champagne transition-colors">info@hpglobalinfra.com</a>.
+            As permitted, you may have the right to obtain confirmation of the existence of data related to you, to verify its content, origin, and accuracy, as well as the right to access, review, delete or stop or withdraw consent to the processing of certain personal data, by contacting us at <a href="mailto:info@HP Globallobalinfra.com" className="text-brand-champagne border-b border-brand-champagne/30 hover:border-brand-champagne transition-colors">info@HP Globallobalinfra.com</a>.
           </p>
 
           <h2 className="text-sm font-bold tracking-[0.2em] uppercase text-brand-charcoal mt-16 mb-6">Your Choices</h2>
           <p className="mb-4">Your choices concerning our use and disclosure of your data:</p>
           <ul className="list-disc pl-6 space-y-3 mb-8">
-            <li><strong>Marketing Communications:</strong> If you no longer wish to receive any marketing communications, please contact us at <a href="mailto:info@hpglobalinfra.com" className="text-brand-champagne border-b border-brand-champagne/30 hover:border-brand-champagne transition-colors">info@hpglobalinfra.com</a>.</li>
+            <li><strong>Marketing Communications:</strong> If you no longer wish to receive any marketing communications, please contact us at <a href="mailto:info@HP Globallobalinfra.com" className="text-brand-champagne border-b border-brand-champagne/30 hover:border-brand-champagne transition-colors">info@HP Globallobalinfra.com</a>.</li>
             <li><strong>Cookies and Similar Technologies:</strong> Please examine your browser or device settings to exercise certain choices regarding cookies.</li>
           </ul>
 
@@ -70,12 +70,12 @@ export function PrivacyPolicy() {
 
           <h2 className="text-sm font-bold tracking-[0.2em] uppercase text-brand-charcoal mt-16 mb-6">How You Can Contact Us?</h2>
           <p className="mb-8">
-            If you have any questions regarding this Privacy Policy or our privacy practices in general, please contact us at <a href="mailto:info@hpglobalinfra.com" className="text-brand-champagne border-b border-brand-champagne/30 hover:border-brand-champagne transition-colors">info@hpglobalinfra.com</a>.<br/><br/>
+            If you have any questions regarding this Privacy Policy or our privacy practices in general, please contact us at <a href="mailto:info@HP Globallobalinfra.com" className="text-brand-champagne border-b border-brand-champagne/30 hover:border-brand-champagne transition-colors">info@HP Globallobalinfra.com</a>.<br /><br />
             You may also have a right to complain to a supervisory authority.
           </p>
 
         </div>
-        
+
       </div>
     </div>
   );

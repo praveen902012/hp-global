@@ -64,13 +64,13 @@ export function Contact() {
   return (
     <div className="pt-40 pb-32 bg-brand-white min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         <div className="grid lg:grid-cols-2 gap-20">
-          
+
           <div className="flex flex-col">
             <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-brand-champagne mb-8 block">Consultation</span>
             <div className="w-12 h-[1px] bg-brand-charcoal mb-10"></div>
-            
+
             <h1 className="text-4xl md:text-5xl font-heading font-light text-brand-charcoal mb-8 tracking-tight">
               Connect With Us
             </h1>
@@ -79,14 +79,14 @@ export function Contact() {
             </p>
 
             <div className="space-y-12 mb-16">
-              
+
               <div className="flex items-start gap-6 group cursor-default">
                 <MapPin className="text-brand-champagne mt-1" size={24} strokeWidth={1.5} />
                 <div>
                   <h3 className="text-sm font-semibold tracking-widest uppercase text-brand-charcoal mb-3">Corporate Office</h3>
                   <p className="text-gray-500 leading-loose font-light">
-                    B-302, T-3, NX-One, Tech Zone - 4,<br/>
-                    Amrapali Dream Valley, Greater Noida,<br/>
+                    B-302, T-3, NX-One, Tech Zone - 4,<br />
+                    Amrapali Dream Valley, Greater Noida,<br />
                     Uttar Pradesh, India
                   </p>
                 </div>
@@ -97,7 +97,7 @@ export function Contact() {
                 <div>
                   <h3 className="text-sm font-semibold tracking-widest uppercase text-brand-charcoal mb-3">Call Us</h3>
                   <p className="text-gray-500 leading-loose font-light">
-                    <span className="text-brand-charcoal font-medium tracking-wider text-base">+91 7827955579</span><br/>
+                    <span className="text-brand-charcoal font-medium tracking-wider text-base">+91 7827955579</span><br />
                     Mon-Sat: 9AM to 6PM
                   </p>
                 </div>
@@ -108,9 +108,9 @@ export function Contact() {
                 <div>
                   <h3 className="text-sm font-semibold tracking-widest uppercase text-brand-charcoal mb-3">Email Us</h3>
                   <p className="text-gray-500 leading-loose font-light">
-                    <a href="mailto:info@hpglobalinfra.com" className="border-b border-gray-300 hover:border-brand-champagne hover:text-brand-champagne transition-colors duration-300">
-                      info@hpglobalinfra.com
-                    </a><br/>
+                    <a href="mailto:info@HP Globallobalinfra.com" className="border-b border-gray-300 hover:border-brand-champagne hover:text-brand-champagne transition-colors duration-300">
+                      info@HP Globallobalinfra.com
+                    </a><br />
                     For PR and General Enquiries.
                   </p>
                 </div>
@@ -150,7 +150,7 @@ export function Contact() {
                   <label htmlFor="message" className="block text-[10px] font-bold tracking-[0.2em] uppercase text-gray-500 mb-3">Message</label>
                   <textarea id="message" value={message} onChange={(e) => setMessage(e.target.value)} required rows={4} className="w-full px-0 py-3 bg-transparent border-0 border-b border-gray-300 focus:ring-0 focus:border-brand-charcoal outline-none transition-colors rounded-none placeholder-gray-400 resize-none h-full" placeholder="How can we assist your vision?"></textarea>
                 </div>
-                
+
                 {/* Math Captcha */}
                 <div className="pt-4">
                   <label className="block text-[10px] font-bold tracking-[0.2em] uppercase text-gray-500 mb-3">
@@ -158,7 +158,7 @@ export function Contact() {
                   </label>
                   <div className="flex items-center gap-4">
                     <div className="bg-white border border-gray-200 text-brand-charcoal px-5 py-3 font-mono tracking-widest text-sm select-none">
-                      {num1} + {num2} = 
+                      {num1} + {num2} =
                     </div>
                     <input
                       type="number"
