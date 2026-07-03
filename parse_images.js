@@ -1,10 +1,10 @@
 const https = require('https');
 
 const urls = [
-  'https://www.hpglobalinfra.com/s-projects-side-by-side',
-  'https://www.hpglobalinfra.com/s-projects-side-by-side-1',
-  'https://www.hpglobalinfra.com/s-projects-side-by-side-2',
-  'https://www.hpglobalinfra.com/s-projects-side-by-side-3'
+  'https://www.HP Globallobalinfra.com/s-projects-side-by-side',
+  'https://www.HP Globallobalinfra.com/s-projects-side-by-side-1',
+  'https://www.HP Globallobalinfra.com/s-projects-side-by-side-2',
+  'https://www.HP Globallobalinfra.com/s-projects-side-by-side-3'
 ];
 
 async function fetchHtml(url) {
@@ -27,11 +27,11 @@ const parser = async () => {
     while ((match = regex.exec(html)) !== null) {
       const src = match[1];
       if (src.includes('static.wixstatic.com')) {
-         images.add(src);
+        images.add(src);
       }
     }
     for (const img of images) {
-       console.log(img);
+      console.log(img);
     }
   }
 }

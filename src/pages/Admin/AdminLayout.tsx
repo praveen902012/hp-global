@@ -44,25 +44,25 @@ export function AdminLayout() {
           <h2 className="text-xl font-heading font-bold text-brand-champagne">HP Global</h2>
           <p className="text-xs text-slate-400 uppercase tracking-widest mt-1">Admin Panel</p>
         </div>
-        
+
         <nav className="flex-1 p-4 space-y-2">
-          <NavLink to="/admin" end className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${isActive ? 'bg-brand-champagne text-brand-charcoal font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white'}`}>
+          <NavLink to="/admin" end className={({ isActive }) => `flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${isActive ? 'bg-brand-champagne text-brand-charcoal font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white'}`}>
             <IconDashboard size={18} />
             Dashboard
           </NavLink>
-          <NavLink to="/admin/articles" className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${isActive ? 'bg-brand-champagne text-brand-charcoal font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white'}`}>
+          <NavLink to="/admin/articles" className={({ isActive }) => `flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${isActive ? 'bg-brand-champagne text-brand-charcoal font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white'}`}>
             <IconArticles size={18} />
             Articles
           </NavLink>
-          <NavLink to="/admin/properties" className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${isActive ? 'bg-brand-champagne text-brand-charcoal font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white'}`}>
+          <NavLink to="/admin/properties" className={({ isActive }) => `flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${isActive ? 'bg-brand-champagne text-brand-charcoal font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white'}`}>
             <IconProps size={18} />
             Properties
           </NavLink>
-          <NavLink to="/admin/enquiries" className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${isActive ? 'bg-brand-champagne text-brand-charcoal font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white'}`}>
+          <NavLink to="/admin/enquiries" className={({ isActive }) => `flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${isActive ? 'bg-brand-champagne text-brand-charcoal font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white'}`}>
             <IconEnquiries size={18} />
             Enquiries
           </NavLink>
-          <NavLink to="/admin/contacts" className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${isActive ? 'bg-brand-champagne text-brand-charcoal font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white'}`}>
+          <NavLink to="/admin/contacts" className={({ isActive }) => `flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${isActive ? 'bg-brand-champagne text-brand-charcoal font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white'}`}>
             <IconContacts size={18} />
             Contact Requests
           </NavLink>

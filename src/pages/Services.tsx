@@ -4,7 +4,7 @@ export function Services() {
   return (
     <div className="pt-32 pb-24 bg-brand-white min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Page Header */}
         <div className="py-20 border-b border-gray-100 mb-20 animate-fade-in-up flex flex-col md:flex-row md:items-end justify-between gap-10">
           <div className="max-w-2xl">
@@ -22,9 +22,9 @@ export function Services() {
           {/* Service 1 */}
           <div className="flex flex-col lg:flex-row items-stretch gap-16 group">
             <div className="w-full lg:w-1/2 overflow-hidden bg-brand-beige">
-              <img 
-                src="/commercial_building_investment_1774769793820.png" 
-                alt="Real Estate Investment Management" 
+              <img
+                src="/commercial_building_investment_1774769793820.png"
+                alt="Real Estate Investment Management"
                 className="w-full h-[500px] object-cover grayscale-[30%] hover:grayscale-0 transition-all duration-1000 transform hover:scale-105"
               />
             </div>
@@ -47,9 +47,9 @@ export function Services() {
           {/* Service 2 */}
           <div className="flex flex-col lg:flex-row-reverse items-stretch gap-16 group">
             <div className="w-full lg:w-1/2 overflow-hidden bg-brand-beige">
-              <img 
-                src="/residential_excellence_plot_1774769812737.png" 
-                alt="Property Management Strategy" 
+              <img
+                src="/residential_excellence_plot_1774769812737.png"
+                alt="Property Management Strategy"
                 className="w-full h-[500px] object-cover grayscale-[30%] hover:grayscale-0 transition-all duration-1000 transform hover:scale-105"
               />
             </div>

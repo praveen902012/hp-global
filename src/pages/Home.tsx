@@ -98,8 +98,8 @@ export function Home() {
             <div className="relative w-full pt-[56.25%] rounded-2xl overflow-hidden shadow-[0_32px_64px_-15px_rgba(0,0,0,0.3)] bg-brand-charcoal group">
               <iframe
                 className="absolute inset-0 w-full h-full"
-                src="https://www.youtube.com/embed/DKi84RHGDog?autoplay=1&mute=1"
-                title="hp global amrit arogyam"
+                src="https://www.youtube.com/embed/Gpp3y6ER99Y?autoplay=1&mute=1"
+                title="Explore Amrit Aarogyam | Complete Project Walkthrough by HP Global Inffra"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 referrerPolicy="strict-origin-when-cross-origin"
@@ -173,8 +173,8 @@ export function Home() {
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
                 className={`text-xs font-bold uppercase tracking-[0.2em] pb-2 border-b-2 transition-all duration-300 ${activeCategory === cat
-                    ? 'border-brand-charcoal text-brand-charcoal'
-                    : 'border-transparent text-gray-400 hover:text-brand-charcoal hover:border-gray-300'
+                  ? 'border-brand-charcoal text-brand-charcoal'
+                  : 'border-transparent text-gray-400 hover:text-brand-charcoal hover:border-gray-300'
                   }`}
               >
                 {cat}

@@ -5,13 +5,13 @@ export function BlogIndex() {
   return (
     <div className="pt-40 pb-32 bg-brand-light-grey min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         <div className="mb-24 flex flex-col items-center text-center animate-fade-in-up">
           <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-brand-champagne mb-6 block">Journal</span>
           <div className="w-12 h-[1px] bg-brand-charcoal mb-10"></div>
-          
+
           <h1 className="text-4xl md:text-5xl font-heading font-light text-brand-charcoal mb-8 tracking-tight">
-            Market Insights &<br/>
+            Market Insights &<br />
             Industry News
           </h1>
           <p className="text-lg text-gray-500 font-light leading-relaxed max-w-2xl">

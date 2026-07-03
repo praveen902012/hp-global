@@ -24,17 +24,16 @@ export function Navbar() {
   ];
 
   return (
-    <nav className={`fixed w-full top-0 z-50 transition-all duration-500 ${scrolled ? 'bg-brand-charcoal/95 backdrop-blur-md shadow-lg border-b border-brand-champagne/10 py-3' : 'bg-transparent py-5'}`}>
-      <div className="absolute inset-0 bg-gradient-to-b from-brand-charcoal/80 to-transparent pointer-events-none data-[scrolled=true]:opacity-0 transition-opacity" data-scrolled={scrolled}></div>
+    <nav className={`fixed w-full top-0 z-50 transition-all duration-500 ${scrolled ? 'bg-brand-charcoal/95 backdrop-blur-md shadow-lg border-b border-brand-champagne/10 py-3' : 'bg-brand-charcoal shadow-2xl py-5'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center">
             <NavLink to="/" className="flex items-center group">
-              <img 
-                src="/images/hp-global-infra-logo.png" 
-                alt="HP Global Infra" 
-                className="h-10 w-auto object-contain transition-transform duration-500 group-hover:scale-105" 
+              <img
+                src="/images/HP Global-logo.jpeg"
+                alt="HP Global Infra"
+                className="h-10 w-auto object-contain transition-transform duration-500 group-hover:scale-105"
               />
             </NavLink>
           </div>
@@ -46,10 +45,9 @@ export function Navbar() {
                 key={link.to}
                 to={link.to}
                 className={({ isActive }) =>
-                  `text-xs font-semibold uppercase tracking-[0.15em] transition-colors duration-500 relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-full after:h-[1px] after:bg-brand-champagne after:scale-x-0 after:origin-right hover:after:scale-x-100 hover:after:origin-left after:transition-transform after:duration-500 ${
-                    isActive 
-                      ? "text-brand-champagne after:scale-x-100" 
-                      : "text-slate-300 hover:text-white"
+                  `text-xs font-semibold uppercase tracking-[0.15em] transition-colors duration-500 relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-full after:h-[1px] after:bg-brand-champagne after:scale-x-0 after:origin-right hover:after:scale-x-100 hover:after:origin-left after:transition-transform after:duration-500 ${isActive
+                    ? "text-brand-champagne after:scale-x-100"
+                    : "text-slate-300 hover:text-white"
                   }`
                 }
               >
@@ -79,8 +77,7 @@ export function Navbar() {
               to={link.to}
               onClick={() => setIsOpen(false)}
               className={({ isActive }) =>
-                `block text-sm font-medium uppercase tracking-[0.2em] transition-colors ${
-                  isActive ? "text-brand-champagne" : "text-slate-400 hover:text-white"
+                `block text-sm font-medium uppercase tracking-[0.2em] transition-colors ${isActive ? "text-brand-champagne" : "text-slate-400 hover:text-white"
                 }`
               }
             >

@@ -34,7 +34,7 @@ export function FeaturedProject() {
           className="absolute inset-0 w-full h-full object-cover opacity-50 transform group-hover:scale-105 transition-transform duration-1000"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-brand-charcoal via-brand-charcoal/50 to-transparent"></div>
-        
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-[1.5px] bg-brand-champagne"></div>
@@ -49,15 +49,15 @@ export function FeaturedProject() {
           </div>
         </div>
       </section>
-      
+
       {/* Video Showcase Section */}
       <section className="bg-white pt-24 -mb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative w-full pt-[56.25%] rounded-2xl overflow-hidden shadow-[0_32px_64px_-15px_rgba(0,0,0,0.3)] bg-brand-charcoal">
             <iframe
               className="absolute inset-0 w-full h-full"
-              src="https://www.youtube.com/embed/DKi84RHGDog?autoplay=1&mute=1"
-              title="hp global amrit arogyam"
+              src="https://www.youtube.com/embed/Gpp3y6ER99Y?autoplay=1&mute=1"
+              title="Explore Amrit Aarogyam | Complete Project Walkthrough by HP Global Inffra"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               referrerPolicy="strict-origin-when-cross-origin"
@@ -70,7 +70,7 @@ export function FeaturedProject() {
       {/* Content Section */}
       <section className="py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           <div className="flex flex-col lg:flex-row gap-16">
             <div className="lg:w-2/3">
               {/* Tabs Navigation */}
@@ -79,11 +79,10 @@ export function FeaturedProject() {
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`py-4 text-xs font-bold uppercase tracking-[0.2em] whitespace-nowrap border-b-2 transition-all duration-300 ${
-                      activeTab === tab
-                        ? 'border-brand-charcoal text-brand-charcoal'
-                        : 'border-transparent text-gray-400 hover:text-brand-charcoal'
-                    }`}
+                    className={`py-4 text-xs font-bold uppercase tracking-[0.2em] whitespace-nowrap border-b-2 transition-all duration-300 ${activeTab === tab
+                      ? 'border-brand-charcoal text-brand-charcoal'
+                      : 'border-transparent text-gray-400 hover:text-brand-charcoal'
+                      }`}
                   >
                     {tab}
                   </button>
@@ -168,13 +167,13 @@ export function FeaturedProject() {
                   </li>
                 </ul>
 
-                <button 
+                <button
                   onClick={() => setEnquiryProject({ title: "Amrit Aarogyam", location: "Haridwar, Uttarakhand", category: "Premium Residences" })}
                   className="w-full justify-center bg-brand-champagne text-brand-charcoal hover:bg-white font-bold text-xs uppercase tracking-widest py-4 transition-colors duration-300"
                 >
                   Register Interest
                 </button>
-                
+
                 <p className="text-center text-xs text-white/40 mt-6 font-light">
                   Our team will contact you within 24 hours to discuss your requirements.
                 </p>
@@ -185,10 +184,10 @@ export function FeaturedProject() {
         </div>
       </section>
 
-      <ProjectEnquiryModal 
-        isOpen={!!enquiryProject} 
-        onClose={() => setEnquiryProject(null)} 
-        project={enquiryProject} 
+      <ProjectEnquiryModal
+        isOpen={!!enquiryProject}
+        onClose={() => setEnquiryProject(null)}
+        project={enquiryProject}
       />
     </div>
   );
