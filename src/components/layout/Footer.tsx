@@ -16,8 +16,8 @@ export function Footer() {
               Shaping the Future of Real Estate.<br />
               Partner in Vision. Invest in Growth.
             </p>
-            <a href="mailto:info@hpglobalinfrra.com" className="inline-block text-sm uppercase tracking-widest font-semibold border-b border-brand-charcoal pb-1 hover:text-brand-champagne hover:border-brand-champagne transition-colors duration-500">
-              info@hpglobalinfrra.com
+            <a href="mailto:info@hpglobalinfra.com" className="inline-block text-sm uppercase tracking-widest font-semibold border-b border-brand-charcoal pb-1 hover:text-brand-champagne hover:border-brand-champagne transition-colors duration-500">
+              info@hpglobalinfra.com
             </a>
           </div>
 
@@ -60,8 +60,8 @@ export function Footer() {
         <div className="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center text-[10px] tracking-[0.2em] uppercase text-gray-400 font-semibold gap-6">
           <p>© 2025 HP Global Infrra. All Rights Reserved.</p>
           <div className="flex space-x-10">
-            <a href="https://www.instagram.com/hpglobalinfrra/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-charcoal transition-colors duration-500">Instagram</a>
-            <a href="https://www.facebook.com/hpglobalinfrra/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-charcoal transition-colors duration-500">Facebook</a>
+            <a href="https://www.instagram.com/hpglobalinfra/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-charcoal transition-colors duration-500">Instagram</a>
+            <a href="https://www.facebook.com/hpglobalinfra/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-charcoal transition-colors duration-500">Facebook</a>
             <NavLink to="/privacy" onClick={() => window.scrollTo(0, 0)} className="hover:text-brand-charcoal transition-colors duration-500">Privacy Policy</NavLink>
           </div>
         </div>

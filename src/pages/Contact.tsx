@@ -108,8 +108,8 @@ export function Contact() {
                 <div>
                   <h3 className="text-sm font-semibold tracking-widest uppercase text-brand-charcoal mb-3">Email Us</h3>
                   <p className="text-gray-500 leading-loose font-light">
-                    <a href="mailto:info@hpglobalinfrra.com" className="border-b border-gray-300 hover:border-brand-champagne hover:text-brand-champagne transition-colors duration-300">
-                      info@hpglobalinfrra.com
+                    <a href="mailto:info@hpglobalinfra.com" className="border-b border-gray-300 hover:border-brand-champagne hover:text-brand-champagne transition-colors duration-300">
+                      info@hpglobalinfra.com
                     </a><br />
                     For PR and General Enquiries.
                   </p>

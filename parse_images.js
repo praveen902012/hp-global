@@ -1,10 +1,10 @@
 const https = require('https');
 
 const urls = [
-  'https://www.hpglobalinfrra.com/s-projects-side-by-side',
-  'https://www.hpglobalinfrra.com/s-projects-side-by-side-1',
-  'https://www.hpglobalinfrra.com/s-projects-side-by-side-2',
-  'https://www.hpglobalinfrra.com/s-projects-side-by-side-3'
+  'https://www.hpglobalinfra.com/s-projects-side-by-side',
+  'https://www.hpglobalinfra.com/s-projects-side-by-side-1',
+  'https://www.hpglobalinfra.com/s-projects-side-by-side-2',
+  'https://www.hpglobalinfra.com/s-projects-side-by-side-3'
 ];
 
 async function fetchHtml(url) {

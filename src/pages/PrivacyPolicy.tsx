@@ -43,13 +43,13 @@ export function PrivacyPolicy() {
 
           <h2 className="text-sm font-bold tracking-[0.2em] uppercase text-brand-charcoal mt-16 mb-6">Your Rights</h2>
           <p className="mb-8">
-            As permitted, you may have the right to obtain confirmation of the existence of data related to you, to verify its content, origin, and accuracy, as well as the right to access, review, delete or stop or withdraw consent to the processing of certain personal data, by contacting us at <a href="mailto:info@hpglobalinfrra.com" className="text-brand-champagne border-b border-brand-champagne/30 hover:border-brand-champagne transition-colors">info@hpglobalinfrra.com</a>.
+            As permitted, you may have the right to obtain confirmation of the existence of data related to you, to verify its content, origin, and accuracy, as well as the right to access, review, delete or stop or withdraw consent to the processing of certain personal data, by contacting us at <a href="mailto:info@hpglobalinfra.com" className="text-brand-champagne border-b border-brand-champagne/30 hover:border-brand-champagne transition-colors">info@hpglobalinfra.com</a>.
           </p>
 
           <h2 className="text-sm font-bold tracking-[0.2em] uppercase text-brand-charcoal mt-16 mb-6">Your Choices</h2>
           <p className="mb-4">Your choices concerning our use and disclosure of your data:</p>
           <ul className="list-disc pl-6 space-y-3 mb-8">
-            <li><strong>Marketing Communications:</strong> If you no longer wish to receive any marketing communications, please contact us at <a href="mailto:info@hpglobalinfrra.com" className="text-brand-champagne border-b border-brand-champagne/30 hover:border-brand-champagne transition-colors">info@hpglobalinfrra.com</a>.</li>
+            <li><strong>Marketing Communications:</strong> If you no longer wish to receive any marketing communications, please contact us at <a href="mailto:info@hpglobalinfra.com" className="text-brand-champagne border-b border-brand-champagne/30 hover:border-brand-champagne transition-colors">info@hpglobalinfra.com</a>.</li>
             <li><strong>Cookies and Similar Technologies:</strong> Please examine your browser or device settings to exercise certain choices regarding cookies.</li>
           </ul>
 
@@ -70,7 +70,7 @@ export function PrivacyPolicy() {
 
           <h2 className="text-sm font-bold tracking-[0.2em] uppercase text-brand-charcoal mt-16 mb-6">How You Can Contact Us?</h2>
           <p className="mb-8">
-            If you have any questions regarding this Privacy Policy or our privacy practices in general, please contact us at <a href="mailto:info@hpglobalinfrra.com" className="text-brand-champagne border-b border-brand-champagne/30 hover:border-brand-champagne transition-colors">info@hpglobalinfrra.com</a>.<br /><br />
+            If you have any questions regarding this Privacy Policy or our privacy practices in general, please contact us at <a href="mailto:info@hpglobalinfra.com" className="text-brand-champagne border-b border-brand-champagne/30 hover:border-brand-champagne transition-colors">info@hpglobalinfra.com</a>.<br /><br />
             You may also have a right to complain to a supervisory authority.
           </p>
 
