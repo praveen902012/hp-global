@@ -15,7 +15,7 @@ export function About() {
 
             <div className="space-y-8 text-lg text-gray-500 font-light leading-relaxed max-w-xl">
               <p>
-                At HP Global Infra, we are committed to excellence in every facet of real estate. Our services range from investment advisory to property management, focusing on high-end projects that make a difference.
+                At HP Global Infrra, we are committed to excellence in every facet of real estate. Our services range from investment advisory to property management, focusing on high-end projects that make a difference.
               </p>
               <p>
                 Our specialized approach includes mixed-use developments, smart solutions, and residential excellence, all backed by profound market insights.
@@ -31,7 +31,7 @@ export function About() {
             <div className="absolute inset-4 overflow-hidden border border-brand-champagne/30">
               <img
                 src="/hero_banner_real_estate_1774769760013.png"
-                alt="HP Global Infra Building"
+                alt="HP Global Infrra Building"
                 className="object-cover h-full w-full grayscale-[15%] hover:grayscale-0 transition-all duration-1000 transform hover:scale-105"
               />
             </div>

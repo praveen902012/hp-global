@@ -10,7 +10,7 @@ export default function Header() {
             <div className="bg-brand-900 text-white p-2 rounded-lg group-hover:bg-accent-600 transition-colors">
               <Building2 className="w-6 h-6" />
             </div>
-            <span className="font-display font-bold text-xl tracking-tight text-brand-900">HP Global Infra</span>
+            <span className="font-display font-bold text-xl tracking-tight text-brand-900">HP Global Infrra</span>
           </Link>
 
           <nav className="hidden md:flex space-x-8">

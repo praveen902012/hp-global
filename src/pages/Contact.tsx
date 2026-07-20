@@ -108,8 +108,8 @@ export function Contact() {
                 <div>
                   <h3 className="text-sm font-semibold tracking-widest uppercase text-brand-charcoal mb-3">Email Us</h3>
                   <p className="text-gray-500 leading-loose font-light">
-                    <a href="mailto:info@HP Globallobalinfra.com" className="border-b border-gray-300 hover:border-brand-champagne hover:text-brand-champagne transition-colors duration-300">
-                      info@HP Globallobalinfra.com
+                    <a href="mailto:info@hpglobalinfrra.com" className="border-b border-gray-300 hover:border-brand-champagne hover:text-brand-champagne transition-colors duration-300">
+                      info@hpglobalinfrra.com
                     </a><br />
                     For PR and General Enquiries.
                   </p>
@@ -128,7 +128,7 @@ export function Contact() {
                 <CheckCircle2 size={64} className="text-green-500 mb-6" />
                 <h4 className="text-3xl font-heading text-brand-charcoal mb-4">Request Sent!</h4>
                 <p className="text-gray-500 font-light text-base leading-relaxed">
-                  Thank you for reaching out to HP Global Infra. Our team will review your message and contact you shortly.
+                  Thank you for reaching out to HP Global Infrra. Our team will review your message and contact you shortly.
                 </p>
                 <div className="mt-12">
                   <Button variant="outline" onClick={() => setIsSuccess(false)}>

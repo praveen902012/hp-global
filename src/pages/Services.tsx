@@ -34,7 +34,7 @@ export function Services() {
                 Real Estate Investment Management
               </h2>
               <p className="text-gray-500 mb-12 leading-loose font-light text-lg">
-                HP Global Infra offers extensive advisory and management for real estate investments. We guide high net worth individuals and organizations toward investments that secure steady cash flows and high appreciation value. Whether you are expanding a portfolio or entering new markets, we bring deep insights to ensure success.
+                HP Global Infrra offers extensive advisory and management for real estate investments. We guide high net worth individuals and organizations toward investments that secure steady cash flows and high appreciation value. Whether you are expanding a portfolio or entering new markets, we bring deep insights to ensure success.
               </p>
               <div>
                 <Button to="/contact" variant="outline" size="lg">

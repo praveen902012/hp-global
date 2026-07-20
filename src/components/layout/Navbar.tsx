@@ -32,7 +32,7 @@ export function Navbar() {
             <NavLink to="/" className="flex items-center group">
               <img
                 src="/images/hpg-logo.png"
-                alt="HP Global Infra"
+                alt="HP Global Infrra"
                 className="h-10 w-auto object-contain transition-transform duration-500 group-hover:scale-105"
               />
             </NavLink>

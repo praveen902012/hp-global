@@ -15,7 +15,7 @@ export function BlogIndex() {
             Industry News
           </h1>
           <p className="text-lg text-gray-500 font-light leading-relaxed max-w-2xl">
-            Read the latest reports, trends, and success stories from HP Global Infra experts.
+            Read the latest reports, trends, and success stories from HP Global Infrra experts.
           </p>
         </div>
 

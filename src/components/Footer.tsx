@@ -11,7 +11,7 @@ export default function Footer() {
               <div className="bg-white text-brand-900 p-1.5 rounded-md">
                 <Building2 className="w-5 h-5" />
               </div>
-              <span className="font-display font-bold text-xl tracking-wide text-white">HP Global Infra</span>
+              <span className="font-display font-bold text-xl tracking-wide text-white">HP Global Infrra</span>
             </Link>
             <p className="text-brand-300 text-sm leading-relaxed mb-6">
               Curating distinctive residential and commercial properties for the modern visionary. Experience real estate with unmatched elegance.
@@ -56,14 +56,14 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-accent-500 shrink-0" />
-                <a href="mailto:info@HP Globallobalinfra.com" className="hover:text-white transition-colors">info@HP Globallobalinfra.com</a>
+                <a href="mailto:info@hpglobalinfrra.com" className="hover:text-white transition-colors">info@hpglobalinfrra.com</a>
               </li>
             </ul>
           </div>
         </div>
 
         <div className="pt-8 border-t border-brand-800 flex flex-col md:flex-row justify-between items-center text-sm text-brand-400">
-          <p>&copy; {new Date().getFullYear()} HP Global Infra. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} HP Global Infrra. All rights reserved.</p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-white transition-colors">Terms of Service</a>

@@ -38,45 +38,7 @@ export const portfolioProjects = [
     price: "₹8.40 Cr*",
     image: "/images/jacob_co.png",
   },
-  {
-    title: "Presidium Empire",
-    location: "Near Noida International Airport, Jewar",
-    category: "Strategic Plots",
-    description: "Residential Converted Plots near Noida International Airport. Invest in Land. Rise with the Region.",
-    details: [
-      "Just 3.5 KM from Noida International Airport.",
-      "NOC Approved by Directorate of Town & Country Planning.",
-      "Close Proximity to Yamuna Expressway & Film City (5 KM)."
-    ],
-    price: "₹27,900/sq.yd",
-    image: "/images/presidium_empire.png",
-  },
-  {
-    title: "Udyog Kunj",
-    location: "NH-24, Dasna, Ghaziabad",
-    category: "Strategic Plots",
-    description: "Freehold Plots for Industries & Commercial Use – Strategic Location with 100% Freehold ownership.",
-    details: [
-      "Ideal for MSMEs, start-ups, manufacturers, and logistics hubs.",
-      "50 Ft Wide Main Road & 40 Ft Internal Roads.",
-      "24/7 Urban Electricity."
-    ],
-    price: "On Request",
-    image: "/images/udyog_kunj.jpeg",
-  },
-  {
-    title: "Galactic City",
-    location: "Knowledge Park 5, Greater Noida",
-    category: "Residential",
-    description: "Luxurious Residences. Purchase one flat, get a free lockable office on 4 acres of land.",
-    details: [
-      "Each floor has 4 corner flats.",
-      "4 lifts for 4 flats, ensuring ultimate convenience.",
-      "Clubhouse with a temperature-controlled swimming pool of 20,000 sqft."
-    ],
-    price: "On Request",
-    image: "/images/galactic_city.png",
-  },
+
   {
     title: "ForestWalk Villas",
     location: "NH 24, Ghaziabad",
