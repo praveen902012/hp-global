@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { MapPin, Check } from 'lucide-react';
+import { MapPin, Check, FileText, Play, Camera, X, Eye } from 'lucide-react';
 import { ProjectEnquiryModal } from '../components/ProjectEnquiryModal';
 
 export function FeaturedProject() {
   const [activeTab, setActiveTab] = useState('gallery');
   const [enquiryProject, setEnquiryProject] = useState<any | null>(null);
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const [activePdfUrl, setActivePdfUrl] = useState<string | null>(null);
 
   const galleryImages = [
     { src: '/assets/featured-project-details/projects-image/1.jpeg', alt: 'Project Image 1' },
@@ -22,6 +24,15 @@ export function FeaturedProject() {
     { name: 'Children Park', icon: '/assets/featured-project-details/projects-image/children-park.png' },
     { name: 'Jogging Track', icon: '/assets/featured-project-details/projects-image/jogging.png' },
     { name: 'Multi-Purpose Hall', icon: '/assets/featured-project-details/projects-image/multi-purpose-hall.png' },
+  ];
+
+  const constructionImages = [
+    '/assets/featured-project-details/new-files/Amrit construction.jpeg',
+    '/assets/featured-project-details/new-files/Amrit Construction 2.jpeg',
+    '/assets/featured-project-details/new-files/Amrit Construction 3.jpeg',
+    '/assets/featured-project-details/new-files/Amrit Construction 4.jpeg',
+    '/assets/featured-project-details/new-files/Amrit Construction 5.jpeg',
+    '/assets/featured-project-details/new-files/Amrit Construction 6.jpeg'
   ];
 
   return (
@@ -75,16 +86,22 @@ export function FeaturedProject() {
             <div className="lg:w-2/3">
               {/* Tabs Navigation */}
               <div className="flex space-x-8 border-b border-gray-200 mb-12 overflow-x-auto pb-1">
-                {['gallery', 'amenities', 'layout'].map((tab) => (
+                {[
+                  { id: 'gallery', label: 'Gallery' },
+                  { id: 'amenities', label: 'Amenities' },
+                  { id: 'layout', label: 'Layout Plan' },
+                  { id: 'updates', label: 'Construction Updates' },
+                  { id: 'downloads', label: 'Documents' }
+                ].map((tab) => (
                   <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`py-4 text-xs font-bold uppercase tracking-[0.2em] whitespace-nowrap border-b-2 transition-all duration-300 ${activeTab === tab
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`py-4 text-xs font-bold uppercase tracking-[0.2em] whitespace-nowrap border-b-2 transition-all duration-300 ${activeTab === tab.id
                       ? 'border-brand-charcoal text-brand-charcoal'
                       : 'border-transparent text-gray-400 hover:text-brand-charcoal'
                       }`}
                   >
-                    {tab}
+                    {tab.label}
                   </button>
                 ))}
               </div>
@@ -141,6 +158,88 @@ export function FeaturedProject() {
                     </div>
                   </div>
                 )}
+
+                {activeTab === 'updates' && (
+                  <div className="animate-fade-in-up space-y-12">
+                    <h3 className="text-3xl font-heading text-brand-charcoal">Construction Updates</h3>
+                    
+                    {/* Native construction video */}
+                    <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                      <h4 className="text-lg font-semibold text-brand-charcoal mb-4 flex items-center gap-2">
+                        <Play size={18} className="text-brand-champagne" /> Live Site Update Video
+                      </h4>
+                      <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-brand-charcoal shadow-inner">
+                        <video
+                          src="/assets/featured-project-details/new-files/Amrit Construction Video.mp4"
+                          controls
+                          className="w-full h-full object-cover"
+                          poster="/assets/featured-project-details/new-files/Amrit construction.jpeg"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Construction image updates */}
+                    <div>
+                      <h4 className="text-lg font-semibold text-brand-charcoal mb-6 flex items-center gap-2">
+                        <Camera size={18} className="text-brand-champagne" /> Construction Site Gallery
+                      </h4>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {constructionImages.map((img, i) => (
+                          <div
+                            key={i}
+                            onClick={() => setLightboxImage(img)}
+                            className="relative aspect-square overflow-hidden rounded-xl cursor-pointer group bg-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300"
+                          >
+                            <img
+                              src={img}
+                              alt={`Construction Update ${i+1}`}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                            <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300"></div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === 'downloads' && (
+                  <div className="animate-fade-in-up space-y-8">
+                    <div>
+                      <h3 className="text-3xl font-heading text-brand-charcoal mb-3">Project Documents</h3>
+                      <p className="text-gray-500 font-light text-sm max-w-xl">
+                        View brochures, payment schedules, layouts, and latest configurations lists for Amrit Aarogyam.
+                      </p>
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 gap-6">
+                      {[
+                        { name: "Apartments Brochure (Latest)", file: "apartments Latest.pdf", size: "26.6 MB" },
+                        { name: "Penthouses Layout & FP (Latest)", file: "Penthouses_All _FP_latest.pdf", size: "24.5 MB" },
+                        { name: "HPG Price List (June 2026)", file: "Amrit-Aarogyam  Hp-Global-Infrra_Price List 13.6.26.pdf", size: "5.4 MB" },
+                        { name: "Penthouses Price List (July 2026)", file: "Penthouses Price List July 26.pdf", size: "9.0 MB" }
+                      ].map((pdf, idx) => (
+                        <div key={idx} className="bg-gray-50 border border-gray-100 rounded-2xl p-6 flex flex-col justify-between hover:border-brand-champagne/45 hover:bg-white transition-all duration-300">
+                          <div className="flex gap-4 items-start mb-6">
+                            <div className="p-3 bg-red-50 text-red-500 rounded-xl shrink-0">
+                              <FileText size={24} />
+                            </div>
+                            <div>
+                              <h4 className="text-base font-semibold text-brand-charcoal mb-1">{pdf.name}</h4>
+                              <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{pdf.size} • PDF Document</span>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => setActivePdfUrl(`/assets/featured-project-details/new-files/${pdf.file}`)}
+                            className="inline-flex items-center justify-center gap-2 w-full py-3 bg-brand-charcoal text-brand-champagne font-bold text-xs uppercase tracking-widest hover:bg-brand-champagne hover:text-brand-charcoal transition-all duration-300 cursor-pointer"
+                          >
+                            <Eye size={14} /> View Document
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -183,6 +282,35 @@ export function FeaturedProject() {
 
         </div>
       </section>
+
+      {/* Lightbox for construction gallery */}
+      {lightboxImage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 animate-fade-in" onClick={() => setLightboxImage(null)}>
+          <button className="absolute top-6 right-6 text-white hover:text-brand-champagne transition-colors" onClick={() => setLightboxImage(null)}>
+            <X size={32} />
+          </button>
+          <img src={lightboxImage} alt="Construction Update Detail" className="max-w-full max-h-[90vh] object-contain shadow-2xl rounded" />
+        </div>
+      )}
+
+      {/* Modal for PDF viewing */}
+      {activePdfUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" onClick={() => setActivePdfUrl(null)}>
+          <div className="bg-white rounded-2xl overflow-hidden shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col animate-fade-in-up" onClick={(e) => e.stopPropagation()}>
+            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-brand-charcoal text-white">
+              <span className="text-sm font-semibold tracking-wider uppercase">Document Viewer</span>
+              <button className="text-white hover:text-brand-champagne transition-colors cursor-pointer" onClick={() => setActivePdfUrl(null)}>
+                <X size={24} />
+              </button>
+            </div>
+            <iframe
+              src={`${activePdfUrl}#toolbar=0`}
+              className="w-full flex-grow border-0"
+              title="PDF Document Viewer"
+            />
+          </div>
+        </div>
+      )}
 
       <ProjectEnquiryModal
         isOpen={!!enquiryProject}

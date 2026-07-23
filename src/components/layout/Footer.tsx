@@ -44,9 +44,8 @@ export function Footer() {
             <h4 className="text-xs font-semibold mb-8 text-brand-charcoal tracking-[0.2em] uppercase">Headquarters</h4>
             <ul className="space-y-8">
               <li className="text-gray-500 font-light leading-relaxed">
-                B-302, T-3, NX-One,<br />
-                Tech Zone - 4, Amrapali Dream Valley,<br />
-                Greater Noida, UP, India
+                D-184, D Block, Sector-63,<br />
+                Noida-201309, Uttar Pradesh
               </li>
               <li className="text-gray-500 font-light">
                 <span className="block text-xs uppercase tracking-widest font-semibold text-brand-charcoal mb-2">Direct Line</span>

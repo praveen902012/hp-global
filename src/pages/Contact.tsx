@@ -85,9 +85,8 @@ export function Contact() {
                 <div>
                   <h3 className="text-sm font-semibold tracking-widest uppercase text-brand-charcoal mb-3">Corporate Office</h3>
                   <p className="text-gray-500 leading-loose font-light">
-                    B-302, T-3, NX-One, Tech Zone - 4,<br />
-                    Amrapali Dream Valley, Greater Noida,<br />
-                    Uttar Pradesh, India
+                    D-184, D Block, Sector-63,<br />
+                    Noida-201309, Uttar Pradesh
                   </p>
                 </div>
               </div>

@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npm run build && rsync -avz --delete dist/ root@164.52.198.160:/var/www/html/"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.101.1",

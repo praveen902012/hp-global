@@ -48,7 +48,7 @@ export default function Footer() {
             <ul className="space-y-4 text-sm text-brand-300">
               <li className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-accent-500 shrink-0" />
-                <span>B-302, T-3, NX-One, Tech Zone - 4<br />Amrapali Dream Valley, Greater Noida, UP, India</span>
+                <span>D-184, D Block, Sector-63,<br />Noida-201309, Uttar Pradesh</span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-accent-500 shrink-0" />

@@ -50,7 +50,7 @@ export const portfolioProjects = [
       "Launch Price Rising Soon to ₹19,445/Sq.ft.*"
     ],
     price: "₹16,633/Sq.ft*",
-    image: "/images/forestwalk.png",
+    image: "/images/forestwalk.jpeg",
   },
   {
     title: "CRC JOYOUS",
