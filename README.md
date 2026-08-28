@@ -1,74 +1,71 @@
-# React + TypeScript + Vite
+# HP Global
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Next.js + TypeScript app with App Router API routes backed by PostgreSQL. Docker Compose runs the Next app and a persistent PostgreSQL database behind the server's nginx reverse proxy.
 
-Currently, two official plugins are available:
+## PostgreSQL setup
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Copy `.env.example` to `.env` and update:
 
-## React Compiler
+- `DATABASE_URL`: PostgreSQL connection string
+- `POSTGRES_SSL`: set to `true` for hosted databases that require SSL
+- `POSTGRES_DB`: Docker PostgreSQL database name
+- `POSTGRES_USER`: Docker PostgreSQL user
+- `POSTGRES_PASSWORD`: Docker PostgreSQL password; generated automatically on first deploy
+- `ADMIN_EMAIL`: admin login email
+- `ADMIN_PASSWORD`: initial admin password, used until it is changed from the dashboard
+- `ADMIN_SESSION_SECRET`: signs persistent admin sessions; generated automatically on first deploy
+- `PORT`: Next server port, default `3000`
+- `APP_PORT`: host port exposed by the Next container for nginx to proxy, default `3002`
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+The API initializes the required PostgreSQL tables from `server/schema.sql` on first database access. Passwords changed from the admin dashboard are stored as salted `scrypt` hashes.
 
-## Expanding the ESLint configuration
+## Development
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Run the Next development server:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```sh
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The app and `/api` routes run from the same Next server.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Production
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Build the frontend:
+
+```sh
+npm run build
 ```
-# hp-global
+
+Start the production server:
+
+```sh
+npm start
+```
+
+`next start` serves the frontend and API routes from the same process.
+
+## Deploy
+
+Deploy the Dockerized app to the configured server:
+
+```sh
+npm run deploy
+```
+
+Defaults:
+
+- `DEPLOY_HOST=178.236.185.159`
+- `DEPLOY_USER=root`
+- `DEPLOY_PATH=/opt/hp-global`
+- `PUBLIC_URL=https://hpglobalinfra.com`
+- `APP_PORT=3002`
+- `COMPOSE_PROJECT=hp-global`
+
+The script uploads a timestamped release, preserves `/opt/hp-global/shared/.env`, rebuilds the Docker image, restarts Compose, removes old orphan services, and verifies the local app response.
+
+To skip local lint/build checks:
+
+```sh
+RUN_CHECKS=0 npm run deploy
+```

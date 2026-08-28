@@ -1,8 +1,10 @@
+"use client";
+
 import { useState, useEffect } from 'react';
 import { X, CheckCircle2 } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { api } from '../lib/api';
 
-interface Project {
+export interface Project {
   title: string;
   location: string;
   category?: string;
@@ -72,24 +74,22 @@ export function ProjectEnquiryModal({ isOpen, onClose, project }: ModalProps) {
     setError('');
     
     try {
-      const { error: dbError } = await supabase.from('enquiries').insert([{
+      await api.createEnquiry({
         name,
         phone,
         whatsapp_consent: consent,
         project_title: project.title
-      }]);
-
-      if (dbError) throw dbError;
+      });
 
       setIsSuccess(true);
       // Let the user see success message before closing automatically
       setTimeout(() => {
         onClose();
       }, 3000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error submitting enquiry:', err);
       // Show the exact database error to help the user know if the table is missing or RLS is failing
-      setError(err?.message || 'Something went wrong. Please try again later.');
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again later.');
     } finally {
       setIsSubmitting(false);
     }

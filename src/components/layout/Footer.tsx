@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
 export function Footer() {
@@ -27,13 +27,13 @@ export function Footer() {
             <ul className="space-y-6">
               {['Services', 'Investments', 'About', 'Journal'].map((item) => (
                 <li key={item}>
-                  <NavLink
-                    to={item === 'Journal' ? '/blog' : `/${item.toLowerCase()}`}
+                  <Link
+                    href={item === 'Journal' ? '/blog' : `/${item.toLowerCase()}`}
                     className="group inline-flex items-center text-gray-500 hover:text-brand-charcoal transition-colors duration-500"
                   >
                     <span className="text-sm font-light tracking-wide">{item}</span>
                     <ArrowUpRight size={14} className="ml-2 opacity-0 -translate-x-2 translate-y-2 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-300 text-brand-champagne" />
-                  </NavLink>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -61,7 +61,7 @@ export function Footer() {
           <div className="flex space-x-10">
             <a href="https://www.instagram.com/hpglobalinfra/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-charcoal transition-colors duration-500">Instagram</a>
             <a href="https://www.facebook.com/hpglobalinfra/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-charcoal transition-colors duration-500">Facebook</a>
-            <NavLink to="/privacy" onClick={() => window.scrollTo(0, 0)} className="hover:text-brand-charcoal transition-colors duration-500">Privacy Policy</NavLink>
+            <Link href="/privacy" className="hover:text-brand-charcoal transition-colors duration-500">Privacy Policy</Link>
           </div>
         </div>
       </div>

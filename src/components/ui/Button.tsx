@@ -1,5 +1,7 @@
+"use client";
+
 import { forwardRef, type ButtonHTMLAttributes } from "react";
-import { NavLink } from "react-router-dom";
+import Link from "next/link";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
@@ -30,9 +32,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     if (to) {
       return (
-        <NavLink to={to} className={classes}>
+        <Link href={to} className={classes}>
           {children}
-        </NavLink>
+        </Link>
       );
     }
 

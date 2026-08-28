@@ -1,5 +1,5 @@
 import { Bed, Bath, Square, MapPin } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 
 interface PropertyCardProps {
   id: string;
@@ -48,7 +48,7 @@ export default function PropertyCard({ id, title, price, address, beds, baths, s
           </div>
         </div>
 
-        <Link to={`/property/${id}`} className="block w-full text-center bg-brand-50 text-brand-900 font-medium py-3 rounded-xl border border-brand-200 hover:bg-brand-900 hover:text-white hover:border-brand-900 transition-all">
+        <Link href={`/property/${id}`} className="block w-full text-center bg-brand-50 text-brand-900 font-medium py-3 rounded-xl border border-brand-200 hover:bg-brand-900 hover:text-white hover:border-brand-900 transition-all">
           View Details
         </Link>
       </div>

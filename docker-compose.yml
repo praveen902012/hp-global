@@ -1,0 +1,35 @@
+services:
+  hp-global-db:
+    image: postgres:17-alpine
+    container_name: hp-global-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB:-hp_global}"
+      POSTGRES_USER: "${POSTGRES_USER:-hp_global}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    volumes:
+      - hp-global-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-hp_global} -d ${POSTGRES_DB:-hp_global}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  hp-global:
+    build: .
+    image: hp-global-next:latest
+    container_name: hp-global
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3002}:3000"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: "postgresql://${POSTGRES_USER:-hp_global}:${POSTGRES_PASSWORD}@hp-global-db:5432/${POSTGRES_DB:-hp_global}"
+      POSTGRES_SSL: "false"
+    depends_on:
+      hp-global-db:
+        condition: service_healthy
+
+volumes:
+  hp-global-postgres:

@@ -1,4 +1,6 @@
-import { NavLink } from "react-router-dom";
+"use client";
+
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 interface CardProps {
@@ -53,7 +55,7 @@ export function Card({ imageSrc, title, description, linkTo, date, author, class
   );
 
   if (linkTo) {
-    return <NavLink to={linkTo} className="block h-full group-wrapper">{content}</NavLink>;
+    return <Link href={linkTo} className="block h-full group-wrapper">{content}</Link>;
   }
 
   return content;
