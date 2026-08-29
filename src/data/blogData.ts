@@ -1,4 +1,17 @@
-export const blogs = [
+export interface BlogEntry {
+  id?: number;
+  slug: string;
+  title: string;
+  author: string;
+  date: string;
+  snippet: string;
+  content: string;
+  image: string;
+  contentFormat?: 'html' | 'text';
+  managed?: boolean;
+}
+
+export const blogs: BlogEntry[] = [
   {
     slug: "discover-the-growing-real-estate-market-in-ghaziabad",
     title: "Discover the Growing Real Estate Market in Ghaziabad",

@@ -5,9 +5,14 @@ import { useRouter } from 'next/navigation';
 import { api } from '../../lib/api';
 import { Button } from '../../components/ui/Button';
 
-export function AdminLogin() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+type DevelopmentCredentials = {
+  email: string;
+  password: string;
+};
+
+export function AdminLogin({ developmentCredentials }: { developmentCredentials?: DevelopmentCredentials }) {
+  const [email, setEmail] = useState(developmentCredentials?.email ?? '');
+  const [password, setPassword] = useState(developmentCredentials?.password ?? '');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();

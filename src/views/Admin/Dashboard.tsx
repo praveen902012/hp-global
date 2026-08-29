@@ -1,13 +1,16 @@
 "use client";
 
 import { api } from '../../lib/api';
+import type { PublishedArticle } from '../../lib/api';
 import { type FormEvent, useEffect, useState } from 'react';
-import { FileText, Building, KeyRound, Eye, EyeOff } from 'lucide-react';
+import Link from 'next/link';
+import { FileText, Building, KeyRound, Eye, EyeOff, ExternalLink } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 
 export function AdminDashboard() {
   const [blogCount, setBlogCount] = useState(0);
   const [propCount, setPropCount] = useState(0);
+  const [publishedArticles, setPublishedArticles] = useState<PublishedArticle[]>([]);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -21,6 +24,7 @@ export function AdminDashboard() {
         const stats = await api.getDashboardStats();
         setBlogCount(stats.blogs);
         setPropCount(stats.properties);
+        setPublishedArticles(stats.publishedArticles);
       } catch (error) {
         console.error('Error loading dashboard stats:', error);
       }
@@ -82,6 +86,35 @@ export function AdminDashboard() {
           </div>
         </div>
       </div>
+
+      <section className="mt-10 overflow-hidden border border-slate-200 bg-white shadow-sm rounded-lg">
+        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
+          <div>
+            <h2 className="text-lg font-heading text-brand-charcoal">Published Articles</h2>
+            <p className="mt-1 text-sm text-slate-500">All articles currently visible in the Journal.</p>
+          </div>
+          <Link href="/admin/articles" className="text-sm font-medium text-brand-champagne hover:text-brand-charcoal">
+            Manage articles
+          </Link>
+        </div>
+        {publishedArticles.length === 0 ? (
+          <p className="p-8 text-center text-sm text-slate-500">No published articles yet.</p>
+        ) : (
+          <div className="divide-y divide-slate-100">
+            {publishedArticles.map((article) => (
+              <div key={article.id} className="flex items-center justify-between gap-4 px-6 py-4">
+                <div className="min-w-0">
+                  <p className="truncate font-medium text-brand-charcoal">{article.title}</p>
+                  <p className="mt-1 text-xs text-slate-500">Published {new Date(article.publishedAt).toLocaleDateString()}</p>
+                </div>
+                <Link href={`/blog/${article.slug}`} target="_blank" aria-label={`View ${article.title}`} title="View article" className="flex h-9 w-9 shrink-0 items-center justify-center text-slate-500 hover:text-brand-champagne">
+                  <ExternalLink size={17} />
+                </Link>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
 
       <section className="mt-10 max-w-2xl border border-slate-200 shadow-sm rounded-lg bg-white">
         <div className="flex items-center gap-3 border-b border-slate-200 px-6 py-5">

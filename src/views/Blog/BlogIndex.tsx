@@ -1,7 +1,7 @@
 import { Card } from "../../components/ui/Card";
-import { blogs } from "../../data/blogData";
+import type { BlogEntry } from "../../data/blogData";
 
-export function BlogIndex() {
+export function BlogIndex({ blogs }: { blogs: BlogEntry[] }) {
   return (
     <div className="pt-40 pb-32 bg-brand-light-grey min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

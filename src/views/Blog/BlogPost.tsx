@@ -1,18 +1,8 @@
-import { blogs } from "../../data/blogData";
+import type { BlogEntry } from "../../data/blogData";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "../../components/ui/Button";
 
-interface BlogPostProps {
-  slug: string;
-}
-
-export function BlogPost({ slug }: BlogPostProps) {
-  const blog = blogs.find((b) => b.slug === slug);
-
-  if (!blog) {
-    return null;
-  }
-
+export function BlogPost({ blog }: { blog: BlogEntry }) {
   return (
     <article className="pt-40 pb-32 bg-brand-white min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 bg-brand-white">
@@ -42,17 +32,22 @@ export function BlogPost({ slug }: BlogPostProps) {
         </div>
 
         <div className="mx-auto max-w-3xl">
-          <div 
-            className="prose prose-lg max-w-none 
+          <div className="prose prose-lg max-w-none
                        text-gray-600 leading-loose prose-p:font-light 
                        prose-h3:text-brand-charcoal prose-h3:font-heading prose-h3:font-normal prose-h3:mt-20 prose-h3:mb-8 prose-h3:text-3xl
                        prose-strong:text-brand-charcoal prose-strong:font-semibold
                        prose-li:marker:text-brand-champagne
                        prose-ul:text-gray-600 prose-ul:font-light
                        prose-ol:text-gray-600 prose-ol:font-light
-                       prose-a:text-brand-charcoal hover:prose-a:text-brand-champagne prose-a:transition-colors prose-a:font-semibold prose-a:underline-offset-4"
-            dangerouslySetInnerHTML={{ __html: blog.content }}
-          />
+                       prose-a:text-brand-charcoal hover:prose-a:text-brand-champagne prose-a:transition-colors prose-a:font-semibold prose-a:underline-offset-4">
+            {blog.contentFormat === 'text' ? (
+              blog.content.split(/\n{2,}/).filter(Boolean).map((paragraph, index) => (
+                <p key={index} className="whitespace-pre-line">{paragraph}</p>
+              ))
+            ) : (
+              <div dangerouslySetInnerHTML={{ __html: blog.content }} />
+            )}
+          </div>
         </div>
       </div>
     </article>

@@ -1,3 +1,5 @@
+import { AdminArticles } from "../../../../views/Admin/Articles";
+
 export default function Page() {
-  return <div className="p-10 text-2xl">Articles coming soon...</div>;
+  return <AdminArticles />;
 }
