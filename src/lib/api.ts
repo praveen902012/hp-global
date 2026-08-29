@@ -18,6 +18,7 @@ export interface Enquiry {
 export interface DashboardStats {
   blogs: number;
   properties: number;
+  portfolioCategories: { hpg: number; partner: number };
   publishedArticles: PublishedArticle[];
 }
 
@@ -49,6 +50,13 @@ export interface BlogInput {
   image_url: string;
   published_at: string;
 }
+
+export interface BlogPage {
+  items: ManagedBlog[];
+  pagination: { page: number; limit: number; total: number };
+}
+
+export type { FeaturedProjectContent } from "../data/featuredProject";
 
 export interface PortfolioProject {
   id: number; portfolio_category: 'hpg' | 'partner'; project_type: 'commercial' | 'residential'; title: string; location: string; description: string; price: string; image_url: string; tags: string[]; sort_order: number; is_enabled: boolean;
@@ -131,8 +139,9 @@ export const api = {
     });
   },
 
-  listBlogs() {
-    return apiRequest<ManagedBlog[]>('/admin/blogs', { cache: 'no-store' });
+  listBlogs(params: { page?: number; limit?: number; search?: string } = {}) {
+    const query = new URLSearchParams(Object.entries(params).filter(([, value]) => value !== undefined && value !== "") as [string, string][]);
+    return apiRequest<BlogPage>(`/admin/blogs?${query}`, { cache: 'no-store' });
   },
 
   createBlog(input: BlogInput) {
@@ -153,6 +162,9 @@ export const api = {
     return apiRequest<{ ok: true }>(`/admin/blogs/${id}`, { method: 'DELETE' });
   },
 
+  getFeaturedProject() { return apiRequest<import("../data/featuredProject").FeaturedProjectContent>("/admin/featured-project", { cache: "no-store" }); },
+  updateFeaturedProject(content: import("../data/featuredProject").FeaturedProjectContent) { return apiRequest<import("../data/featuredProject").FeaturedProjectContent>("/admin/featured-project", { method: "PUT", body: JSON.stringify(content) }); },
+
   listPortfolio(params: { page?: number; limit?: number; search?: string; category?: string; type?: string } = {}) {
     const query = new URLSearchParams(Object.entries(params).filter(([, value]) => value !== undefined && value !== "") as [string, string][]);
     return apiRequest<PortfolioPage>(`/admin/portfolio?${query}`, { cache: 'no-store' });
@@ -166,6 +178,14 @@ export const api = {
     const response = await fetch('/api/admin/portfolio/upload', { method: 'POST', credentials: 'include', body: form });
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(payload.error || 'Unable to upload image.');
+    return payload as { image_url: string };
+  },
+  async uploadImage(file: File) {
+    const form = new FormData();
+    form.append("image", file);
+    const response = await fetch("/api/admin/media/images", { method: "POST", credentials: "include", body: form });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || "Unable to upload image.");
     return payload as { image_url: string };
   },
 };

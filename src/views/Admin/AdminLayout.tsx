@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard as IconDashboard, FileText as IconArticles, Building as IconProps, LogOut as IconLogout, MessageSquare as IconEnquiries, Mail as IconContacts, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { LayoutDashboard as IconDashboard, FileText as IconArticles, Building as IconProps, Star, LogOut as IconLogout, MessageSquare as IconEnquiries, Mail as IconContacts, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { api } from '../../lib/api';
 
 interface AdminSession {
@@ -39,6 +39,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     { href: '/admin', label: 'Dashboard', icon: IconDashboard, exact: true },
     { href: '/admin/articles', label: 'Articles', icon: IconArticles },
     { href: '/admin/properties', label: 'Portfolio', icon: IconProps },
+    { href: '/admin/featured-project', label: 'Featured Project', icon: Star },
     { href: '/admin/enquiries', label: 'Enquiries', icon: IconEnquiries },
     { href: '/admin/contacts', label: 'Contact Requests', icon: IconContacts },
   ];

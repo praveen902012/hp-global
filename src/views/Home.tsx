@@ -5,15 +5,19 @@ import { Card } from "../components/ui/Card";
 import { MoveRight, MapPin, Play, Camera, FileText, X, Check, Calendar, Eye } from "lucide-react";
 import { blogs } from "../data/blogData";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ProjectEnquiryModal, type Project } from "../components/ProjectEnquiryModal";
 import { PortfolioSection } from "../components/PortfolioSection";
+import { defaultFeaturedProject, iframeUrl, type FeaturedProjectContent } from "../data/featuredProject";
 
 export function Home() {
   const [portfolioTab, setPortfolioTab] = useState<'hpg' | 'partner'>('hpg');
   const [enquiryProject, setEnquiryProject] = useState<Project | null>(null);
   const [showVideo, setShowVideo] = useState(false);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const [featuredProject, setFeaturedProject] = useState<FeaturedProjectContent>(defaultFeaturedProject);
+
+  useEffect(() => { fetch('/api/featured-project').then((response) => response.ok ? response.json() : defaultFeaturedProject).then(setFeaturedProject).catch(() => undefined); }, []);
   const [activePdfUrl, setActivePdfUrl] = useState<string | null>(null);
 
   const commercialProjects = [
@@ -139,13 +143,13 @@ export function Home() {
             <div className="max-w-2xl">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-[1.5px] bg-brand-champagne"></div>
-                <span className="text-[11px] font-bold tracking-[0.4em] uppercase text-brand-champagne">Exclusive Showcase</span>
+                <span className="text-[11px] font-bold tracking-[0.4em] uppercase text-brand-champagne">{featuredProject.home.eyebrow}</span>
               </div>
               <h2 className="text-4xl md:text-6xl font-heading font-light text-brand-charcoal mb-6 tracking-tight leading-[1.1]">
-                Featured <span className="italic font-medium text-brand-champagne/80">Project</span>
+                {featuredProject.home.heading} <span className="italic font-medium text-brand-champagne/80">{featuredProject.home.accentHeading}</span>
               </h2>
               <p className="text-xl text-slate-500 font-light max-w-xl leading-relaxed">
-                Discover our latest masterpiece. A perfect blend of luxury, comfort, and modern architecture designed for the future.
+                {featuredProject.home.description}
               </p>
             </div>
             <div className="hidden md:block pb-2">
@@ -160,12 +164,12 @@ export function Home() {
             <div className="relative w-full pt-[56.25%] rounded-2xl overflow-hidden shadow-[0_32px_64px_-15px_rgba(0,0,0,0.3)] bg-brand-charcoal group">
               <iframe
                 className="absolute inset-0 w-full h-full"
-                src="https://www.youtube.com/embed/z4nivwEVlgM?autoplay=1&mute=1"
-                title="Explore Amrit Aarogyam | Complete Project Walkthrough by HP Global Infrra"
+                src={iframeUrl(featuredProject.iframe)}
+                title={featuredProject.iframe.title}
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
+                referrerPolicy={featuredProject.iframe.referrer_policy as React.HTMLAttributeReferrerPolicy}
+                allowFullScreen={featuredProject.iframe.allow_fullscreen}
               ></iframe>
 
             </div>
@@ -174,28 +178,27 @@ export function Home() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="relative h-[600px] w-full group overflow-hidden">
               <img
-                src="/assets/featured-project-details/projects-image/slider-05.jpg"
+                src={featuredProject.home.cardImage}
                 alt="Featured Project Overview"
                 className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-1000"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-brand-charcoal via-transparent to-transparent opacity-80"></div>
               <div className="absolute bottom-10 left-10 right-10">
-                <h3 className="text-3xl font-heading text-white mb-3">Amrit Aarogyam</h3>
-                <p className="text-slate-300 font-light mb-6">Premium apartments in Haridwar, Uttarakhand offering unparalleled living with state-of-the-art amenities.</p>
+                <h3 className="text-3xl font-heading text-white mb-3">{featuredProject.home.cardTitle}</h3>
+                <p className="text-slate-300 font-light mb-6">{featuredProject.home.cardDescription}</p>
                 <div className="flex gap-4">
-                  <span className="px-4 py-2 border border-white/20 text-xs text-white uppercase tracking-widest backdrop-blur-sm">Apartments</span>
-                  <span className="px-4 py-2 border border-white/20 text-xs text-white uppercase tracking-widest backdrop-blur-sm">Penthouses</span>
+                  {featuredProject.home.tags.map((tag) => <span key={tag} className="px-4 py-2 border border-white/20 text-xs text-white uppercase tracking-widest backdrop-blur-sm">{tag}</span>)}
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-6 h-[600px]">
               <div className="relative h-full overflow-hidden group">
-                <img src="/assets/featured-project-details/projects-image/slider-06.jpg" alt="Interior" className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-1000" />
+                <img src={featuredProject.home.galleryImages[0] || featuredProject.home.cardImage} alt="Interior" className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-1000" />
               </div>
               <div className="grid grid-rows-2 gap-6 h-full">
                 <div className="relative overflow-hidden group">
-                  <img src="/assets/featured-project-details/projects-image/slider-03.jpg" alt="Amenities" className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-1000" />
+                  <img src={featuredProject.home.galleryImages[1] || featuredProject.home.cardImage} alt="Amenities" className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-1000" />
                 </div>
                 <div className="relative overflow-hidden group bg-brand-champagne flex flex-col items-center justify-center p-8 text-center hover:bg-white transition-colors duration-500">
                   <h4 className="text-2xl font-heading text-brand-charcoal mb-4">Discover More</h4>

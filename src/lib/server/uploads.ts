@@ -16,7 +16,7 @@ export function uploadPath(filename: string) {
   return path.join(uploadsDirectory(), filename);
 }
 
-export async function savePortfolioImage(file: File) {
+export async function saveImage(file: File) {
   const extension = allowedTypes.get(file.type);
   if (!extension) throw new Error("Upload a JPG, PNG, WebP, or GIF image.");
   if (!file.size) throw new Error("Select an image to upload.");
@@ -35,3 +35,6 @@ export async function savePortfolioImage(file: File) {
   await fs.writeFile(path.join(uploadsDirectory(), filename), content);
   return `/api/media/${filename}`;
 }
+
+// Kept for the existing Portfolio endpoint during the generic media migration.
+export const savePortfolioImage = saveImage;

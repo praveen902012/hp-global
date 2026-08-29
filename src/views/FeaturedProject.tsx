@@ -1,48 +1,27 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MapPin, Check, FileText, Play, Camera, X, Eye } from 'lucide-react';
 import { ProjectEnquiryModal, type Project } from '../components/ProjectEnquiryModal';
+import { defaultFeaturedProject, iframeUrl, type FeaturedProjectContent } from '../data/featuredProject';
 
 export function FeaturedProject() {
   const [activeTab, setActiveTab] = useState('gallery');
   const [enquiryProject, setEnquiryProject] = useState<Project | null>(null);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   const [activePdfUrl, setActivePdfUrl] = useState<string | null>(null);
+  const [content, setContent] = useState<FeaturedProjectContent>(defaultFeaturedProject);
 
-  const galleryImages = [
-    { src: '/assets/featured-project-details/projects-image/1.jpeg', alt: 'Project Image 1' },
-    { src: '/assets/featured-project-details/projects-image/2.jpeg', alt: 'Project Image 2' },
-    { src: '/assets/featured-project-details/projects-image/3.jpg', alt: 'Project Image 3' },
-    { src: '/assets/featured-project-details/projects-image/slider-01.jpg', alt: 'Slider 1' },
-    { src: '/assets/featured-project-details/projects-image/slider-03.jpg', alt: 'Slider 3' },
-    { src: '/assets/featured-project-details/projects-image/slider-05.jpg', alt: 'Slider 5' },
-    { src: '/assets/featured-project-details/projects-image/slider-06.jpg', alt: 'Slider 6' },
-    { src: '/assets/featured-project-details/projects-image/overview-img1.jpg', alt: 'Overview 1' },
-    { src: '/assets/featured-project-details/projects-image/overview-img2.jpg', alt: 'Overview 2' },
-  ];
+  useEffect(() => { fetch('/api/featured-project').then((response) => response.ok ? response.json() : defaultFeaturedProject).then(setContent).catch(() => undefined); }, []);
 
-  const amenities = [
-    { name: 'Children Park', icon: '/assets/featured-project-details/projects-image/children-park.png' },
-    { name: 'Jogging Track', icon: '/assets/featured-project-details/projects-image/jogging.png' },
-    { name: 'Multi-Purpose Hall', icon: '/assets/featured-project-details/projects-image/multi-purpose-hall.png' },
-  ];
-
-  const constructionImages = [
-    '/assets/featured-project-details/new-files/Amrit construction.jpeg',
-    '/assets/featured-project-details/new-files/Amrit Construction 2.jpeg',
-    '/assets/featured-project-details/new-files/Amrit Construction 3.jpeg',
-    '/assets/featured-project-details/new-files/Amrit Construction 4.jpeg',
-    '/assets/featured-project-details/new-files/Amrit Construction 5.jpeg',
-    '/assets/featured-project-details/new-files/Amrit Construction 6.jpeg'
-  ];
+  const { hero, iframe, gallery: galleryImages, amenities, layout, construction, documents, sidebar } = content;
 
   return (
     <div className="bg-brand-white min-h-screen pt-20">
       {/* Hero Header */}
       <section className="relative h-[60vh] min-h-[500px] flex items-end pb-20 bg-brand-charcoal overflow-hidden group">
         <img
-          src="/assets/featured-project-details/projects-image/overview-img.jpg"
+          src={hero.image_url}
           alt="Featured Project Hero"
           className="absolute inset-0 w-full h-full object-cover opacity-50 transform group-hover:scale-105 transition-transform duration-1000"
         />
@@ -51,14 +30,14 @@ export function FeaturedProject() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-[1.5px] bg-brand-champagne"></div>
-            <span className="text-[11px] font-bold tracking-[0.4em] uppercase text-brand-champagne">Premium Residences</span>
+            <span className="text-[11px] font-bold tracking-[0.4em] uppercase text-brand-champagne">{hero.eyebrow}</span>
           </div>
           <h1 className="text-4xl md:text-7xl font-heading font-light text-white mb-6 tracking-tight leading-tight">
-            Amrit <span className="italic font-medium text-brand-champagne/80">Aarogyam</span>
+            {hero.title} <span className="italic font-medium text-brand-champagne/80">{hero.accentTitle}</span>
           </h1>
           <div className="flex items-center text-slate-300 gap-2 mb-8">
             <MapPin size={18} className="text-brand-champagne" />
-            <p className="font-light tracking-wide">Haridwar, Uttarakhand</p>
+            <p className="font-light tracking-wide">{hero.location}</p>
           </div>
         </div>
       </section>
@@ -69,12 +48,12 @@ export function FeaturedProject() {
           <div className="relative w-full pt-[56.25%] rounded-2xl overflow-hidden shadow-[0_32px_64px_-15px_rgba(0,0,0,0.3)] bg-brand-charcoal">
             <iframe
               className="absolute inset-0 w-full h-full"
-              src="https://www.youtube.com/embed/z4nivwEVlgM?autoplay=1&mute=1"
-              title="Explore Amrit Aarogyam | Complete Project Walkthrough by HP Global Infrra"
+              src={iframeUrl(iframe)}
+              title={iframe.title}
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerPolicy="strict-origin-when-cross-origin"
-              allowFullScreen
+              referrerPolicy={iframe.referrer_policy as React.HTMLAttributeReferrerPolicy}
+              allowFullScreen={iframe.allow_fullscreen}
             ></iframe>
           </div>
         </div>
@@ -153,8 +132,8 @@ export function FeaturedProject() {
                     <h3 className="text-3xl font-heading text-brand-charcoal mb-8">Master Layout Plan</h3>
                     <div className="border border-gray-200 p-2 bg-white shadow-sm overflow-hidden group">
                       <img
-                        src="/assets/featured-project-details/projects-image/layout-plan1.jpg"
-                        alt="Layout Plan"
+                        src={layout.image_url}
+                        alt={layout.alt}
                         className="w-full h-auto group-hover:scale-105 transition-transform duration-1000"
                       />
                     </div>
@@ -172,10 +151,10 @@ export function FeaturedProject() {
                       </h4>
                       <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-brand-charcoal shadow-inner">
                         <video
-                          src="/assets/featured-project-details/new-files/Amrit Construction Video.mp4"
+                          src={construction.video_url}
                           controls
                           className="w-full h-full object-cover"
-                          poster="/assets/featured-project-details/new-files/Amrit construction.jpeg"
+                          poster={construction.poster_url}
                         />
                       </div>
                     </div>
@@ -186,7 +165,7 @@ export function FeaturedProject() {
                         <Camera size={18} className="text-brand-champagne" /> Construction Site Gallery
                       </h4>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        {constructionImages.map((img, i) => (
+                        {construction.images.map((img, i) => (
                           <div
                             key={i}
                             onClick={() => setLightboxImage(img)}
@@ -215,12 +194,7 @@ export function FeaturedProject() {
                     </div>
 
                     <div className="grid sm:grid-cols-2 gap-6">
-                      {[
-                        { name: "Apartments Brochure (Latest)", file: "apartments Latest.pdf", size: "26.6 MB" },
-                        { name: "Penthouses Layout & FP (Latest)", file: "Penthouses_All _FP_latest.pdf", size: "24.5 MB" },
-                        { name: "HPG Price List (June 2026)", file: "Amrit-Aarogyam  Hp-Global-Infrra_Price List 13.6.26.pdf", size: "5.4 MB" },
-                        { name: "Penthouses Price List (July 2026)", file: "Penthouses Price List July 26.pdf", size: "9.0 MB" }
-                      ].map((pdf, idx) => (
+                      {documents.map((pdf, idx) => (
                         <div key={idx} className="bg-gray-50 border border-gray-100 rounded-2xl p-6 flex flex-col justify-between hover:border-brand-champagne/45 hover:bg-white transition-all duration-300">
                           <div className="flex gap-4 items-start mb-6">
                             <div className="p-3 bg-red-50 text-red-500 rounded-xl shrink-0">
@@ -232,7 +206,7 @@ export function FeaturedProject() {
                             </div>
                           </div>
                           <button
-                            onClick={() => setActivePdfUrl(`/assets/featured-project-details/new-files/${pdf.file}`)}
+                            onClick={() => setActivePdfUrl(pdf.url)}
                             className="inline-flex items-center justify-center gap-2 w-full py-3 bg-brand-charcoal text-brand-champagne font-bold text-xs uppercase tracking-widest hover:bg-brand-champagne hover:text-brand-charcoal transition-all duration-300 cursor-pointer"
                           >
                             <Eye size={14} /> View Document
@@ -249,34 +223,23 @@ export function FeaturedProject() {
               <div className="sticky top-32 bg-brand-charcoal p-10 shadow-2xl">
                 <div className="mb-8">
                   <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-brand-champagne mb-4 block">Project Status</span>
-                  <h3 className="text-white text-3xl font-heading font-light">Now Booking</h3>
+                  <h3 className="text-white text-3xl font-heading font-light">{sidebar.status}</h3>
                   <div className="w-12 h-[1px] bg-brand-champagne/50 mt-6 mb-8"></div>
                 </div>
 
                 <ul className="space-y-6 mb-10">
-                  <li className="flex items-start gap-4 text-slate-300">
-                    <Check size={18} className="text-brand-champagne mt-1 shrink-0" />
-                    <span className="font-light text-sm leading-relaxed">Premium Apartments & Luxury Penthouses</span>
-                  </li>
-                  <li className="flex items-start gap-4 text-slate-300">
-                    <Check size={18} className="text-brand-champagne mt-1 shrink-0" />
-                    <span className="font-light text-sm leading-relaxed">State-of-the-art security features</span>
-                  </li>
-                  <li className="flex items-start gap-4 text-slate-300">
-                    <Check size={18} className="text-brand-champagne mt-1 shrink-0" />
-                    <span className="font-light text-sm leading-relaxed">Strategic urban location with great connectivity</span>
-                  </li>
+                  {sidebar.items.map((item) => <li key={item} className="flex items-start gap-4 text-slate-300"><Check size={18} className="text-brand-champagne mt-1 shrink-0" /><span className="font-light text-sm leading-relaxed">{item}</span></li>)}
                 </ul>
 
                 <button
-                  onClick={() => setEnquiryProject({ title: "Amrit Aarogyam", location: "Haridwar, Uttarakhand", category: "Premium Residences" })}
+                  onClick={() => setEnquiryProject({ title: `${hero.title} ${hero.accentTitle}`, location: hero.location, category: hero.eyebrow })}
                   className="w-full justify-center bg-brand-champagne text-brand-charcoal hover:bg-white font-bold text-xs uppercase tracking-widest py-4 transition-colors duration-300"
                 >
-                  Register Interest
+                  {sidebar.button_label}
                 </button>
 
                 <p className="text-center text-xs text-white/40 mt-6 font-light">
-                  Our team will contact you within 24 hours to discuss your requirements.
+                  {sidebar.note}
                 </p>
               </div>
             </div>

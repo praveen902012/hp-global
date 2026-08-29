@@ -10,6 +10,7 @@ import { Button } from '../../components/ui/Button';
 export function AdminDashboard() {
   const [blogCount, setBlogCount] = useState(0);
   const [propCount, setPropCount] = useState(0);
+  const [portfolioCategories, setPortfolioCategories] = useState({ hpg: 0, partner: 0 });
   const [publishedArticles, setPublishedArticles] = useState<PublishedArticle[]>([]);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -24,6 +25,7 @@ export function AdminDashboard() {
         const stats = await api.getDashboardStats();
         setBlogCount(stats.blogs);
         setPropCount(stats.properties);
+        setPortfolioCategories(stats.portfolioCategories);
         setPublishedArticles(stats.publishedArticles);
       } catch (error) {
         console.error('Error loading dashboard stats:', error);
@@ -76,15 +78,17 @@ export function AdminDashboard() {
           </div>
         </div>
 
-        <div className="p-6 border border-slate-200 shadow-sm rounded-lg bg-white flex items-center justify-between">
+        <Link href="/admin/properties" className="group flex items-center justify-between rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-brand-champagne/40 hover:shadow-md">
           <div>
-            <p className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-1">Properties</p>
+            <p className="mb-1 text-xs font-bold uppercase tracking-widest text-slate-400">Portfolio listings</p>
             <h3 className="text-4xl font-heading text-brand-charcoal">{propCount}</h3>
+            <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[10px] font-bold uppercase tracking-wide text-slate-400"><span>HPG: {portfolioCategories.hpg}</span><span>Partner: {portfolioCategories.partner}</span></div>
+            <p className="mt-2 text-xs font-medium text-brand-champagne opacity-0 transition group-hover:opacity-100">Manage listings →</p>
           </div>
-          <div className="w-12 h-12 rounded-full bg-brand-champagne/10 text-brand-champagne flex items-center justify-center">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-champagne/10 text-brand-champagne">
             <Building size={24} />
           </div>
-        </div>
+        </Link>
       </div>
 
       <section className="mt-10 overflow-hidden border border-slate-200 bg-white shadow-sm rounded-lg">

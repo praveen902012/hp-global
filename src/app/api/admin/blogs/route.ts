@@ -20,7 +20,7 @@ function isHttpUrl(value: string) {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   const session = await requireAdminSession();
   if (!session) return NextResponse.json({ error: "Please sign in again." }, { status: 401 });
 
@@ -46,10 +46,19 @@ export async function GET() {
     ));
   }
 
+  const { searchParams } = new URL(request.url);
+  const page = Math.max(1, Number(searchParams.get("page")) || 1);
+  const limit = Math.min(50, Math.max(1, Number(searchParams.get("limit")) || 9));
+  const search = searchParams.get("search")?.trim();
+  const values: unknown[] = [];
+  const where = search ? (() => { values.push(`%${search}%`); return "WHERE title ILIKE $1 OR slug ILIKE $1"; })() : "";
+  const total = await query<{ count: number }>(`SELECT COUNT(*)::int AS count FROM blogs ${where}`, values);
+  values.push(limit, (page - 1) * limit);
   const result = await query<ManagedBlog>(
-    `SELECT ${blogFields} FROM blogs ORDER BY published_at DESC, created_at DESC`,
+    `SELECT ${blogFields} FROM blogs ${where} ORDER BY published_at DESC, created_at DESC LIMIT $${values.length - 1} OFFSET $${values.length}`,
+    values,
   );
-  return NextResponse.json(result.rows, {
+  return NextResponse.json({ items: result.rows, pagination: { page, limit, total: total.rows[0]?.count || 0 } }, {
     headers: { "Cache-Control": "private, no-store, max-age=0" },
   });
 }

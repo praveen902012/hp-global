@@ -64,3 +64,9 @@ CREATE TABLE IF NOT EXISTS portfolio_projects (
 );
 
 ALTER TABLE portfolio_projects ADD COLUMN IF NOT EXISTS is_enabled BOOLEAN NOT NULL DEFAULT TRUE;
+
+CREATE TABLE IF NOT EXISTS featured_project_settings (
+  id SMALLINT PRIMARY KEY CHECK (id = 1),
+  content JSONB NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
