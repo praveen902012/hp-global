@@ -4,7 +4,7 @@ import { uploadPath } from "../../../../lib/server/uploads";
 
 export const runtime = "nodejs";
 
-const contentTypes: Record<string, string> = { jpg: "image/jpeg", png: "image/png", webp: "image/webp", gif: "image/gif" };
+const contentTypes: Record<string, string> = { jpg: "image/jpeg", png: "image/png", webp: "image/webp", gif: "image/gif", pdf: "application/pdf" };
 
 export async function GET(_request: Request, { params }: { params: Promise<{ filename: string }> }) {
   const { filename } = await params;

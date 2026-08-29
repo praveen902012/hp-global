@@ -188,4 +188,12 @@ export const api = {
     if (!response.ok) throw new Error(payload.error || "Unable to upload image.");
     return payload as { image_url: string };
   },
+  async uploadDocument(file: File) {
+    const form = new FormData();
+    form.append("document", file);
+    const response = await fetch("/api/admin/media/documents", { method: "POST", credentials: "include", body: form });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || "Unable to upload document.");
+    return payload as { document_url: string; name: string; size: string };
+  },
 };

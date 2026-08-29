@@ -6,13 +6,14 @@ const allowedTypes = new Map([
   ["image/jpeg", ".jpg"], ["image/png", ".png"], ["image/webp", ".webp"], ["image/gif", ".gif"],
 ]);
 const maxUploadBytes = 10 * 1024 * 1024;
+const maxDocumentUploadBytes = 25 * 1024 * 1024;
 
 export function uploadsDirectory() {
   return process.env.UPLOADS_DIR || path.join(process.cwd(), "uploads");
 }
 
 export function uploadPath(filename: string) {
-  if (path.basename(filename) !== filename || !/^[a-f0-9-]+\.(jpg|png|webp|gif)$/.test(filename)) return null;
+  if (path.basename(filename) !== filename || !/^[a-f0-9-]+\.(jpg|png|webp|gif|pdf)$/.test(filename)) return null;
   return path.join(uploadsDirectory(), filename);
 }
 
@@ -32,6 +33,18 @@ export async function saveImage(file: File) {
 
   await fs.mkdir(uploadsDirectory(), { recursive: true });
   const filename = `${crypto.randomUUID()}${extension}`;
+  await fs.writeFile(path.join(uploadsDirectory(), filename), content);
+  return `/api/media/${filename}`;
+}
+
+export async function saveDocument(file: File) {
+  if (file.type !== "application/pdf") throw new Error("Upload a PDF document.");
+  if (!file.size) throw new Error("Select a document to upload.");
+  if (file.size > maxDocumentUploadBytes) throw new Error("Document must be 25 MB or smaller.");
+  const content = Buffer.from(await file.arrayBuffer());
+  if (content.subarray(0, 5).toString() !== "%PDF-") throw new Error("The uploaded file does not match its document type.");
+  await fs.mkdir(uploadsDirectory(), { recursive: true });
+  const filename = `${crypto.randomUUID()}.pdf`;
   await fs.writeFile(path.join(uploadsDirectory(), filename), content);
   return `/api/media/${filename}`;
 }
