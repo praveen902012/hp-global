@@ -41,8 +41,10 @@ set -euo pipefail
 timestamp="$(date +%Y%m%d%H%M%S)"
 release_dir="${DEPLOY_PATH}/releases/${timestamp}"
 shared_dir="${DEPLOY_PATH}/shared"
+uploads_dir="${shared_dir}/uploads"
 
 mkdir -p "${release_dir}" "${shared_dir}"
+mkdir -p "${uploads_dir}"
 tar -xzf "${REMOTE_ARCHIVE}" -C "${release_dir}"
 
 if [[ -f "${shared_dir}/.env" ]]; then
@@ -52,6 +54,8 @@ else
   cp "${shared_dir}/.env" "${release_dir}/.env"
   echo "Created ${shared_dir}/.env from .env.example. Update it with production values."
 fi
+
+grep -q '^HOST_UPLOADS_DIR=' "${shared_dir}/.env" || printf 'HOST_UPLOADS_DIR=%s\n' "${uploads_dir}" >> "${shared_dir}/.env"
 
 if ! grep -q '^POSTGRES_PASSWORD=.[[:print:]]*' "${shared_dir}/.env" \
   || grep -q '^POSTGRES_PASSWORD=replace-with-' "${shared_dir}/.env"; then
@@ -78,6 +82,8 @@ if ! grep -q '^ADMIN_SESSION_SECRET=.[[:print:]]*' "${shared_dir}/.env" \
   cp "${shared_dir}/.env" "${release_dir}/.env"
   echo "Generated persistent admin session secret."
 fi
+
+cp "${shared_dir}/.env" "${release_dir}/.env"
 
 ln -sfn "${release_dir}" "${DEPLOY_PATH}/current"
 

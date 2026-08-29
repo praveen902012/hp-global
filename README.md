@@ -69,3 +69,13 @@ To skip local lint/build checks:
 ```sh
 RUN_CHECKS=0 npm run deploy
 ```
+
+### Rsync deployment with schema migration
+
+Use the rsync deployment when you want to upload the release files directly instead of creating a tar archive:
+
+```sh
+npm run deploy:rsync
+```
+
+It uploads a timestamped release with `rsync`, preserves the server's shared `.env`, starts PostgreSQL, applies `server/schema.sql` with `psql -v ON_ERROR_STOP=1`, then rebuilds and health-checks the application container. The schema must remain idempotent because it is applied on every deployment.

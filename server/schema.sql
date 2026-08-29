@@ -46,3 +46,21 @@ CREATE TABLE IF NOT EXISTS admin_credentials (
   password_hash TEXT NOT NULL,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE TABLE IF NOT EXISTS portfolio_projects (
+  id BIGSERIAL PRIMARY KEY,
+  portfolio_category TEXT NOT NULL CHECK (portfolio_category IN ('hpg', 'partner')),
+  project_type TEXT NOT NULL CHECK (project_type IN ('commercial', 'residential')),
+  title TEXT NOT NULL,
+  location TEXT NOT NULL,
+  description TEXT NOT NULL,
+  price TEXT NOT NULL DEFAULT '',
+  image_url TEXT NOT NULL,
+  tags TEXT[] NOT NULL DEFAULT '{}',
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  is_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE portfolio_projects ADD COLUMN IF NOT EXISTS is_enabled BOOLEAN NOT NULL DEFAULT TRUE;

@@ -4,6 +4,9 @@ import { query } from "./db";
 
 const sessionCookieName = "hpg_admin_session";
 const sessionDuration = 24 * 60 * 60 * 1000;
+const loginAttempts = new Map<string, { count: number; resetAt: number }>();
+const loginLimit = 5;
+const loginWindowMs = 15 * 60 * 1000;
 
 interface SessionPayload {
   email: string;
@@ -17,9 +20,31 @@ function sameSecret(a: string, b: string) {
 }
 
 function getSessionSecret() {
-  const secret = process.env.ADMIN_SESSION_SECRET || process.env.ADMIN_PASSWORD;
-  if (!secret) throw new Error("ADMIN_SESSION_SECRET or ADMIN_PASSWORD is required.");
+  const secret = process.env.ADMIN_SESSION_SECRET || (process.env.NODE_ENV !== "production" ? process.env.ADMIN_PASSWORD : undefined);
+  if (!secret) throw new Error("ADMIN_SESSION_SECRET is required in production.");
   return secret;
+}
+
+export function loginRateLimitKey(ip: string, email: string) {
+  return `${ip}:${email.trim().toLowerCase()}`;
+}
+
+export function isLoginRateLimited(key: string) {
+  const attempt = loginAttempts.get(key);
+  if (!attempt) return false;
+  if (attempt.resetAt <= Date.now()) { loginAttempts.delete(key); return false; }
+  return attempt.count >= loginLimit;
+}
+
+export function recordLoginFailure(key: string) {
+  const current = loginAttempts.get(key);
+  const attempt = !current || current.resetAt <= Date.now() ? { count: 0, resetAt: Date.now() + loginWindowMs } : current;
+  attempt.count += 1;
+  loginAttempts.set(key, attempt);
+}
+
+export function clearLoginFailures(key: string) {
+  loginAttempts.delete(key);
 }
 
 function signSession(payload: SessionPayload) {

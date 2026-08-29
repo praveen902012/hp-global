@@ -8,7 +8,8 @@
     "build": "next build --webpack",
     "lint": "eslint .",
     "start": "next start",
-    "deploy": "scripts/deploy.sh"
+    "deploy": "scripts/deploy.sh",
+    "deploy:rsync": "scripts/deploy-rsync.sh"
   },
   "dependencies": {
     "@types/leaflet": "^1.9.21",

@@ -27,6 +27,9 @@ services:
     environment:
       DATABASE_URL: "postgresql://${POSTGRES_USER:-hp_global}:${POSTGRES_PASSWORD}@hp-global-db:5432/${POSTGRES_DB:-hp_global}"
       POSTGRES_SSL: "false"
+      UPLOADS_DIR: "/app/uploads"
+    volumes:
+      - "${HOST_UPLOADS_DIR:-./uploads}:/app/uploads"
     depends_on:
       hp-global-db:
         condition: service_healthy

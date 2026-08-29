@@ -7,6 +7,7 @@ import { blogs } from "../data/blogData";
 import Link from "next/link";
 import { useState } from "react";
 import { ProjectEnquiryModal, type Project } from "../components/ProjectEnquiryModal";
+import { PortfolioSection } from "../components/PortfolioSection";
 
 export function Home() {
   const [portfolioTab, setPortfolioTab] = useState<'hpg' | 'partner'>('hpg');
@@ -214,8 +215,10 @@ export function Home() {
         </div>
       </section>
 
-      {/* Our Projects Portfolio Section */}
-      <section className="py-32 bg-brand-light-grey relative overflow-hidden">
+      <PortfolioSection />
+
+      {/* Legacy portfolio markup retained for reference; live content is rendered above. */}
+      <section className="hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
           <div className="text-center mb-16">

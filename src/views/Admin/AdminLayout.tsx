@@ -35,7 +35,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const adminLinks = [
     { href: '/admin', label: 'Dashboard', icon: IconDashboard, exact: true },
     { href: '/admin/articles', label: 'Articles', icon: IconArticles },
-    { href: '/admin/properties', label: 'Properties', icon: IconProps },
+    { href: '/admin/properties', label: 'Portfolio', icon: IconProps },
     { href: '/admin/enquiries', label: 'Enquiries', icon: IconEnquiries },
     { href: '/admin/contacts', label: 'Contact Requests', icon: IconContacts },
   ];

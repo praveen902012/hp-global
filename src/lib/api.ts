@@ -50,6 +50,12 @@ export interface BlogInput {
   published_at: string;
 }
 
+export interface PortfolioProject {
+  id: number; portfolio_category: 'hpg' | 'partner'; project_type: 'commercial' | 'residential'; title: string; location: string; description: string; price: string; image_url: string; tags: string[]; sort_order: number; is_enabled: boolean;
+}
+export type PortfolioInput = Omit<PortfolioProject, 'id'>;
+export interface PortfolioPage { items: PortfolioProject[]; pagination: { page: number; limit: number; total: number }; }
+
 async function apiRequest<T>(path: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(`/api${path}`, {
     credentials: 'include',
@@ -145,5 +151,21 @@ export const api = {
 
   deleteBlog(id: number) {
     return apiRequest<{ ok: true }>(`/admin/blogs/${id}`, { method: 'DELETE' });
+  },
+
+  listPortfolio(params: { page?: number; limit?: number; search?: string; category?: string; type?: string } = {}) {
+    const query = new URLSearchParams(Object.entries(params).filter(([, value]) => value !== undefined && value !== "") as [string, string][]);
+    return apiRequest<PortfolioPage>(`/admin/portfolio?${query}`, { cache: 'no-store' });
+  },
+  createPortfolio(input: PortfolioInput) { return apiRequest<PortfolioProject>('/admin/portfolio', { method: 'POST', body: JSON.stringify(input) }); },
+  updatePortfolio(id: number, input: PortfolioInput) { return apiRequest<PortfolioProject>(`/admin/portfolio/${id}`, { method: 'PUT', body: JSON.stringify(input) }); },
+  deletePortfolio(id: number) { return apiRequest<{ ok: true }>(`/admin/portfolio/${id}`, { method: 'DELETE' }); },
+  async uploadPortfolioImage(file: File) {
+    const form = new FormData();
+    form.append('image', file);
+    const response = await fetch('/api/admin/portfolio/upload', { method: 'POST', credentials: 'include', body: form });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || 'Unable to upload image.');
+    return payload as { image_url: string };
   },
 };
