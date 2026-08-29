@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard as IconDashboard, FileText as IconArticles, Building as IconProps, LogOut as IconLogout, MessageSquare as IconEnquiries, Mail as IconContacts } from 'lucide-react';
+import { LayoutDashboard as IconDashboard, FileText as IconArticles, Building as IconProps, LogOut as IconLogout, MessageSquare as IconEnquiries, Mail as IconContacts, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { api } from '../../lib/api';
 
 interface AdminSession {
@@ -17,6 +17,7 @@ interface AdminLayoutProps {
 export function AdminLayout({ children }: AdminLayoutProps) {
   const [session, setSession] = useState<AdminSession | null>(null);
   const [loading, setLoading] = useState(true);
+  const [collapsed, setCollapsed] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -26,6 +27,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       .catch(() => setSession(null))
       .finally(() => setLoading(false));
   }, []);
+
+  const toggleSidebar = () => setCollapsed((current) => !current);
 
   const handleLogout = async () => {
     await api.logout();
@@ -54,29 +57,32 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <div className="min-h-screen bg-brand-light-grey flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-brand-charcoal text-white flex flex-col">
-        <div className="p-6 border-b border-white/10">
-          <h2 className="text-xl font-heading font-bold text-brand-champagne">HP Global</h2>
-          <p className="text-xs text-slate-400 uppercase tracking-widest mt-1">Admin Panel</p>
+      <aside className={`${collapsed ? 'w-20' : 'w-64'} shrink-0 bg-brand-charcoal text-white flex flex-col transition-[width] duration-300`}>
+        <div className={`${collapsed ? 'p-4' : 'p-6'} flex min-h-[90px] items-center justify-between border-b border-white/10`}>
+          {!collapsed && <div><h2 className="text-xl font-heading font-bold text-brand-champagne">HP Global</h2><p className="mt-1 text-xs uppercase tracking-widest text-slate-400">Admin Panel</p></div>}
+          <button type="button" onClick={toggleSidebar} className="rounded-md p-2 text-brand-champagne transition-colors hover:bg-white/10" aria-label={collapsed ? 'Expand admin menu' : 'Collapse admin menu'} title={collapsed ? 'Expand menu' : 'Collapse menu'}>
+            {collapsed ? <PanelLeftOpen size={20}/> : <PanelLeftClose size={20}/>} 
+          </button>
         </div>
 
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className={`${collapsed ? 'p-3' : 'p-4'} flex-1 space-y-2`} aria-label="Admin navigation">
           {adminLinks.map(({ href, label, icon: Icon, exact }) => (
             <Link
               key={href}
               href={href}
-              className={`flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${isActiveLink(href, exact) ? 'bg-brand-champagne text-brand-charcoal font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white'}`}
+              className={`flex items-center ${collapsed ? 'justify-center px-3' : 'gap-3 px-4'} py-3 rounded-md transition-colors ${isActiveLink(href, exact) ? 'bg-brand-champagne text-brand-charcoal font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white'}`}
+              title={collapsed ? label : undefined}
             >
               <Icon size={18} />
-              {label}
+              {!collapsed && label}
             </Link>
           ))}
         </nav>
 
-        <div className="p-4 border-t border-white/10">
-          <button onClick={handleLogout} className="flex items-center gap-3 px-4 py-3 w-full text-left rounded-md text-red-300 hover:bg-white/5 transition-colors">
+        <div className={`${collapsed ? 'p-3' : 'p-4'} border-t border-white/10`}>
+          <button onClick={handleLogout} className={`flex w-full items-center ${collapsed ? 'justify-center px-3' : 'gap-3 px-4'} py-3 text-left rounded-md text-red-300 hover:bg-white/5 transition-colors`} title={collapsed ? 'Logout' : undefined}>
             <IconLogout size={18} />
-            Logout
+            {!collapsed && 'Logout'}
           </button>
         </div>
       </aside>
