@@ -4,8 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
+import { isInternalHref, type MenuItem } from "../../data/siteMenu";
+import { MenuLink } from "./MenuLink";
 
-export function Navbar() {
+export function Navbar({ links }: { links: MenuItem[] }) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
@@ -18,16 +20,12 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const links = [
-    { to: "/", label: "Home" },
-    { to: "/services", label: "Services" },
-    { to: "/about", label: "Our Story" },
-    { to: "/investments", label: "Investments" },
-    { to: "/blog", label: "Journal" },
-    { to: "/contact", label: "Contact" },
-  ];
 
-  const isActiveLink = (href: string) => href === "/" ? pathname === "/" : (pathname || "").startsWith(href);
+  const isActiveLink = (href: string) => {
+    if (!isInternalHref(href)) return false;
+    const path = href.split(/[?#]/)[0];
+    return path === "/" ? pathname === "/" : (pathname || "").startsWith(path);
+  };
 
   return (
     <nav className={`fixed w-full top-0 z-50 transition-all duration-500 ${scrolled ? 'bg-brand-charcoal/95 backdrop-blur-md shadow-lg border-b border-brand-champagne/10 py-3' : 'bg-brand-charcoal shadow-2xl py-5'}`}>
@@ -47,16 +45,16 @@ export function Navbar() {
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center space-x-10">
             {links.map((link) => (
-              <Link
-                key={link.to}
-                href={link.to}
-                className={`text-xs font-semibold uppercase tracking-[0.15em] transition-colors duration-500 relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-full after:h-[1px] after:bg-brand-champagne after:scale-x-0 after:origin-right hover:after:scale-x-100 hover:after:origin-left after:transition-transform after:duration-500 ${isActiveLink(link.to)
+              <MenuLink
+                key={`${link.href}-${link.label}`}
+                item={link}
+                className={`text-xs font-semibold uppercase tracking-[0.15em] transition-colors duration-500 relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-full after:h-[1px] after:bg-brand-champagne after:scale-x-0 after:origin-right hover:after:scale-x-100 hover:after:origin-left after:transition-transform after:duration-500 ${isActiveLink(link.href)
                     ? "text-brand-champagne after:scale-x-100"
                     : "text-slate-300 hover:text-white"
                   }`}
               >
                 {link.label}
-              </Link>
+              </MenuLink>
             ))}
           </div>
 
@@ -73,18 +71,18 @@ export function Navbar() {
       </div>
 
       {/* Mobile Nav */}
-      <div className={`md:hidden absolute top-full left-0 w-full bg-brand-charcoal border-b border-white/10 shadow-2xl overflow-hidden transition-all duration-500 ease-in-out ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+      <div className={`md:hidden absolute top-full left-0 w-full bg-brand-charcoal border-b border-white/10 shadow-2xl overflow-hidden transition-all duration-500 ease-in-out ${isOpen ? 'max-h-[80vh] overflow-y-auto opacity-100' : 'max-h-0 opacity-0'}`}>
         <div className="px-6 py-8 space-y-6">
           {links.map((link) => (
-            <Link
-              key={link.to}
-              href={link.to}
+            <MenuLink
+              key={`${link.href}-${link.label}`}
+              item={link}
               onClick={() => setIsOpen(false)}
-              className={`block text-sm font-medium uppercase tracking-[0.2em] transition-colors ${isActiveLink(link.to) ? "text-brand-champagne" : "text-slate-400 hover:text-white"
+              className={`block text-sm font-medium uppercase tracking-[0.2em] transition-colors ${isActiveLink(link.href) ? "text-brand-champagne" : "text-slate-400 hover:text-white"
                 }`}
             >
               {link.label}
-            </Link>
+            </MenuLink>
           ))}
         </div>
       </div>

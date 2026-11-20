@@ -3,14 +3,14 @@
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
 import { MoveRight, MapPin, Play, Camera, FileText, X, Check, Calendar, Eye } from "lucide-react";
-import { blogs } from "../data/blogData";
+import { blogs as builtInBlogs, type BlogEntry } from "../data/blogData";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ProjectEnquiryModal, type Project } from "../components/ProjectEnquiryModal";
 import { PortfolioSection } from "../components/PortfolioSection";
 import { defaultFeaturedProject, iframeUrl, type FeaturedProjectContent } from "../data/featuredProject";
 
-export function Home() {
+export function Home({ latestBlogs = builtInBlogs.slice(0, 3) }: { latestBlogs?: BlogEntry[] } = {}) {
   const [portfolioTab, setPortfolioTab] = useState<'hpg' | 'partner'>('hpg');
   const [enquiryProject, setEnquiryProject] = useState<Project | null>(null);
   const [showVideo, setShowVideo] = useState(false);
@@ -708,7 +708,7 @@ export function Home() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-10 lg:gap-14 mb-16">
-            {blogs.slice(0, 3).map((blog) => (
+            {latestBlogs.slice(0, 3).map((blog) => (
               <Card
                 key={blog.slug}
                 imageSrc={blog.image}

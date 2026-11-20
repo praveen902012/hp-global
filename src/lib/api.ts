@@ -165,6 +165,9 @@ export const api = {
   getFeaturedProject() { return apiRequest<import("../data/featuredProject").FeaturedProjectContent>("/admin/featured-project", { cache: "no-store" }); },
   updateFeaturedProject(content: import("../data/featuredProject").FeaturedProjectContent) { return apiRequest<import("../data/featuredProject").FeaturedProjectContent>("/admin/featured-project", { method: "PUT", body: JSON.stringify(content) }); },
 
+  getMenu() { return apiRequest<import("../data/siteMenu").SiteMenu>("/admin/menu", { cache: "no-store" }); },
+  updateMenu(menu: import("../data/siteMenu").SiteMenu) { return apiRequest<import("../data/siteMenu").SiteMenu>("/admin/menu", { method: "PUT", body: JSON.stringify(menu) }); },
+
   listPortfolio(params: { page?: number; limit?: number; search?: string; category?: string; type?: string } = {}) {
     const query = new URLSearchParams(Object.entries(params).filter(([, value]) => value !== undefined && value !== "") as [string, string][]);
     return apiRequest<PortfolioPage>(`/admin/portfolio?${query}`, { cache: 'no-store' });

@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { type MenuItem } from "../../data/siteMenu";
+import { MenuLink } from "./MenuLink";
 
-export function Footer() {
+export function Footer({ links }: { links: MenuItem[] }) {
   return (
     <footer className="bg-brand-light-grey border-t border-gray-200 text-brand-charcoal pt-32 pb-16 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -25,15 +27,15 @@ export function Footer() {
           <div className="md:col-span-3">
             <h4 className="text-xs font-semibold mb-8 text-brand-charcoal tracking-[0.2em] uppercase">Navigation</h4>
             <ul className="space-y-6">
-              {['Services', 'Investments', 'About', 'Journal'].map((item) => (
-                <li key={item}>
-                  <Link
-                    href={item === 'Journal' ? '/blog' : `/${item.toLowerCase()}`}
+              {links.map((item) => (
+                <li key={`${item.href}-${item.label}`}>
+                  <MenuLink
+                    item={item}
                     className="group inline-flex items-center text-gray-500 hover:text-brand-charcoal transition-colors duration-500"
                   >
-                    <span className="text-sm font-light tracking-wide">{item}</span>
+                    <span className="text-sm font-light tracking-wide">{item.label}</span>
                     <ArrowUpRight size={14} className="ml-2 opacity-0 -translate-x-2 translate-y-2 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-300 text-brand-champagne" />
-                  </Link>
+                  </MenuLink>
                 </li>
               ))}
             </ul>
