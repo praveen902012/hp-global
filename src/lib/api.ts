@@ -64,6 +64,8 @@ export interface PortfolioProject {
 export type PortfolioInput = Omit<PortfolioProject, 'id'>;
 export interface PortfolioPage { items: PortfolioProject[]; pagination: { page: number; limit: number; total: number }; }
 
+export type AdminPage = import("../data/pages").SitePage & { menus: ("header" | "footer")[] };
+
 async function apiRequest<T>(path: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(`/api${path}`, {
     credentials: 'include',
@@ -167,6 +169,13 @@ export const api = {
 
   getMenu() { return apiRequest<import("../data/siteMenu").SiteMenu>("/admin/menu", { cache: "no-store" }); },
   updateMenu(menu: import("../data/siteMenu").SiteMenu) { return apiRequest<import("../data/siteMenu").SiteMenu>("/admin/menu", { method: "PUT", body: JSON.stringify(menu) }); },
+
+  listPages() { return apiRequest<import("../data/pages").PageSummary[]>("/admin/pages", { cache: "no-store" }); },
+  createPage(input: { title: string; slug: string }) { return apiRequest<import("../data/pages").SitePage>("/admin/pages", { method: "POST", body: JSON.stringify(input) }); },
+  getPage(id: number) { return apiRequest<AdminPage>(`/admin/pages/${id}`, { cache: "no-store" }); },
+  updatePage(id: number, content: import("../data/pages").PageContent) { return apiRequest<AdminPage>(`/admin/pages/${id}`, { method: "PUT", body: JSON.stringify(content) }); },
+  setPagePublished(id: number, input: { published: boolean; add_to_menu?: ("header" | "footer")[]; menu_label?: string }) { return apiRequest<AdminPage & { menu_full: ("header" | "footer")[]; removed_menu_links: number }>(`/admin/pages/${id}/publish`, { method: "POST", body: JSON.stringify(input) }); },
+  deletePage(id: number) { return apiRequest<{ ok: true; removed_menu_links: number }>(`/admin/pages/${id}`, { method: "DELETE" }); },
 
   listPortfolio(params: { page?: number; limit?: number; search?: string; category?: string; type?: string } = {}) {
     const query = new URLSearchParams(Object.entries(params).filter(([, value]) => value !== undefined && value !== "") as [string, string][]);

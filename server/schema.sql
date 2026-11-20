@@ -76,3 +76,15 @@ CREATE TABLE IF NOT EXISTS site_settings (
   content JSONB NOT NULL,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE TABLE IF NOT EXISTS pages (
+  id BIGSERIAL PRIMARY KEY,
+  slug TEXT NOT NULL UNIQUE,
+  title TEXT NOT NULL,
+  meta_description TEXT NOT NULL DEFAULT '',
+  sections JSONB NOT NULL DEFAULT '[]'::jsonb,
+  status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'published')),
+  published_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
