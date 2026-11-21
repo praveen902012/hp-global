@@ -22,6 +22,7 @@ export const sitePages = [
   { href: "/listings", label: "Listings" },
   { href: "/featured-project", label: "Featured Project" },
   { href: "/blog", label: "Journal" },
+  { href: "/media", label: "In the News" },
   { href: "/contact", label: "Contact" },
   { href: "/privacy", label: "Privacy Policy" },
 ];

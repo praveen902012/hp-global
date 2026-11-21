@@ -88,3 +88,22 @@ CREATE TABLE IF NOT EXISTS pages (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE TABLE IF NOT EXISTS press_clippings (
+  id BIGSERIAL PRIMARY KEY,
+  media_type TEXT NOT NULL CHECK (media_type IN ('print', 'video', 'online')),
+  publication TEXT NOT NULL,
+  headline TEXT NOT NULL,
+  summary TEXT NOT NULL DEFAULT '',
+  published_on DATE NOT NULL,
+  project TEXT NOT NULL DEFAULT '',
+  image_url TEXT NOT NULL DEFAULT '',
+  document_url TEXT NOT NULL DEFAULT '',
+  video_url TEXT NOT NULL DEFAULT '',
+  article_url TEXT NOT NULL DEFAULT '',
+  is_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS press_clippings_project_idx ON press_clippings (lower(project));

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import { ProjectPress } from '../components/press/ProjectPress';
 import { MapPin, Check, FileText, Play, Camera, X, Eye } from 'lucide-react';
 import { ProjectEnquiryModal, type Project } from '../components/ProjectEnquiryModal';
 import { defaultFeaturedProject, iframeUrl, type FeaturedProjectContent } from '../data/featuredProject';
@@ -247,6 +248,8 @@ export function FeaturedProject() {
 
         </div>
       </section>
+
+      <ProjectPress project={`${hero.title} ${hero.accentTitle}`.trim()} />
 
       {/* Lightbox for construction gallery */}
       {lightboxImage && (
