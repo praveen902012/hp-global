@@ -27,9 +27,14 @@ function Eyebrow({ children }: { children: string }) {
   return <span className="mb-6 block text-[10px] font-bold uppercase tracking-[0.3em] text-brand-champagne">{children}</span>;
 }
 
-function Heading({ children, dark, center, as: Tag = "h2" }: { children: string; dark: boolean; center?: boolean; as?: "h1" | "h2" }) {
-  if (!children) return null;
-  return <Tag className={`mb-8 font-heading text-3xl font-light tracking-tight md:text-5xl ${dark ? "text-white" : "text-brand-charcoal"} ${center ? "text-center" : ""}`}>{children}</Tag>;
+function Heading({ children, accent, dark, center, as: Tag = "h2" }: { children: string; accent?: string; dark: boolean; center?: boolean; as?: "h1" | "h2" }) {
+  if (!children && !accent) return null;
+  return (
+    <Tag className={`mb-8 font-heading text-3xl font-light tracking-tight md:text-5xl ${accent ? "lg:leading-snug" : ""} ${dark ? "text-white" : "text-brand-charcoal"} ${center ? "text-center" : ""}`}>
+      {children}
+      {accent && <>{children && <br />}<span className="font-normal italic text-brand-champagne">{accent}</span></>}
+    </Tag>
+  );
 }
 
 function ButtonLink({ label, href, dark }: { label: string; href: string; dark: boolean }) {
@@ -83,15 +88,16 @@ function Section({ section, isFirst }: { section: PageSection; isFirst: boolean 
     case "image_text":
       return (
         <Shell background={section.background}>
-          <div className={`flex flex-col items-center gap-16 lg:gap-24 ${section.image_position === "left" ? "lg:flex-row-reverse" : "lg:flex-row"}`}>
+          <div className={`flex flex-col items-center gap-16 lg:gap-32 ${section.image_position === "left" ? "lg:flex-row-reverse" : "lg:flex-row"}`}>
             <div className="lg:w-1/2">
               <Eyebrow>{section.eyebrow}</Eyebrow>
               {section.eyebrow && <div className={`mb-10 h-[1px] w-12 ${dark ? "bg-brand-champagne" : "bg-brand-charcoal"}`} />}
-              <Heading dark={dark} as={isFirst ? "h1" : "h2"}>{section.heading}</Heading>
+              <Heading dark={dark} accent={section.accent_heading} as={isFirst ? "h1" : "h2"}>{section.heading}</Heading>
               {section.body && <div className={`${richText(dark)} mb-10 max-w-xl`} dangerouslySetInnerHTML={{ __html: section.body }} />}
+              {section.tagline && <p className={`mb-10 max-w-xl text-sm font-semibold uppercase tracking-widest ${dark ? "text-white" : "text-brand-charcoal"}`}>{section.tagline}</p>}
               <ButtonLink label={section.button_label} href={section.button_href} dark={dark} />
             </div>
-            <div className={`relative h-[420px] w-full lg:h-[560px] lg:w-1/2 ${dark ? "bg-white/5" : "bg-brand-beige"}`}>
+            <div className={`relative h-[420px] w-full lg:h-[600px] lg:w-1/2 ${dark ? "bg-white/5" : "bg-brand-beige"}`}>
               <div className="absolute inset-4 overflow-hidden border border-brand-champagne/30">
                 <img src={section.image_url} alt={section.image_alt} loading="lazy" className="h-full w-full object-cover transition-transform duration-1000 hover:scale-105" />
               </div>
@@ -219,7 +225,7 @@ function Section({ section, isFirst }: { section: PageSection; isFirst: boolean 
 export function PageSections({ sections }: { sections: PageSection[] }) {
   const startsWithHero = sections[0]?.type === "hero";
   return (
-    <div className={startsWithHero ? "" : "pt-24"}>
+    <div className={startsWithHero ? "" : "pt-8"}>
       {sections.map((section, index) => <Section key={section.id} section={section} isFirst={index === 0} />)}
     </div>
   );

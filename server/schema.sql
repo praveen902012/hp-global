@@ -107,3 +107,6 @@ CREATE TABLE IF NOT EXISTS press_clippings (
 );
 
 CREATE INDEX IF NOT EXISTS press_clippings_project_idx ON press_clippings (lower(project));
+
+ALTER TABLE pages ADD COLUMN IF NOT EXISTS system_key TEXT;
+CREATE UNIQUE INDEX IF NOT EXISTS pages_system_key_idx ON pages (system_key) WHERE system_key IS NOT NULL;

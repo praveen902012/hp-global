@@ -37,7 +37,7 @@ export function AdminPages() {
         <div>
           <p className="mb-2 text-xs font-bold uppercase tracking-[.22em] text-brand-champagne">Content management</p>
           <h1 className="text-3xl font-heading text-brand-charcoal">Pages</h1>
-          <p className="mt-2 text-sm text-slate-500">Create new pages for the site from ready-made sections. New pages start as drafts.</p>
+          <p className="mt-2 text-sm text-slate-500">Create new pages from ready-made sections, or edit built-in site pages like Our Story. New pages start as drafts. <Link href="/admin/guide#pages" className="ml-1 whitespace-nowrap font-medium text-brand-charcoal underline decoration-brand-champagne underline-offset-4 hover:text-brand-champagne">How it works</Link></p>
         </div>
         <Button type="button" onClick={() => setCreating(true)} className="gap-2"><Plus size={16} />New page</Button>
       </div>
@@ -61,7 +61,7 @@ export function AdminPages() {
             <tbody className="divide-y divide-slate-100">
               {pages.map((page) => (
                 <tr key={page.id} className="hover:bg-slate-50/60">
-                  <td className="px-4 py-3"><Link href={`/admin/pages/${page.id}`} className="font-medium text-brand-charcoal hover:text-brand-champagne">{page.title}</Link><p className="text-xs text-slate-400">/{page.slug}</p></td>
+                  <td className="px-4 py-3"><Link href={`/admin/pages/${page.id}`} className="font-medium text-brand-charcoal hover:text-brand-champagne">{page.title}</Link>{page.system_key && <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600">Site page</span>}<p className="text-xs text-slate-400">/{page.slug}</p></td>
                   <td className="px-4 py-3"><span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${page.status === "published" ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>{page.status === "published" ? "Published" : "Draft"}</span></td>
                   <td className="px-4 py-3 text-slate-500">{page.section_count}</td>
                   <td className="px-4 py-3 text-slate-500">{formatDate(page.updated_at)}</td>
@@ -69,7 +69,7 @@ export function AdminPages() {
                     <div className="flex justify-end gap-1">
                       <Link href={`/${page.slug}`} target="_blank" title={page.status === "published" ? "View page" : "Preview draft"} className="rounded p-2 text-slate-500 hover:bg-slate-100"><ExternalLink size={16} /></Link>
                       <Link href={`/admin/pages/${page.id}`} title="Edit" className="rounded p-2 text-slate-500 hover:bg-slate-100"><Pencil size={16} /></Link>
-                      <button type="button" onClick={() => void remove(page)} title="Delete" className="rounded p-2 text-red-500 hover:bg-red-50"><Trash2 size={16} /></button>
+                      {page.system_key ? <span className="w-8" aria-hidden="true" /> : <button type="button" onClick={() => void remove(page)} title="Delete" className="rounded p-2 text-red-500 hover:bg-red-50"><Trash2 size={16} /></button>}
                     </div>
                   </td>
                 </tr>

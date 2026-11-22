@@ -27,7 +27,7 @@ export async function PUT(request: Request, { params }: Props) {
   if (id === null) return notFound();
   const existing = await getPageById(id);
   if (!existing) return notFound();
-  const parsed = normalizePageContent(await request.json().catch(() => null), sanitizePageHtml);
+  const parsed = normalizePageContent(await request.json().catch(() => null), sanitizePageHtml, existing.system_key ? { fixedSlug: existing.slug } : {});
   if ("error" in parsed) return NextResponse.json({ error: parsed.error }, { status: 400 });
   try {
     const page = await updatePage(id, parsed.content);
@@ -43,6 +43,8 @@ export async function PUT(request: Request, { params }: Props) {
 export async function DELETE(_request: Request, { params }: Props) {
   if (!await requireAdminSession()) return unauthorized();
   const id = await parseId(params);
+  const existing = id === null ? null : await getPageById(id);
+  if (existing?.system_key) return NextResponse.json({ error: `"${existing.title}" is a built-in site page and can't be deleted. You can edit its content instead.` }, { status: 400 });
   const slug = id === null ? null : await deletePage(id);
   if (!slug) return notFound();
   const removedLinks = await removeMenuLinks(`/${slug}`);

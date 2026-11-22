@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp, ExternalLink, Eye, EyeOff, Plus, RotateCcw, Save, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { api } from "../../lib/api";
 import { Button } from "../../components/ui/Button";
 import { defaultSiteMenu, isValidMenuHref, MAX_MENU_ITEMS, MAX_MENU_LABEL_LENGTH, sitePages, type MenuItem, type SiteMenu } from "../../data/siteMenu";
@@ -56,7 +57,7 @@ export function AdminMenu() {
         <div>
           <p className="mb-2 text-xs font-bold uppercase tracking-[.22em] text-brand-champagne">Content management</p>
           <h1 className="text-3xl font-heading text-brand-charcoal">Menu</h1>
-          <p className="mt-2 text-sm text-slate-500">Rename, reorder, hide or add links in the site&apos;s header and footer navigation.</p>
+          <p className="mt-2 text-sm text-slate-500">Rename, reorder, hide or add links in the site&apos;s header and footer navigation. <Link href="/admin/guide#menu" className="ml-1 whitespace-nowrap font-medium text-brand-charcoal underline decoration-brand-champagne underline-offset-4 hover:text-brand-champagne">How it works</Link></p>
         </div>
         <Button type="button" variant="outline" size="sm" onClick={reset} className="gap-2"><RotateCcw size={14} />Reset to default</Button>
       </div>

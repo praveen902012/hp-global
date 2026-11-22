@@ -85,7 +85,7 @@ export function AdminPageEditor({ id }: { id: number }) {
   };
 
   async function save(): Promise<AdminPage | null> {
-    const check = normalizePageContent(content);
+    const check = normalizePageContent(content, undefined, page?.system_key ? { fixedSlug: page.slug } : {});
     if ("error" in check) { setStatus({ error: check.error }); return null; }
     setBusy("saving"); setStatus({});
     try {
@@ -112,6 +112,7 @@ export function AdminPageEditor({ id }: { id: number }) {
   }
 
   const live = page.status === "published";
+  const system = page.system_key !== null;
   const slugChanged = content.slug !== page.slug;
 
   return (
@@ -123,14 +124,14 @@ export function AdminPageEditor({ id }: { id: number }) {
         <div className="flex min-w-0 items-center gap-3">
           <Link href="/admin/pages" className="rounded p-2 text-slate-500 hover:bg-slate-100" title="All pages" aria-label="All pages"><ArrowLeft size={18} /></Link>
           <div className="min-w-0">
-            <div className="flex items-center gap-2"><h1 className="truncate font-heading text-2xl text-brand-charcoal">{content.title || "Untitled page"}</h1><span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${live ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>{live ? "Published" : "Draft"}</span></div>
+            <div className="flex items-center gap-2"><h1 className="truncate font-heading text-2xl text-brand-charcoal">{content.title || "Untitled page"}</h1><span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${live ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>{live ? "Published" : "Draft"}</span>{system && <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600">Site page</span>}</div>
             <p className="truncate text-xs text-slate-400">/{page.slug}{dirty && <span className="ml-2 text-amber-600">· Unsaved changes</span>}</p>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Link href={`/${page.slug}`} target="_blank" title={dirty ? "Preview shows the last saved version" : undefined} className="inline-flex items-center gap-2 rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-600 hover:border-brand-champagne hover:text-brand-charcoal"><ExternalLink size={15} />{live ? "View" : "Preview"}</Link>
           <button type="button" onClick={() => void save()} disabled={!dirty || busy !== null} className="inline-flex items-center gap-2 rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-700 hover:border-brand-champagne disabled:cursor-not-allowed disabled:opacity-50">{busy === "saving" ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}{live ? "Save & update live page" : "Save draft"}</button>
-          {live
+          {system ? null : live
             ? <button type="button" disabled={busy !== null} onClick={() => { if (window.confirm("Unpublish this page? Visitors will no longer see it, and menu links to it will be removed.")) void changePublished(false); }} className="rounded-md px-3 py-2 text-sm text-red-600 hover:bg-red-50 disabled:opacity-50">Unpublish</button>
             : <Button type="button" size="sm" disabled={busy !== null} onClick={() => setPublishing(true)} className="gap-2"><Globe size={15} />Publish</Button>}
         </div>
@@ -150,8 +151,8 @@ export function AdminPageEditor({ id }: { id: number }) {
             <div className="grid gap-4 border-t border-slate-100 p-5 md:grid-cols-2">
               <label className="block text-sm font-medium text-slate-700">Page title<input className={inputClass} value={content.title} maxLength={PAGE_LIMITS.title} onChange={(event) => change({ ...content, title: event.target.value })} /><span className="mt-1 block text-xs font-normal text-slate-400">Shown in the browser tab and search results.</span></label>
               <label className="block text-sm font-medium text-slate-700">Page URL
-                <div className="mt-1.5 flex items-center rounded-md border border-slate-300 focus-within:border-brand-champagne"><span className="pl-3 text-sm text-slate-400">/</span><input className="w-full rounded-md py-2 pl-0.5 pr-3 text-sm outline-none" value={content.slug} onChange={(event) => change({ ...content, slug: slugify(event.target.value) })} /></div>
-                {slugError(content.slug) ? <span className="mt-1 block text-xs font-normal text-red-600">{slugError(content.slug)}</span>
+                <div className={`mt-1.5 flex items-center rounded-md border border-slate-300 focus-within:border-brand-champagne ${system ? "bg-slate-50" : ""}`}><span className="pl-3 text-sm text-slate-400">/</span><input readOnly={system} className="w-full rounded-md bg-transparent py-2 pl-0.5 pr-3 text-sm outline-none read-only:text-slate-500" value={content.slug} onChange={(event) => change({ ...content, slug: slugify(event.target.value) })} /></div>
+                {system ? <span className="mt-1 block text-xs font-normal text-slate-400">Built-in site page: its address can&apos;t be changed.</span> : slugError(content.slug) ? <span className="mt-1 block text-xs font-normal text-red-600">{slugError(content.slug)}</span>
                   : slugChanged && live ? <span className="mt-1 block text-xs font-normal text-amber-700">The old address /{page.slug} will stop working. Menu links will be updated automatically.</span> : null}
               </label>
               <label className="block text-sm font-medium text-slate-700 md:col-span-2">Search description <span className="font-normal text-slate-400">(optional)</span>
@@ -389,10 +390,12 @@ function SectionFields({ section, onChange, onError }: { section: PageSection; o
       return (
         <div className={grid}>
           <Field label="Heading" value={section.heading} onChange={(heading) => set({ heading })} />
+          <Field label="Second line (gold italic)" value={section.accent_heading ?? ""} onChange={(accent_heading) => set({ accent_heading })} placeholder="Optional, e.g. Excellence" />
           <Field label="Small heading above" value={section.eyebrow} onChange={(eyebrow) => set({ eyebrow })} placeholder="Optional" />
           <div className="md:col-span-2 text-sm font-medium text-slate-700">Text<RichTextEditor value={section.body} onChange={(body) => set({ body })} /></div>
           <ImageField label="Image" required value={section.image_url} onChange={(image_url) => set({ image_url })} onError={onError} />
           <Field label="Image description (for accessibility)" value={section.image_alt} onChange={(image_alt) => set({ image_alt })} placeholder="e.g. Tower A at sunset" />
+          <Field label="Closing line (small capitals, optional)" value={section.tagline ?? ""} onChange={(tagline) => set({ tagline })} placeholder="e.g. Join us in shaping a new era…" wide />
           <Choice label="Image position" value={section.image_position} options={[{ value: "left", label: "Left" }, { value: "right", label: "Right" }]} onChange={(image_position) => set({ image_position })} />
           <Field label="Button label" value={section.button_label} onChange={(button_label) => set({ button_label })} placeholder="Optional" max={60} />
           <LinkField label="Button link" value={section.button_href} onChange={(button_href) => set({ button_href })} />

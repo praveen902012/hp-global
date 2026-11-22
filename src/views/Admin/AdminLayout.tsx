@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard as IconDashboard, FileText as IconArticles, Building as IconProps, Star, LogOut as IconLogout, MessageSquare as IconEnquiries, Mail as IconContacts, PanelLeftClose, PanelLeftOpen, Menu as IconMenu, Files as IconPages, Newspaper as IconPress } from 'lucide-react';
+import { LayoutDashboard as IconDashboard, FileText as IconArticles, Building as IconProps, Star, LogOut as IconLogout, MessageSquare as IconEnquiries, Mail as IconContacts, PanelLeftClose, PanelLeftOpen, Menu as IconMenu, Files as IconPages, Newspaper as IconPress, BookOpen as IconGuide } from 'lucide-react';
 import { api } from '../../lib/api';
 
 interface AdminSession {
@@ -45,6 +45,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     { href: '/admin/menu', label: 'Menu', icon: IconMenu },
     { href: '/admin/enquiries', label: 'Enquiries', icon: IconEnquiries },
     { href: '/admin/contacts', label: 'Contact Requests', icon: IconContacts },
+    { href: '/admin/guide', label: 'User guide', icon: IconGuide },
   ];
 
   const isActiveLink = (href: string, exact?: boolean) => exact ? pathname === href : (pathname || "").startsWith(href);

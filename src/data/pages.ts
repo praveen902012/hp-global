@@ -16,8 +16,8 @@ export interface TextSection extends SectionBase {
   type: "text"; eyebrow: string; heading: string; body: string; align: "left" | "center";
 }
 export interface ImageTextSection extends SectionBase {
-  type: "image_text"; eyebrow: string; heading: string; body: string; image_url: string; image_alt: string;
-  image_position: "left" | "right"; button_label: string; button_href: string;
+  type: "image_text"; eyebrow: string; heading: string; accent_heading: string; body: string; image_url: string; image_alt: string;
+  image_position: "left" | "right"; button_label: string; button_href: string; tagline?: string;
 }
 export interface GallerySection extends SectionBase {
   type: "gallery"; heading: string; columns: 2 | 3 | 4; images: { src: string; alt: string }[];
@@ -57,6 +57,8 @@ export interface PageContent {
 
 export interface SitePage extends PageContent {
   id: number;
+  /** Set for built-in site pages (e.g. "about"): fixed URL, always live, cannot be deleted. */
+  system_key: string | null;
   status: PageStatus;
   created_at: string;
   updated_at: string;
@@ -91,7 +93,7 @@ export function createSection(type: SectionType): PageSection {
   switch (type) {
     case "hero": return { id, type, background: "dark", eyebrow: "", title: "Page title", accent_title: "", subtitle: "", image_url: "/hero_banner_real_estate_1774769760013.png", button_label: "", button_href: "", height: "medium" };
     case "text": return { id, type, background: "white", eyebrow: "", heading: "Section heading", body: "<p>Write your content here.</p>", align: "left" };
-    case "image_text": return { id, type, background: "white", eyebrow: "", heading: "Section heading", body: "<p>Write your content here.</p>", image_url: "/commercial_building_investment_1774769793820.png", image_alt: "", image_position: "right", button_label: "", button_href: "" };
+    case "image_text": return { id, type, background: "white", eyebrow: "", heading: "Section heading", accent_heading: "", body: "<p>Write your content here.</p>", image_url: "/commercial_building_investment_1774769793820.png", image_alt: "", image_position: "right", button_label: "", button_href: "" };
     case "gallery": return { id, type, background: "white", heading: "Gallery", columns: 3, images: [] };
     case "cards": return { id, type, background: "light", heading: "Highlights", intro: "", cards: [{ image_url: "", title: "Card title", description: "Short description.", link: "" }] };
     case "stats": return { id, type, background: "dark", heading: "", items: [{ value: "25+", label: "Years of experience" }, { value: "100+", label: "Projects delivered" }, { value: "5,000+", label: "Happy families" }] };
@@ -103,6 +105,30 @@ export function createSection(type: SectionType): PageSection {
 }
 
 export const starterSections = (): PageSection[] => [createSection("hero"), createSection("text")];
+
+/* ------------------------------------------------------------------ */
+/* Built-in site pages that admins can edit with the page builder      */
+/* ------------------------------------------------------------------ */
+
+export interface SystemPageDefinition { key: string; slug: string; title: string; meta_description: string; sections: () => PageSection[] }
+
+export const systemPages: SystemPageDefinition[] = [
+  {
+    key: "about",
+    slug: "about",
+    title: "Our Story",
+    meta_description: "HP Global Infrra is committed to excellence in every facet of real estate, from investment advisory to property management.",
+    // Same content and layout as the original hard-coded Our Story page.
+    sections: () => [{
+      id: "about_intro", type: "image_text", background: "white", eyebrow: "Our Origin", heading: "A Commitment to", accent_heading: "Excellence",
+      body: "<p>At HP Global Infrra, we are committed to excellence in every facet of real estate. Our services range from investment advisory to property management, focusing on high-end projects that make a difference.</p><p>Our specialized approach includes mixed-use developments, smart solutions, and residential excellence, all backed by profound market insights.</p>",
+      tagline: "Join us in shaping a new era of real estate advancement.",
+      image_url: "/hero_banner_real_estate_1774769760013.png", image_alt: "HP Global Infrra Building", image_position: "right", button_label: "", button_href: "",
+    }],
+  },
+];
+
+export const systemPageByKey = (key: string | null | undefined) => systemPages.find((page) => page.key === key);
 
 /* ------------------------------------------------------------------ */
 /* Slugs and URLs                                                      */
@@ -197,12 +223,13 @@ function buttonPair(label: string, href: string, where: string) {
  * Cleans and validates page content. `sanitizeHtml` is applied to rich-text fields
  * (pass the server sanitizer on the server; the identity function is fine for client-side checks).
  */
-export function normalizePageContent(value: unknown, sanitizeHtml: (html: string) => string = (html) => html): { content: PageContent } | { error: string } {
+export function normalizePageContent(value: unknown, sanitizeHtml: (html: string) => string = (html) => html, options: { fixedSlug?: string } = {}): { content: PageContent } | { error: string } {
   try {
     const input = obj(value);
     const title = text(input.title, "Page title", PAGE_LIMITS.title, true);
-    const slug = String(input.slug ?? "").trim().toLowerCase();
-    const slugProblem = slugError(slug);
+    // Built-in site pages keep their fixed URL (which is otherwise a reserved slug).
+    const slug = options.fixedSlug ?? String(input.slug ?? "").trim().toLowerCase();
+    const slugProblem = options.fixedSlug ? null : slugError(slug);
     if (slugProblem) throw new PageInputError(slugProblem);
     const meta_description = text(input.meta_description, "Search description", PAGE_LIMITS.meta);
     if (!Array.isArray(input.sections)) throw new PageInputError("Page sections are missing.");
@@ -234,7 +261,7 @@ export function normalizePageContent(value: unknown, sanitizeHtml: (html: string
         case "text":
           return { id, type, background, eyebrow: text(raw.eyebrow, `${where}: small heading`, PAGE_LIMITS.short), heading: text(raw.heading, `${where}: heading`, PAGE_LIMITS.short), body: html(raw.body, "text"), align: pick(raw.align, ["left", "center"] as const, "left") };
         case "image_text": {
-          const section: ImageTextSection = { id, type, background, eyebrow: text(raw.eyebrow, `${where}: small heading`, PAGE_LIMITS.short), heading: text(raw.heading, `${where}: heading`, PAGE_LIMITS.short), body: html(raw.body, "text"), image_url: image(raw.image_url, `${where}: image`, true), image_alt: text(raw.image_alt, `${where}: image description`, PAGE_LIMITS.short), image_position: pick(raw.image_position, ["left", "right"] as const, "right"), button_label: text(raw.button_label, `${where}: button label`, 60), button_href: link(raw.button_href, `${where}: button link`) };
+          const section: ImageTextSection = { id, type, background, eyebrow: text(raw.eyebrow, `${where}: small heading`, PAGE_LIMITS.short), heading: text(raw.heading, `${where}: heading`, PAGE_LIMITS.short), accent_heading: text(raw.accent_heading, `${where}: gold second line`, PAGE_LIMITS.short), body: html(raw.body, "text"), image_url: image(raw.image_url, `${where}: image`, true), image_alt: text(raw.image_alt, `${where}: image description`, PAGE_LIMITS.short), image_position: pick(raw.image_position, ["left", "right"] as const, "right"), tagline: text(raw.tagline, `${where}: closing line`, PAGE_LIMITS.short), button_label: text(raw.button_label, `${where}: button label`, 60), button_href: link(raw.button_href, `${where}: button link`) };
           buttonPair(section.button_label, section.button_href, where);
           return section;
         }

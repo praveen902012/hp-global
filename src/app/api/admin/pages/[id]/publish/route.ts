@@ -16,6 +16,7 @@ export async function POST(request: Request, { params }: Props) {
   if (!/^\d+$/.test(id)) return NextResponse.json({ error: "Page not found." }, { status: 404 });
   const existing = await getPageById(Number(id));
   if (!existing) return NextResponse.json({ error: "Page not found." }, { status: 404 });
+  if (existing.system_key) return NextResponse.json({ error: `"${existing.title}" is a built-in site page and is always live.` }, { status: 400 });
   const body = await request.json().catch(() => ({})) as Record<string, unknown>;
   const published = body.published === true;
   const href = `/${existing.slug}`;

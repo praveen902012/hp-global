@@ -46,7 +46,7 @@ export function AdminPress() {
         <div>
           <p className="mb-2 text-xs font-bold uppercase tracking-[.22em] text-brand-champagne">Content management</p>
           <h1 className="text-3xl font-heading text-brand-charcoal">Press clippings</h1>
-          <p className="mt-2 max-w-2xl text-sm text-slate-500">Newspaper cuttings, TV/video coverage and online articles. They appear on the <Link href="/media" target="_blank" className="underline">In the News</Link> page, and on the Featured Project page when tagged with {featuredProject ? <strong>{featuredProject}</strong> : "the featured project"}.</p>
+          <p className="mt-2 max-w-2xl text-sm text-slate-500">Newspaper cuttings, TV/video coverage and online articles. They appear on the <Link href="/media" target="_blank" className="underline">In the News</Link> page, and on the Featured Project page when tagged with {featuredProject ? <strong>{featuredProject}</strong> : "the featured project"}. <Link href="/admin/guide#press" className="ml-1 whitespace-nowrap font-medium text-brand-charcoal underline decoration-brand-champagne underline-offset-4 hover:text-brand-champagne">How it works</Link></p>
         </div>
         <Button type="button" onClick={() => { setStatus({}); setEditing({ id: null, form: { ...emptyPressClipping(), project: featuredProject } }); }} className="gap-2"><Plus size={16} />Add clipping</Button>
       </div>

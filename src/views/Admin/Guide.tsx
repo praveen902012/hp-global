@@ -1,0 +1,222 @@
+import Link from "next/link";
+import { BookOpen, Lightbulb, TriangleAlert } from "lucide-react";
+
+/* Admin user guide for the Menu, Pages, Press and Journal features.
+   Screenshots live in server/admin-guide and are served only to signed-in admins. */
+
+const toc = [
+  { id: "overview", label: "What's new" },
+  { id: "menu", label: "Edit the site menu" },
+  { id: "pages", label: "Create a new page" },
+  { id: "sections", label: "Section types" },
+  { id: "publish", label: "Preview & publish" },
+  { id: "our-story", label: "Edit Our Story" },
+  { id: "press", label: "Add press clippings" },
+  { id: "press-where", label: "Where clippings appear" },
+  { id: "journal", label: "Home page Journal" },
+  { id: "tips", label: "Tips & troubleshooting" },
+];
+
+function Shot({ file, alt, caption }: { file: string; alt: string; caption: string }) {
+  const src = `/api/admin/guide/${file}`;
+  return (
+    <figure className="my-6">
+      <a href={src} target="_blank" rel="noopener noreferrer" title="Open full size" className="block overflow-hidden rounded-lg border border-slate-200 bg-slate-50 shadow-sm transition hover:border-brand-champagne hover:shadow-md">
+        <img src={src} alt={alt} loading="lazy" className="w-full" />
+      </a>
+      <figcaption className="mt-2 text-xs text-slate-500">{caption} <span className="text-slate-400">· Click to enlarge</span></figcaption>
+    </figure>
+  );
+}
+
+function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
+  return (
+    <section id={id} className="scroll-mt-6 border-t border-slate-200 pt-10">
+      <h2 className="mb-4 font-heading text-2xl text-brand-charcoal">{title}</h2>
+      <div className="space-y-4 text-[15px] leading-relaxed text-slate-600">{children}</div>
+    </section>
+  );
+}
+
+function Steps({ children }: { children: React.ReactNode }) {
+  return <ol className="list-decimal space-y-2 pl-6 marker:font-semibold marker:text-brand-champagne">{children}</ol>;
+}
+
+function Note({ tone = "tip", children }: { tone?: "tip" | "warn"; children: React.ReactNode }) {
+  const warn = tone === "warn";
+  const Icon = warn ? TriangleAlert : Lightbulb;
+  return (
+    <div className={`flex gap-3 rounded-lg border px-4 py-3 text-sm ${warn ? "border-amber-200 bg-amber-50 text-amber-900" : "border-sky-200 bg-sky-50 text-sky-900"}`}>
+      <Icon size={18} className="mt-0.5 shrink-0" />
+      <div>{children}</div>
+    </div>
+  );
+}
+
+const B = ({ children }: { children: React.ReactNode }) => <strong className="font-semibold text-brand-charcoal">{children}</strong>;
+const A = ({ href, children }: { href: string; children: React.ReactNode }) => <Link href={href} className="font-medium text-brand-charcoal underline decoration-brand-champagne underline-offset-4 hover:text-brand-champagne">{children}</Link>;
+
+export function AdminGuide() {
+  return (
+    <div className="p-6 lg:p-10">
+      <div className="mb-10 flex items-start gap-4">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-brand-champagne/15 text-brand-charcoal"><BookOpen size={24} /></span>
+        <div>
+          <p className="mb-1 text-xs font-bold uppercase tracking-[.22em] text-brand-champagne">Help</p>
+          <h1 className="font-heading text-3xl text-brand-charcoal">Admin user guide</h1>
+          <p className="mt-2 max-w-2xl text-sm text-slate-500">How to edit the site menu, build new pages and publish press coverage. This guide is visible only to signed-in admins.</p>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-10 xl:flex-row">
+        <nav aria-label="Guide contents" className="xl:sticky xl:top-6 xl:w-56 xl:shrink-0 xl:self-start">
+          <p className="mb-3 text-xs font-bold uppercase tracking-widest text-slate-400">Contents</p>
+          <ol className="grid gap-1 text-sm sm:grid-cols-2 xl:grid-cols-1">
+            {toc.map((item, index) => <li key={item.id}><a href={`#${item.id}`} className="block rounded px-2 py-1.5 text-slate-600 hover:bg-slate-100 hover:text-brand-charcoal"><span className="mr-2 text-slate-400">{index + 1}.</span>{item.label}</a></li>)}
+          </ol>
+        </nav>
+
+        <article className="min-w-0 max-w-4xl flex-1 space-y-10">
+          <Section id="overview" title="What's new">
+            <p>These things can now be managed from the admin panel without a developer:</p>
+            <ul className="list-disc space-y-1.5 pl-6">
+              <li><B>Menu</B>: rename, reorder, hide or add the links in the website&apos;s header and footer.</li>
+              <li><B>Pages</B>: create brand-new pages (for example an NRI desk or a project launch page) from ready-made sections, preview them as drafts and publish when ready.</li>
+              <li><B>Our Story</B>: edit the text and image of the Our Story (<code>/about</code>) page, and add more sections to it.</li>
+              <li><B>Press</B>: add newspaper clippings, TV/YouTube coverage and online articles. They appear on the <em>In the News</em> page and on the project&apos;s page.</li>
+              <li><B>Journal on the home page</B>: the home page now shows your three latest articles automatically.</li>
+            </ul>
+            <p>All of these are in the left sidebar. If the sidebar is collapsed, click the panel icon at the top to expand it and see the labels.</p>
+          </Section>
+
+          <Section id="menu" title="1. Edit the site menu">
+            <p>Open <A href="/admin/menu">Menu</A> in the sidebar. There are two lists: the <B>Header menu</B> (top navigation, desktop and mobile) and the <B>Footer menu</B> (the Navigation column in the footer).</p>
+            <Shot file="menu-editor.png" alt="Menu editor with header and footer menu lists" caption="The Menu page. Each row is one link with its label, its address and action buttons." />
+            <p>For each link you can:</p>
+            <ul className="list-disc space-y-1.5 pl-6">
+              <li><B>Change the label</B>: the text visitors see, e.g. &quot;Our Story&quot;.</li>
+              <li><B>Change the link</B>: click the box to pick a site page from the list, or type a full web address (<code>https://…</code>), an email (<code>mailto:info@hpglobalinfra.com</code>) or a phone number (<code>tel:+91…</code>).</li>
+              <li>Use the buttons on the right to <B>hide/show</B> the link (eye icon), <B>open it in a new tab</B>, <B>move it up or down</B>, or <B>remove</B> it.</li>
+              <li>Click <B>Add link</B> to add a new one (up to 12 per menu).</li>
+            </ul>
+            <p>Nothing changes on the website until you click <B>Save menu</B> at the bottom. To start over, <B>Reset to default</B> restores the original links (again, only once you save).</p>
+            <Note>Hiding a link is a good way to take a page out of the menu temporarily without losing its label and position.</Note>
+          </Section>
+
+          <Section id="pages" title="2. Create a new page">
+            <p>Open <A href="/admin/pages">Pages</A>. The list shows every page you have created, whether it is a <B>Draft</B> (not public) or <B>Published</B>, and when it was last edited.</p>
+            <Shot file="pages-list.png" alt="Pages list showing a published page and a draft" caption="The Pages list. Use the icons on the right to view, edit or delete a page." />
+            <Steps>
+              <li>Click <B>New page</B>.</li>
+              <li>Type the <B>page title</B>. The <B>page URL</B> is filled in for you (e.g. <code>nri-investment-desk</code>); you can shorten it. Addresses the site already uses, such as <code>about</code> or <code>blog</code>, are not allowed.</li>
+              <li>Click <B>Create page</B>. The page opens in the editor as a draft with a hero banner and a text section to start from.</li>
+            </Steps>
+            <Shot file="pages-new.png" alt="New page dialog with title and URL fields" caption="Creating a page: just a title and the address." />
+            <p>In the editor, the page is a stack of <B>sections</B> shown top to bottom in the same order as on the website. Click a section&apos;s header to open it and edit its content.</p>
+            <Shot file="page-editor.png" alt="Page editor showing a list of sections with one open for editing" caption="The page editor. The toolbar at the top has Preview, Save and Publish." />
+            <p>On each section header you can:</p>
+            <ul className="list-disc space-y-1.5 pl-6">
+              <li>Pick a <B>background</B> (white, light grey or dark) with the three coloured dots.</li>
+              <li><B>Move</B> the section up or down, <B>duplicate</B> it, or <B>remove</B> it.</li>
+            </ul>
+            <p>To add a section, click <B>Add section</B> at the bottom, or hover between two sections and click <B>Insert section here</B>. Then choose the type:</p>
+            <Shot file="page-section-picker.png" alt="Add a section dialog listing the ten section types" caption="Choosing a section type." />
+            <p><B>Page settings</B> (at the top of the editor) holds the page title, the URL and an optional <B>search description</B>, the short text Google shows under the page title.</p>
+            <Note>Images: click <B>Upload image</B> next to any image field (JPG, PNG, WebP or GIF, up to 10 MB). Wide landscape photos around 1600–2400 px work best for hero banners.</Note>
+          </Section>
+
+          <Section id="sections" title="Section types">
+            <div className="overflow-x-auto rounded-lg border border-slate-200">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500"><tr><th className="px-4 py-2.5">Section</th><th className="px-4 py-2.5">Use it for</th></tr></thead>
+                <tbody className="divide-y divide-slate-100">
+                  {[
+                    ["Hero banner", "The big opening image with the page title, an optional gold second line, subtitle and button. Usually the first section."],
+                    ["Text", "Headings and paragraphs. The toolbar has bold, italic, H2/H3 headings, lists, quotes and links (select text, then click the link icon)."],
+                    ["Image + text", "A photo beside a heading, text and an optional button. Choose whether the image is on the left or right."],
+                    ["Image gallery", "A grid of photos (2, 3 or 4 per row). Upload several images at once with Upload images."],
+                    ["Cards", "A row of cards, each with an image, title, short text and optional link, e.g. project highlights."],
+                    ["Key figures", "Big numbers with labels, e.g. 25+ Years of experience."],
+                    ["Video", "Paste a normal YouTube or Vimeo link; it is converted automatically."],
+                    ["FAQ", "Questions that open to show the answer when clicked."],
+                    ["Call to action", "A banner with a heading, short text and a button, e.g. Book a site visit."],
+                    ["Contact form", "Name, email and message form. Submissions arrive in Contact Requests."],
+                  ].map(([name, use]) => <tr key={name}><td className="whitespace-nowrap px-4 py-2.5 font-medium text-brand-charcoal">{name}</td><td className="px-4 py-2.5">{use}</td></tr>)}
+                </tbody>
+              </table>
+            </div>
+            <p>If a button label is filled in, the button also needs a link, otherwise saving shows a message telling you which section to fix.</p>
+          </Section>
+
+          <Section id="publish" title="3. Preview & publish">
+            <Steps>
+              <li>Click <B>Save draft</B>. Drafts are never shown to visitors.</li>
+              <li>Click <B>Preview</B> to open the page on the real website. While signed in you will see it with a gold <B>Draft preview</B> bar at the bottom; visitors who try the address get &quot;page not found&quot;.</li>
+              <li>When it looks right, click <B>Publish</B>. In the dialog you can tick <B>Header menu</B> and/or <B>Footer menu</B> to add a link to the page, and choose the menu label.</li>
+              <li>Click <B>Publish now</B>. The page is live at its address straight away.</li>
+            </Steps>
+            <Shot file="page-publish.png" alt="Publish dialog with options to add the page to the header or footer menu" caption="Publishing, with the option to add the page to the menu." />
+            <Shot file="page-live.png" alt="A published page on the website" caption="The published page on the website, with its new link in the header menu." />
+            <p><B>Editing a published page:</B> the save button changes to <B>Save &amp; update live page</B>, and your changes go live as soon as you save.</p>
+            <p><B>Unpublish</B> turns the page back into a draft and removes its menu links. <B>Delete</B> (from the Pages list) removes the page permanently, and its menu links too.</p>
+            <Note tone="warn">Changing the URL of a published page breaks the old address (for example, links already shared on WhatsApp). Menu links are updated automatically, but anything shared elsewhere is not.</Note>
+          </Section>
+
+          <Section id="our-story" title="4. Edit the Our Story page">
+            <p>Our Story is a built-in <B>site page</B>. Open <A href="/admin/pages">Pages</A> and click <B>Our Story</B> (marked <em>Site page</em>, always at the top of the list). It opens in the same editor as your own pages, already filled with the current text and photo.</p>
+            <Shot file="about-editor.png" alt="Our Story page open in the page editor" caption="Our Story in the page editor. Edit the heading, gold second line, text and image." />
+            <ul className="list-disc space-y-1.5 pl-6">
+              <li>Change the <B>heading</B>, the <B>gold second line</B> (e.g. &quot;Excellence&quot;), the <B>text</B> and the <B>photo</B>, then click <B>Save &amp; update live page</B>. Changes appear on the website immediately.</li>
+              <li>Use <B>Add section</B> to extend the story, for example <em>Key figures</em> for years of experience, an <em>Image gallery</em> of the team, or a <em>Call to action</em> at the end.</li>
+              <li>Click <B>View</B> to open the live page and check it.</li>
+            </ul>
+            <Note>Site pages are always live: they have no Publish or Unpublish button, can&apos;t be deleted, and their address (<code>/about</code>) can&apos;t be changed, so links in the menu and elsewhere keep working.</Note>
+          </Section>
+
+          <Section id="press" title="5. Add press clippings">
+            <p>Open <A href="/admin/press">Press</A>. All clippings are listed newest first, with their type, publication, date and project. Use the search box or the project filter to find one.</p>
+            <Shot file="press-list.png" alt="Press clippings list with print, video and online items" caption="The Press page. Eye icon hides or shows a clipping; pencil edits; bin deletes." />
+            <Steps>
+              <li>Click <B>Add clipping</B>.</li>
+              <li>Choose the <B>type of coverage</B>:
+                <ul className="mt-1.5 list-disc space-y-1 pl-5">
+                  <li><B>Newspaper / magazine</B>: upload the scan or photo with <B>Upload image</B>, and/or the full page as a <B>PDF</B> (up to 25 MB).</li>
+                  <li><B>TV / video</B>: paste the YouTube or Vimeo link. The video&apos;s own thumbnail is used unless you upload one.</li>
+                  <li><B>Online article</B>: paste the link to the story on the news website.</li>
+                </ul>
+              </li>
+              <li>Fill in the <B>publication</B> or channel, the <B>date published</B> and the <B>headline</B>. A short <B>summary</B> is optional.</li>
+              <li>Choose the <B>project</B> from the list (start typing to see suggestions). Leave it empty for coverage about the company as a whole.</li>
+              <li>Click <B>Add clipping</B>. It is live on the website immediately, unless you untick <B>Show on the website</B>.</li>
+            </Steps>
+            <Shot file="press-form.png" alt="Add clipping form with type, publication, headline, project and image upload" caption="Adding a newspaper clipping." />
+            <Note>Always pick the project name from the suggestions rather than typing it differently. That way all coverage for a project is grouped together.</Note>
+          </Section>
+
+          <Section id="press-where" title="Where clippings appear">
+            <p><B>The In the News page</B> (<A href="/media">/media</A>) lists all visible coverage, newest first. Visitors can filter by project and by type. Videos play in a pop-up, newspaper scans and PDFs open full size, and online articles open the news website in a new tab.</p>
+            <Shot file="press-media-page.png" alt="Public In the News page listing press coverage" caption="The public In the News page." />
+            <p><B>The Featured Project page</B> shows an <B>In the News</B> block automatically once at least one visible clipping is tagged with the featured project&apos;s name (currently <em>Amrit Aarogyam</em>). With more than six, a link to all of them appears.</p>
+            <Shot file="press-featured.png" alt="In the News block on the Featured Project page" caption="Coverage tagged with the featured project, on its page." />
+            <Note>The In the News page isn&apos;t in the menu by default. To add it, go to <A href="/admin/menu">Menu</A>, click <B>Add link</B>, choose <code>/media</code> from the list and save.</Note>
+          </Section>
+
+          <Section id="journal" title="6. Home page Journal">
+            <p>The <B>The Journal</B> section on the home page now shows the three most recent articles from <A href="/admin/articles">Articles</A>, ordered by publish date. Publish or edit an article and the home page updates by itself. There&apos;s nothing else to do.</p>
+          </Section>
+
+          <Section id="tips" title="Tips & troubleshooting">
+            <ul className="list-disc space-y-2 pl-6">
+              <li><B>&quot;You have unsaved changes&quot;</B>: the Menu and page editors warn you before you leave with unsaved work. Save first.</li>
+              <li><B>A save shows a red message</B>: it names the section and field to fix, e.g. a button without a link, or a video link that isn&apos;t YouTube or Vimeo.</li>
+              <li><B>Preview shows old content</B>: Preview shows the last <em>saved</em> version. Save, then refresh the preview tab.</li>
+              <li><B>&quot;Please sign in again&quot;</B>: your session has ended. Sign in again; unsaved changes in that tab may be lost.</li>
+              <li><B>A menu is full</B>: each menu holds up to 12 links. If the header is full when you publish, remove or hide a link on the Menu page first.</li>
+              <li><B>Uploaded files</B> are stored on the server and stay available even if you remove them from a page.</li>
+            </ul>
+          </Section>
+        </article>
+      </div>
+    </div>
+  );
+}
