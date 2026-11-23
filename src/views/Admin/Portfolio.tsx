@@ -1,105 +1,204 @@
 "use client";
 
-import { type FormEvent, useCallback, useEffect, useState } from "react";
-import { Building2, CheckCircle2, ExternalLink, ImagePlus, MapPin, Pencil, Plus, Search, SlidersHorizontal, Star, Trash2, Upload, X } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { emptyProjectDetails, type ProjectDetails } from "../../data/projects";
-import { DocumentList, MediaField, MediaList, TextList } from "./FeaturedProject";
-import { ImageEditor } from "../../components/admin/ImageEditor";
-import { api, type PortfolioInput, type PortfolioProject } from "../../lib/api";
-import { Button } from "../../components/ui/Button";
+import { Building2, ExternalLink, GripVertical, Pencil, Plus, Star, Trash2, X, ChevronUp, ChevronDown, ArrowUpDown } from "lucide-react";
+import { api, type PortfolioProject } from "../../lib/api";
+import { Button, EmptyState, IconButton, Notice, PageHeader, SearchInput, SegTabs, StatusPill, SwitchControl, fieldInput, tdClass, thClass, useToast } from "../../components/admin/ui";
+import { moveItem } from "../../components/admin/media";
 
-const blank: PortfolioInput = { portfolio_category: "hpg", project_type: "residential", title: "", location: "", description: "", price: "", image_url: "", tags: [], sort_order: 0, is_enabled: true, slug: "", status: "", is_featured: false, details: emptyProjectDetails };
-const move = <T,>(items: T[], index: number, direction: -1 | 1) => { const next = [...items]; const target = index + direction; if (target < 0 || target >= next.length) return items; [next[index], next[target]] = [next[target], next[index]]; return next; };
-const inputClass = "mt-1.5 w-full rounded-md border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-brand-champagne focus:ring-2 focus:ring-brand-champagne/20";
+type Category = "all" | "hpg" | "partner";
+const PER_PAGE = 20;
+
+/** How much of a project's own page has been filled in. */
+export function pageProgress(project: Pick<PortfolioProject, "details" | "is_featured">) {
+  const d = project.details;
+  const checks = [
+    { label: "Overview", done: !!d.overview },
+    { label: "Highlights", done: d.highlights.length > 0 },
+    { label: "Key facts", done: d.facts.length > 0 },
+    { label: "Gallery", done: project.is_featured || d.gallery.length > 0 },
+    { label: "Video", done: project.is_featured || !!d.video_url },
+    { label: "Amenities & layout", done: project.is_featured || d.amenities.length > 0 || !!d.layout_image },
+    { label: "Documents", done: project.is_featured || d.documents.length > 0 },
+  ];
+  return { checks, done: checks.filter((check) => check.done).length, total: checks.length };
+}
 
 export function AdminPortfolio() {
-  const [items, setItems] = useState<PortfolioProject[]>([]);
+  const toast = useToast();
+  const [items, setItems] = useState<PortfolioProject[] | null>(null);
   const [total, setTotal] = useState(0);
-  const [form, setForm] = useState<PortfolioInput>(blank);
-  const [editing, setEditing] = useState<number | null>(null);
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState<"all" | PortfolioInput["portfolio_category"]>("all");
-  const [type, setType] = useState<"all" | PortfolioInput["project_type"]>("all");
-  const [imageMode, setImageMode] = useState<"url" | "upload">("url");
+  const [search, setSearchState] = useState("");
+  const [category, setCategoryState] = useState<Category>("all");
+  const [type, setTypeState] = useState<"all" | "residential" | "commercial">("all");
   const [page, setPage] = useState(1);
-  const [imageEditor, setImageEditor] = useState<{ src: string; apply: (url: string) => void } | null>(null);
-  const projectsPerPage = 9;
+  const setSearch = (value: string) => { setSearchState(value); setPage(1); };
+  const setCategory = (value: Category) => { setCategoryState(value); setPage(1); };
+  const setType = (value: typeof type) => { setTypeState(value); setPage(1); };
+  const [reordering, setReordering] = useState(false);
 
   const load = useCallback(async () => {
-    setLoading(true);
     try {
-      const result = await api.listPortfolio({ page, limit: projectsPerPage, search: query, category: category === "all" ? undefined : category, type: type === "all" ? undefined : type });
-      setItems(result.items); setTotal(result.pagination.total);
-    } catch (reason) { setError(reason instanceof Error ? reason.message : "Unable to load projects."); } finally { setLoading(false); }
-  }, [page, query, category, type]);
-  useEffect(() => { void load(); }, [load]);
+      const result = await api.listPortfolio({ page, limit: PER_PAGE, search, category: category === "all" ? undefined : category, type: type === "all" ? undefined : type });
+      setItems(result.items); setTotal(result.pagination.total); setError(null);
+    } catch (reason) { setError(reason instanceof Error ? reason.message : "Unable to load projects."); }
+  }, [page, search, category, type]);
+  useEffect(() => { const timer = window.setTimeout(() => void load(), search ? 250 : 0); return () => window.clearTimeout(timer); }, [load, search]);
 
-  const totalPages = Math.max(1, Math.ceil(total / projectsPerPage));
-  const currentPage = Math.min(page, totalPages);
-  const filtered = items;
-  useEffect(() => { setPage(1); }, [query, category, type]);
-
-  function update<K extends keyof PortfolioInput>(key: K, value: PortfolioInput[K]) { setForm((current) => ({ ...current, [key]: value })); }
-  function closeEditor() { setOpen(false); setEditing(null); setForm(blank); setError(null); }
-  function addProject() { setEditing(null); setForm(blank); setImageMode("url"); setError(null); setOpen(true); }
-  function editProject(item: PortfolioProject) { setEditing(item.id); setForm({ ...item, details: { ...emptyProjectDetails, ...item.details } }); setImageMode(item.image_url.startsWith("/api/media/") ? "upload" : "url"); setError(null); setOpen(true); }
-
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); setSaving(true); setError(null); setSuccess(null);
-    try {
-      if (editing === null) await api.createPortfolio(form); else await api.updatePortfolio(editing, form);
-      void load();
-      setSuccess(editing === null ? "Project added to the portfolio." : "Project changes saved.");
-      closeEditor();
-    } catch (reason) { setError(reason instanceof Error ? reason.message : "Unable to save project."); } finally { setSaving(false); }
+  async function toggleVisible(item: PortfolioProject) {
+    const next = !item.is_enabled;
+    setItems((rows) => rows?.map((row) => (row.id === item.id ? { ...row, is_enabled: next } : row)) ?? rows);
+    try { await api.updatePortfolio(item.id, { ...item, is_enabled: next }); toast(next ? `${item.title} is now on the website.` : `${item.title} is hidden from the website.`); }
+    catch (reason) { toast(reason instanceof Error ? reason.message : "Unable to update.", "error"); void load(); }
   }
-
-  async function upload(file: File | undefined) {
-    if (!file) return; setUploading(true); setError(null);
-    try { update("image_url", (await api.uploadPortfolioImage(file)).image_url); } catch (reason) { setError(reason instanceof Error ? reason.message : "Unable to upload image."); } finally { setUploading(false); }
-  }
-  function updateDetails<K extends keyof ProjectDetails>(key: K, value: ProjectDetails[K]) { setForm((current) => ({ ...current, details: { ...current.details, [key]: value } })); }
-  async function uploadInto(file: File | undefined, apply: (url: string) => void) { if (!file) return; setError(null); try { apply((await api.uploadImage(file)).image_url); } catch (reason) { setError(reason instanceof Error ? reason.message : "Unable to upload image."); } }
-  async function uploadDocumentInto(file: File | undefined, apply: (document: ProjectDetails["documents"][number]) => void) { if (!file) return; setError(null); try { const document = await api.uploadDocument(file); apply({ name: document.name.replace(/\.pdf$/i, ""), url: document.document_url, size: document.size }); } catch (reason) { setError(reason instanceof Error ? reason.message : "Unable to upload document."); } }
-  const openImageEditor = (src: string, apply: (url: string) => void) => setImageEditor({ src, apply });
   async function remove(item: PortfolioProject) {
-    if (!window.confirm(`Delete “${item.title}”? The uploaded image file will be retained.`)) return;
-    try { await api.deletePortfolio(item.id); void load(); setSuccess("Project removed from the portfolio."); } catch (reason) { setError(reason instanceof Error ? reason.message : "Unable to delete project."); }
+    if (!window.confirm(`Delete “${item.title}”? Its page /projects/${item.slug} will stop working. Uploaded images are kept.`)) return;
+    try { await api.deletePortfolio(item.id); toast("Project deleted."); void load(); }
+    catch (reason) { toast(reason instanceof Error ? reason.message : "Unable to delete.", "error"); }
   }
 
-  return <div className="p-6 lg:p-10">
-    <div className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end"><div><p className="mb-2 text-xs font-bold uppercase tracking-[0.22em] text-brand-champagne">Content management</p><h1 className="text-3xl font-heading text-brand-charcoal">Portfolio</h1><p className="mt-2 text-sm text-slate-500">Manage projects presented across both portfolio categories.</p></div><Button type="button" onClick={addProject} className="gap-2 self-start sm:self-auto"><Plus size={17}/> Add project</Button></div>
-    {(error || success) && <div role="status" className={`mb-6 flex items-center gap-2 rounded-md border px-4 py-3 text-sm ${error ? "border-red-200 bg-red-50 text-red-700" : "border-emerald-200 bg-emerald-50 text-emerald-700"}`}>{success && <CheckCircle2 size={17}/>} {error || success}</div>}
-    <section className="mb-6 rounded-lg border border-slate-200 bg-white p-4 shadow-sm"><div className="flex flex-col gap-4 lg:flex-row lg:items-center"><div className="relative min-w-0 flex-1"><Search size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"/><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search projects or locations" className="w-full rounded-md border border-slate-300 py-2.5 pl-10 pr-3 text-sm outline-none focus:border-brand-champagne focus:ring-2 focus:ring-brand-champagne/20"/></div><div className="flex items-center gap-2 text-sm text-slate-500"><SlidersHorizontal size={16}/><span className="hidden sm:inline">Filter:</span></div><select value={category} onChange={(event) => setCategory(event.target.value as typeof category)} className="rounded-md border border-slate-300 px-3 py-2.5 text-sm"><option value="all">All categories</option><option value="hpg">Developed by HPG</option><option value="partner">Partner Developments</option></select><select value={type} onChange={(event) => setType(event.target.value as typeof type)} className="rounded-md border border-slate-300 px-3 py-2.5 text-sm"><option value="all">All types</option><option value="residential">Residential</option><option value="commercial">Commercial</option></select></div></section>
-    <div className="mb-4 flex items-center justify-between"><h2 className="font-heading text-lg text-brand-charcoal">Published projects</h2><span className="rounded-full bg-brand-champagne/15 px-3 py-1 text-xs font-semibold text-brand-charcoal">{total} matching projects</span></div>
-    {loading ? <div className="rounded-3xl border border-slate-200 bg-white p-12 text-center text-sm text-slate-500">Loading portfolio projects…</div> : !filtered.length ? <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-12 text-center"><Building2 className="mx-auto mb-3 text-slate-300" size={32}/><h3 className="font-heading text-lg text-brand-charcoal">No matching projects</h3><p className="mt-1 text-sm text-slate-500">Try another filter or add a new project.</p></div> : <div className="space-y-8">{filtered.map((item, index) => <article key={item.id} className="overflow-hidden rounded-3xl border border-gray-100/50 bg-white shadow-xl transition-shadow duration-500 hover:shadow-2xl"><div className="grid gap-0 lg:grid-cols-12"><div className={`relative min-h-[260px] overflow-hidden bg-slate-100 lg:col-span-4 ${index % 2 ? "order-1 lg:order-2" : "order-1"}`}><img src={item.image_url} alt={item.title} className="h-full w-full object-cover transition-transform duration-1000 hover:scale-105"/><div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"/><span className="absolute left-5 top-5 rounded-full bg-brand-charcoal px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-brand-champagne">{item.portfolio_category === "hpg" ? "Developed by HPG" : "Partner Development"}</span><span className={`absolute bottom-5 left-5 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider ${item.is_enabled ? "bg-emerald-500 text-white" : "bg-slate-700 text-white"}`}>{item.is_enabled ? "Enabled" : "Disabled"}</span></div><div className={`flex flex-col justify-between p-7 lg:col-span-8 lg:p-9 ${index % 2 ? "order-2 lg:order-1" : "order-2"}`}><div><div className="mb-4 flex items-center justify-between gap-4"><div className="flex items-center gap-2 text-brand-champagne"><MapPin size={16}/><span className="text-xs font-semibold uppercase tracking-widest text-gray-500">{item.location}</span></div><span className="rounded-full border border-gray-100 bg-gray-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-gray-500">{item.project_type}</span></div><h3 className="mb-3 flex flex-wrap items-center gap-3 text-3xl font-heading text-brand-charcoal">{item.title}{item.is_featured && <span className="inline-flex items-center gap-1 rounded-full bg-brand-champagne/20 px-3 py-1 font-sans text-[10px] font-bold uppercase tracking-wider text-brand-charcoal"><Star size={12}/> Featured</span>}</h3><p className="mb-6 text-sm font-light leading-relaxed text-gray-500">{item.description}</p><div className="mb-6 flex flex-wrap gap-2">{item.tags.map((tag) => <span key={tag} className="rounded-full border border-gray-100 bg-gray-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-gray-500">{tag}</span>)}</div></div><div className="flex flex-col items-center justify-between gap-4 border-t border-gray-100 pt-5 sm:flex-row"><div><span className="block text-[10px] font-bold uppercase tracking-wider text-gray-400">Display order {item.sort_order}</span><span className="text-xl font-heading text-brand-charcoal">{item.price || "Price on request"}</span></div><div className="flex gap-2">{item.slug && <a href={`/projects/${item.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 border border-slate-200 px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-600 hover:bg-slate-50" title="Open the public page"><ExternalLink size={15}/> View page</a>}<button type="button" onClick={() => editProject(item)} className="inline-flex items-center gap-2 bg-brand-charcoal px-4 py-3 text-xs font-bold uppercase tracking-wider text-brand-champagne transition-colors hover:bg-brand-champagne hover:text-brand-charcoal"><Pencil size={15}/> Edit</button><button type="button" onClick={() => void remove(item)} className="rounded border border-red-100 p-3 text-red-500 hover:bg-red-50" title="Delete project"><Trash2 size={16}/></button></div></div></div></div></article>)}</div>}
-    {!loading && total > 0 && <nav aria-label="Portfolio pagination" className="mt-8 flex flex-col items-center justify-between gap-3 border-t border-slate-200 pt-5 sm:flex-row"><p className="text-sm text-slate-500">Showing {(currentPage - 1) * projectsPerPage + 1}–{Math.min(currentPage * projectsPerPage, total)} of {total} projects</p><div className="flex items-center gap-2"><button type="button" onClick={() => setPage((value) => Math.max(1, value - 1))} disabled={currentPage === 1} className="rounded border border-slate-300 px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-40">Previous</button><span className="px-2 text-sm font-medium text-brand-charcoal">Page {currentPage} of {totalPages}</span><button type="button" onClick={() => setPage((value) => Math.min(totalPages, value + 1))} disabled={currentPage === totalPages} className="rounded border border-slate-300 px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-40">Next</button></div></nav>}
-    {open && <div className="fixed inset-0 z-50 flex justify-end bg-brand-charcoal/35" role="dialog" aria-modal="true" aria-label={editing === null ? "Add portfolio project" : "Edit portfolio project"}><form onSubmit={submit} className="h-full w-full max-w-3xl overflow-y-auto bg-white shadow-2xl"><div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-6 py-5"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-brand-champagne">Portfolio project</p><h2 className="mt-1 text-2xl font-heading text-brand-charcoal">{editing === null ? "Add project" : "Edit project"}</h2></div><button type="button" onClick={closeEditor} className="rounded p-2 text-slate-500 hover:bg-slate-100" aria-label="Close editor"><X size={20}/></button></div><div className="space-y-5 p-6"><div className="grid grid-cols-2 gap-4"><label className="text-sm font-medium text-slate-700">Portfolio category<select value={form.portfolio_category} onChange={(event) => update("portfolio_category", event.target.value as PortfolioInput["portfolio_category"])} className={inputClass}><option value="hpg">Developed by HPG Inffra</option><option value="partner">Partner Developments</option></select></label><label className="text-sm font-medium text-slate-700">Project type<select value={form.project_type} onChange={(event) => update("project_type", event.target.value as PortfolioInput["project_type"])} className={inputClass}><option value="residential">Residential</option><option value="commercial">Commercial</option></select></label></div><fieldset><legend className="text-sm font-medium text-slate-700">Visibility</legend><div className="mt-2 flex gap-3"><label className={`flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm ${form.is_enabled ? "border-emerald-500 bg-emerald-50 text-emerald-800" : "border-slate-200 text-slate-600"}`}><input type="radio" name="is_enabled" checked={form.is_enabled} onChange={() => update("is_enabled", true)}/> Enabled</label><label className={`flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm ${!form.is_enabled ? "border-slate-500 bg-slate-50 text-slate-800" : "border-slate-200 text-slate-600"}`}><input type="radio" name="is_enabled" checked={!form.is_enabled} onChange={() => update("is_enabled", false)}/> Disabled</label></div><p className="mt-1.5 text-xs text-slate-500">Disabled projects remain in admin but are hidden from the public portfolio.</p></fieldset><label className="block text-sm font-medium text-slate-700">Project name<input required value={form.title} onChange={(event) => update("title", event.target.value)} className={inputClass}/></label><div className="grid grid-cols-2 gap-4"><label className="text-sm font-medium text-slate-700">Location<input required value={form.location} onChange={(event) => update("location", event.target.value)} className={inputClass}/></label><label className="text-sm font-medium text-slate-700">Display order<input type="number" min="0" value={form.sort_order} onChange={(event) => update("sort_order", Number(event.target.value))} className={inputClass}/></label></div><label className="block text-sm font-medium text-slate-700">Description<textarea required rows={4} value={form.description} onChange={(event) => update("description", event.target.value)} className={`${inputClass} resize-y`}/></label><label className="block text-sm font-medium text-slate-700">Price / investment<input value={form.price} onChange={(event) => update("price", event.target.value)} className={inputClass}/></label><div><div className="mb-2 flex items-center justify-between"><p className="text-sm font-medium text-slate-700">Project image</p><div className="flex rounded bg-slate-100 p-0.5 text-xs"><button type="button" onClick={() => setImageMode("url")} className={`rounded px-2 py-1 ${imageMode === "url" ? "bg-white shadow" : "text-slate-500"}`}>Image URL</button><button type="button" onClick={() => setImageMode("upload")} className={`rounded px-2 py-1 ${imageMode === "upload" ? "bg-white shadow" : "text-slate-500"}`}>Upload</button></div></div>{imageMode === "url" ? <input required value={form.image_url} onChange={(event) => update("image_url", event.target.value)} placeholder="https://…" className={inputClass}/> : <label className="mt-1 flex cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed border-slate-300 p-4 text-sm text-slate-600 hover:border-brand-champagne"><Upload size={17}/>{uploading ? "Uploading image…" : "Choose JPG, PNG, WebP, or GIF (max 10 MB)"}<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(event) => void upload(event.target.files?.[0])} className="sr-only"/></label>}{form.image_url ? <div className="mt-3 overflow-hidden rounded-md border border-slate-200"><img src={form.image_url} alt="Project preview" className="h-44 w-full object-cover"/></div> : <div className="mt-3 flex h-28 items-center justify-center rounded-md bg-slate-100 text-xs text-slate-400"><ImagePlus size={18} className="mr-2"/> Image preview</div>}</div><label className="block text-sm font-medium text-slate-700">Tags<span className="ml-1 font-normal text-slate-400">(comma-separated)</span><input value={form.tags.join(", ")} onChange={(event) => update("tags", event.target.value.split(",").map((tag) => tag.trim()).filter(Boolean))} className={inputClass}/></label>
-<div className="grid gap-4 sm:grid-cols-2"><label className="block text-sm font-medium text-slate-700">Page address<div className="mt-1.5 flex items-center rounded-md border border-slate-300 bg-slate-50 text-sm focus-within:border-brand-champagne"><span className="pl-3 text-slate-400">/projects/</span><input value={form.slug} onChange={(event) => update("slug", event.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"))} placeholder="created from the name" className="w-full rounded-r-md bg-white px-2 py-2.5 outline-none"/></div></label><label className="block text-sm font-medium text-slate-700">Status label<input value={form.status} onChange={(event) => update("status", event.target.value)} list="project-status-options" placeholder="e.g. Now booking" className={inputClass}/><datalist id="project-status-options"><option value="Now booking"/><option value="New launch"/><option value="Under construction"/><option value="Ready to move"/><option value="Upcoming"/><option value="Sold out"/></datalist></label></div>
-<label className={`flex cursor-pointer items-start gap-3 rounded-md border p-3 text-sm ${form.is_featured ? "border-brand-champagne bg-brand-champagne/10" : "border-slate-200"}`}><input type="checkbox" checked={form.is_featured} onChange={(event) => update("is_featured", event.target.checked)} className="mt-0.5"/><span><span className="font-medium text-slate-800">Featured project</span><span className="mt-0.5 block text-xs text-slate-500">Shown first on the home page and the Projects page. Only one project can be featured; its page uses the content from Featured Project.</span></span></label>
-<section className="rounded-lg border border-slate-200 p-4"><h3 className="font-heading text-lg text-brand-charcoal">Project page</h3><p className="mt-1 text-xs text-slate-500">Everything here is optional — sections without content are hidden on the public page.</p>
-{form.is_featured ? <p className="mt-4 rounded-md bg-slate-50 p-3 text-sm text-slate-600">This is the featured project, so its gallery, video, amenities, layout, construction updates and documents are edited in <Link href="/admin/featured-project" className="font-semibold text-brand-charcoal underline">Featured Project</Link>. You can still add an overview, highlights and key facts below.</p> : null}
-<div className="mt-4 space-y-5">
-<label className="block text-sm font-medium text-slate-700">Overview<textarea rows={4} value={form.details.overview} onChange={(event) => updateDetails("overview", event.target.value)} placeholder="Leave blank to use the description" className={`${inputClass} resize-y`}/></label>
-<TextList label="Highlights (shown as a checklist; tags are used if empty)" values={form.details.highlights} onChange={(values) => updateDetails("highlights", values)}/>
-<div><p className="mb-2 text-sm font-medium text-slate-700">Key facts <span className="font-normal text-slate-400">(e.g. Configuration · 3 & 4 BHK, Possession · Dec 2027, RERA · UPRERAPRJ…)</span></p>{form.details.facts.map((fact, index) => <div key={index} className="mb-2 grid grid-cols-[1fr_1.4fr_auto] gap-2"><input value={fact.label} onChange={(event) => updateDetails("facts", form.details.facts.map((item, position) => position === index ? { ...item, label: event.target.value } : item))} placeholder="Label" className="rounded border border-slate-300 px-3 py-2 text-sm"/><input value={fact.value} onChange={(event) => updateDetails("facts", form.details.facts.map((item, position) => position === index ? { ...item, value: event.target.value } : item))} placeholder="Value" className="rounded border border-slate-300 px-3 py-2 text-sm"/><button type="button" onClick={() => updateDetails("facts", form.details.facts.filter((_, position) => position !== index))} className="rounded p-2 text-red-500 hover:bg-red-50" aria-label="Remove fact"><Trash2 size={16}/></button></div>)}<button type="button" onClick={() => updateDetails("facts", [...form.details.facts, { label: "", value: "" }])} className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-brand-champagne"><Plus size={14}/> Add fact</button></div>
-{!form.is_featured && <>
-<MediaField label="Hero image (optional — the project image is used if empty)" src={form.details.hero_image} onChange={(url) => updateDetails("hero_image", url)} onUpload={uploadInto} onEdit={openImageEditor}/>
-<label className="block text-sm font-medium text-slate-700">Video (YouTube or Vimeo link)<input value={form.details.video_url} onChange={(event) => updateDetails("video_url", event.target.value)} placeholder="https://www.youtube.com/watch?v=…" className={inputClass}/></label>
-<MediaList label="Gallery" items={form.details.gallery} onChange={(items) => updateDetails("gallery", items)} onUpload={uploadInto} onEdit={openImageEditor} move={move} hasAlt/>
-<MediaList label="Amenities (icon image optional)" items={form.details.amenities.map((item) => ({ src: item.icon, alt: item.name }))} onChange={(items) => updateDetails("amenities", items.map((item) => ({ name: item.alt, icon: item.src })))} onUpload={uploadInto} onEdit={openImageEditor} move={move} hasAlt altLabel="Amenity name"/>
-<MediaField label="Layout plan" src={form.details.layout_image} onChange={(url) => updateDetails("layout_image", url)} onUpload={uploadInto} onEdit={openImageEditor}/>
-<MediaList label="Construction photos" items={form.details.construction_images.map((src) => ({ src, alt: "" }))} onChange={(items) => updateDetails("construction_images", items.map((item) => item.src))} onUpload={uploadInto} onEdit={openImageEditor} move={move}/>
-<div><p className="mb-2 text-sm font-medium text-slate-700">Documents (brochures, price lists, floor plans)</p><DocumentList items={form.details.documents} onChange={(items) => updateDetails("documents", items)} move={move} onUpload={uploadDocumentInto}/></div>
-</>}
-</div></section></div><div className="sticky bottom-0 flex gap-3 border-t border-slate-200 bg-white px-6 py-4"><Button type="submit" disabled={saving || uploading} className="gap-2">{saving ? "Saving…" : <><CheckCircle2 size={16}/>{editing === null ? "Add project" : "Save changes"}</>}</Button><button type="button" onClick={closeEditor} className="px-3 text-sm text-slate-500 hover:text-brand-charcoal">Cancel</button></div></form></div>}
-    {imageEditor && <ImageEditor src={imageEditor.src} onClose={() => setImageEditor(null)} onSaved={(url) => imageEditor.apply(url)}/>}
-  </div>;
+  const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
+
+  return (
+    <div>
+      <PageHeader title="Projects" description="Every project gets its own page on the website. Hidden projects stay here but are not shown to visitors."
+        actions={<><Button variant="outline" onClick={() => setReordering(true)}><ArrowUpDown size={16} aria-hidden />Reorder</Button><Button to="/admin/properties/new"><Plus size={16} aria-hidden />Add project</Button></>} />
+      {error && <Notice tone="error">{error}</Notice>}
+
+      <section className="rounded-[20px] border border-line bg-white">
+        <div className="flex flex-col gap-3 border-b border-line p-4 lg:flex-row lg:items-center lg:justify-between md:px-6">
+          <SegTabs label="Developer" value={category} onChange={setCategory} options={[{ value: "all", label: "All" }, { value: "hpg", label: "By HPG" }, { value: "partner", label: "Partner" }]} />
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <select value={type} onChange={(event) => setType(event.target.value as typeof type)} aria-label="Project type" className={`${fieldInput} h-10 py-0 text-[14px] sm:w-44`}><option value="all">All types</option><option value="residential">Residential</option><option value="commercial">Commercial</option></select>
+            <SearchInput value={search} onChange={setSearch} placeholder="Search name or location" className="sm:w-64" />
+          </div>
+        </div>
+
+        {items === null ? <p className="p-6 text-[14px] text-ink-muted">Loading projects…</p> : items.length === 0 ? (
+          <EmptyState icon={<Building2 size={24} />} title="No matching projects" description="Try another filter, or add a new project." action={<Button to="/admin/properties/new"><Plus size={16} aria-hidden />Add project</Button>} />
+        ) : (
+          <>
+            <div className="hidden overflow-x-auto lg:block">
+              <table className="w-full text-left text-[14px]">
+                <thead><tr><th className={thClass}>Project</th><th className={thClass}>Price</th><th className={thClass}>Status</th><th className={thClass}>Page content</th><th className={thClass}>Visible</th><th className={thClass}><span className="sr-only">Actions</span></th></tr></thead>
+                <tbody>
+                  {items.map((item) => {
+                    const progress = pageProgress(item);
+                    return (
+                      <tr key={item.id} className={`hover:bg-ivory-50 ${item.is_enabled ? "" : "text-ink-muted"}`}>
+                        <td className={tdClass}>
+                          <Link href={`/admin/properties/${item.id}`} className="flex items-center gap-3">
+                            <img src={item.image_url} alt="" className={`h-12 w-16 shrink-0 rounded-lg bg-ivory-100 object-cover ${item.is_enabled ? "" : "opacity-50"}`} />
+                            <span className="min-w-0"><span className="flex items-center gap-1.5 font-semibold text-ink hover:text-gold-700">{item.title}{item.is_featured && <Star size={14} className="fill-gold-400 text-gold-500" aria-label="Featured" />}</span><span className="block truncate text-[13px] text-ink-muted">{item.location} · {item.portfolio_category === "hpg" ? "By HPG" : "Partner"} · <span className="capitalize">{item.project_type}</span></span></span>
+                          </Link>
+                        </td>
+                        <td className={`${tdClass} whitespace-nowrap`}>{item.price || "On request"}</td>
+                        <td className={tdClass}>{!item.is_enabled ? <StatusPill status="hidden" /> : item.is_featured ? <StatusPill status="featured" /> : <StatusPill status="published" label={item.status || "Published"} />}</td>
+                        <td className={tdClass}>
+                          <span className="flex items-center gap-2" title={progress.checks.filter((check) => !check.done).map((check) => check.label).join(", ") || "Complete"}>
+                            <span className="h-1.5 w-16 overflow-hidden rounded-full bg-ivory-100"><span className="block h-full rounded-full bg-gold-500" style={{ width: `${(progress.done / progress.total) * 100}%` }} /></span>
+                            <span className="text-[13px] text-ink-muted">{progress.done}/{progress.total}</span>
+                          </span>
+                        </td>
+                        <td className={tdClass}><SwitchControl checked={item.is_enabled} onChange={() => void toggleVisible(item)} label={`Show ${item.title} on the website`} /></td>
+                        <td className={tdClass}>
+                          <div className="flex justify-end gap-1">
+                            {item.slug && <IconButton label="View on website" href={`/projects/${item.slug}`} target="_blank"><ExternalLink size={16} /></IconButton>}
+                            <Link href={`/admin/properties/${item.id}`} className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-ink-muted hover:bg-ivory-100 hover:text-ink" aria-label={`Edit ${item.title}`} title="Edit"><Pencil size={16} /></Link>
+                            <IconButton label={`Delete ${item.title}`} tone="danger" onClick={() => void remove(item)}><Trash2 size={16} /></IconButton>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <ul className="divide-y divide-line lg:hidden">
+              {items.map((item) => (
+                <li key={item.id} className="flex items-center gap-3 p-4">
+                  <Link href={`/admin/properties/${item.id}`} className="flex min-w-0 flex-1 items-center gap-3">
+                    <img src={item.image_url} alt="" className={`h-14 w-16 shrink-0 rounded-lg bg-ivory-100 object-cover ${item.is_enabled ? "" : "opacity-50"}`} />
+                    <span className="min-w-0"><span className="flex items-center gap-1.5 font-semibold text-ink">{item.title}{item.is_featured && <Star size={14} className="fill-gold-400 text-gold-500" aria-label="Featured" />}</span><span className="block truncate text-[13px] text-ink-muted">{item.location}</span><span className="mt-1 block">{item.is_enabled ? <StatusPill status="published" label={item.status || "Published"} /> : <StatusPill status="hidden" />}</span></span>
+                  </Link>
+                  <SwitchControl checked={item.is_enabled} onChange={() => void toggleVisible(item)} label={`Show ${item.title} on the website`} />
+                </li>
+              ))}
+            </ul>
+            <div className="flex items-center justify-between gap-3 px-5 py-4 md:px-6">
+              <p className="text-[14px] text-ink-muted">{total} {total === 1 ? "project" : "projects"}</p>
+              {totalPages > 1 && <div className="flex gap-2"><Button variant="outline" size="sm" onClick={() => setPage(page - 1)} disabled={page === 1}>Previous</Button><Button variant="outline" size="sm" onClick={() => setPage(page + 1)} disabled={page === totalPages}>Next</Button></div>}
+            </div>
+          </>
+        )}
+      </section>
+      {reordering && <ReorderDialog onClose={() => setReordering(false)} onSaved={() => { setReordering(false); toast("New order saved. The website shows projects in this order."); void load(); }} />}
+    </div>
+  );
+}
+
+/** Drag projects into the order they appear on the website (per developer and type, as on the site). */
+function ReorderDialog({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
+  const [groups, setGroups] = useState<{ key: string; label: string; items: PortfolioProject[] }[] | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [drag, setDrag] = useState<{ group: number; index: number } | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const all: PortfolioProject[] = [];
+      for (let page = 1; page < 20; page += 1) {
+        const result = await api.listPortfolio({ page, limit: 50 });
+        all.push(...result.items);
+        if (all.length >= result.pagination.total) break;
+      }
+      const labels: Record<string, string> = { "hpg-residential": "By HPG · Residential", "hpg-commercial": "By HPG · Commercial", "partner-residential": "Partner · Residential", "partner-commercial": "Partner · Commercial" };
+      setGroups(Object.entries(labels).map(([key, label]) => ({ key, label, items: all.filter((item) => `${item.portfolio_category}-${item.project_type}` === key).sort((a, b) => a.sort_order - b.sort_order || a.id - b.id) })).filter((group) => group.items.length));
+    })().catch((reason) => setError(reason instanceof Error ? reason.message : "Unable to load projects."));
+  }, []);
+  useEffect(() => { const esc = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); }; window.addEventListener("keydown", esc); return () => window.removeEventListener("keydown", esc); }, [onClose]);
+
+  const setItems = (groupIndex: number, items: PortfolioProject[]) => setGroups((current) => current?.map((group, index) => (index === groupIndex ? { ...group, items } : group)) ?? current);
+
+  async function save() {
+    if (!groups) return;
+    setSaving(true); setError(null);
+    try { for (const group of groups) await api.reorderPortfolio(group.items.map((item) => item.id)); onSaved(); }
+    catch (reason) { setError(reason instanceof Error ? reason.message : "Unable to save the order."); setSaving(false); }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex justify-end bg-navy-950/40" role="dialog" aria-modal="true" aria-label="Reorder projects" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+      <div className="flex h-full w-full max-w-lg animate-fade-in flex-col bg-white shadow-float">
+        <div className="flex items-start justify-between gap-4 border-b border-line px-6 py-5">
+          <div><h2 className="font-heading text-[24px] leading-8 text-ink">Reorder projects</h2><p className="mt-1 text-[14px] text-ink-muted">Drag rows to change the order on the website. The featured project always shows first.</p></div>
+          <IconButton label="Close" onClick={onClose}><X size={18} /></IconButton>
+        </div>
+        <div className="flex-1 space-y-6 overflow-y-auto p-6">
+          {error && <Notice tone="error">{error}</Notice>}
+          {!groups ? <p className="text-[14px] text-ink-muted">Loading…</p> : groups.map((group, groupIndex) => (
+            <div key={group.key}>
+              <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.1em] text-ink-muted">{group.label}</p>
+              <ul className="space-y-2">
+                {group.items.map((item, index) => (
+                  <li key={item.id} draggable onDragStart={() => setDrag({ group: groupIndex, index })} onDragEnd={() => setDrag(null)}
+                    onDragOver={(event) => { event.preventDefault(); if (drag && drag.group === groupIndex && drag.index !== index) { const next = [...group.items]; const [moved] = next.splice(drag.index, 1); next.splice(index, 0, moved); setItems(groupIndex, next); setDrag({ group: groupIndex, index }); } }}
+                    className={`flex items-center gap-3 rounded-2xl border bg-white p-2 pr-3 ${drag?.group === groupIndex && drag.index === index ? "border-gold-500 opacity-60" : "border-line"}`}>
+                    <span className="flex h-9 w-7 cursor-grab items-center justify-center text-ink-subtle" title="Drag to reorder"><GripVertical size={18} aria-hidden /></span>
+                    <img src={item.image_url} alt="" className="h-10 w-14 rounded-lg bg-ivory-100 object-cover" />
+                    <span className="min-w-0 flex-1 truncate text-[14px] font-semibold text-ink">{item.title}{!item.is_enabled && <span className="ml-2 text-[12px] font-medium text-ink-muted">Hidden</span>}</span>
+                    <button type="button" onClick={() => setItems(groupIndex, moveItem(group.items, index, -1))} disabled={index === 0} className="rounded-lg p-1.5 text-ink-muted hover:bg-ivory-100 disabled:opacity-30" aria-label={`Move ${item.title} up`}><ChevronUp size={16} /></button>
+                    <button type="button" onClick={() => setItems(groupIndex, moveItem(group.items, index, 1))} disabled={index === group.items.length - 1} className="rounded-lg p-1.5 text-ink-muted hover:bg-ivory-100 disabled:opacity-30" aria-label={`Move ${item.title} down`}><ChevronDown size={16} /></button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <div className="flex justify-end gap-2 border-t border-line px-6 py-4"><Button variant="ghost" onClick={onClose}>Cancel</Button><Button onClick={() => void save()} disabled={saving || !groups}>{saving ? "Saving…" : "Save order"}</Button></div>
+      </div>
+    </div>
+  );
 }

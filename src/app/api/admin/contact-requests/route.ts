@@ -4,6 +4,7 @@ import { requireAdminSession } from "../../../../lib/server/auth";
 import type { ContactRequest } from "../../../../lib/api";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   const session = await requireAdminSession();
@@ -12,10 +13,10 @@ export async function GET() {
   }
 
   const result = await query<ContactRequest>(
-    `SELECT id, name, email, message, created_at
+    `SELECT id, name, email, message, read_at, created_at
      FROM contact_requests
      ORDER BY created_at DESC`,
   );
 
-  return NextResponse.json(result.rows);
+  return NextResponse.json(result.rows, { headers: { "Cache-Control": "private, no-store, max-age=0" } });
 }

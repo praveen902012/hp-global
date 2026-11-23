@@ -68,7 +68,7 @@ export function ProjectEnquiryModal({ isOpen, onClose, project }: ModalProps) {
     if (Object.keys(next).length) return;
     setSubmitting(true);
     try {
-      await api.createEnquiry({ name, phone, whatsapp_consent: consent, project_title: title });
+      await api.createEnquiry({ name, phone, whatsapp_consent: consent, project_title: title, source: window.location.pathname });
       setSuccess(true);
     } catch (error) {
       setErrors({ form: error instanceof Error ? error.message : "Something went wrong. Please try again." });

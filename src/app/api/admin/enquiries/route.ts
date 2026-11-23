@@ -13,7 +13,7 @@ export async function GET() {
   }
 
   const result = await query<Enquiry>(
-    `SELECT id, name, phone, whatsapp_consent, project_title, created_at
+    `SELECT id, name, phone, whatsapp_consent, project_title, source, status, notes, created_at
      FROM enquiries
      ORDER BY created_at DESC`,
   );

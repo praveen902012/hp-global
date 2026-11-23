@@ -123,11 +123,6 @@
   .bg-gradient-gold { @apply bg-gradient-to-r from-[#D4AF37] to-[#B8972E] text-white; }
 }
 
-@layer base {
-  .legacy-ui h1, .legacy-ui h2, .legacy-ui h3, .legacy-ui h4, .legacy-ui h5, .legacy-ui h6 { @apply font-heading tracking-tight text-brand-charcoal font-medium; }
-  .legacy-ui p { @apply text-slate-600 font-light leading-relaxed; }
-}
-
 /* A dark hero that the transparent header sits on top of. */
 @layer components {
   .hero-overlay { margin-top: -4rem; padding-top: 4rem; }

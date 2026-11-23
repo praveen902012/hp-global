@@ -113,6 +113,12 @@ export async function getProjectPageBySlug(slug: string) {
   return buildProjectPage(toPublicProject(project), project.details, featured, toVideoEmbedUrl);
 }
 
+export async function getPortfolioProject(id: number) {
+  await ensurePortfolioSeed();
+  const result = await query<PortfolioProject>(`SELECT ${COLUMNS} FROM portfolio_projects WHERE id = $1`, [id]);
+  return result.rows[0] ? mapRow(result.rows[0]) : null;
+}
+
 export async function getFeaturedProjectSlug() {
   await ensurePortfolioSeed();
   const result = await query<{ slug: string }>("SELECT slug FROM portfolio_projects WHERE is_featured AND is_enabled ORDER BY id LIMIT 1");
@@ -137,7 +143,7 @@ export async function listPortfolioProjectPage(options: {
   const total = await query<{ count: number }>(`SELECT COUNT(*)::int AS count FROM portfolio_projects ${where}`, values);
   const limit = add(options.limit);
   const offset = add((options.page - 1) * options.limit);
-  const projects = await query<PortfolioProject>(`SELECT ${COLUMNS} FROM portfolio_projects ${where} ORDER BY portfolio_category, project_type, sort_order, id LIMIT ${limit} OFFSET ${offset}`, values);
+  const projects = await query<PortfolioProject>(`SELECT ${COLUMNS} FROM portfolio_projects ${where} ORDER BY is_featured DESC, portfolio_category, project_type, sort_order, id LIMIT ${limit} OFFSET ${offset}`, values);
   return { items: projects.rows.map(mapRow), pagination: { page: options.page, limit: options.limit, total: total.rows[0]?.count || 0 } };
 }
 

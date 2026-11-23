@@ -3,8 +3,11 @@ export interface ContactRequest {
   name: string;
   email: string;
   message: string;
+  read_at?: string | null;
   created_at: string;
 }
+
+export type EnquiryStatus = "new" | "contacted" | "closed";
 
 export interface Enquiry {
   id: number;
@@ -12,22 +15,27 @@ export interface Enquiry {
   phone: string;
   whatsapp_consent: boolean;
   project_title: string;
+  source?: string;
+  status?: EnquiryStatus;
+  notes?: string;
   created_at: string;
 }
 
+export interface AttentionItem { id: string; title: string; detail: string; href: string; tone: "warning" | "info" }
+
 export interface DashboardStats {
-  blogs: number;
-  properties: number;
-  portfolioCategories: { hpg: number; partner: number };
-  publishedArticles: PublishedArticle[];
+  counts: {
+    new_enquiries: number; enquiries_week: number; waiting_enquiries: number;
+    unread_contacts: number; contacts_week: number;
+    live_projects: number; hidden_projects: number;
+    published_articles: number; draft_articles: number; press_items: number;
+  };
+  latestEnquiries: Enquiry[];
+  latestContacts: ContactRequest[];
+  attention: AttentionItem[];
 }
 
-export interface PublishedArticle {
-  id: string;
-  title: string;
-  slug: string;
-  publishedAt: string;
-}
+export interface SearchResult { type: "Project" | "Article" | "Page" | "Press" | "Enquiry" | "Contact request"; title: string; detail: string; href: string }
 
 export interface ManagedBlog {
   id: number;
@@ -38,6 +46,8 @@ export interface ManagedBlog {
   content: string;
   image_url: string;
   published_at: string;
+  is_draft: boolean;
+  updated_at?: string;
   created_at: string;
 }
 
@@ -49,11 +59,13 @@ export interface BlogInput {
   content: string;
   image_url: string;
   published_at: string;
+  is_draft: boolean;
 }
 
 export interface BlogPage {
   items: ManagedBlog[];
   pagination: { page: number; limit: number; total: number };
+  counts: { published: number; draft: number };
 }
 
 export type { FeaturedProjectContent } from "../data/featuredProject";
@@ -112,7 +124,7 @@ export const api = {
   },
 
   listContactRequests() {
-    return apiRequest<ContactRequest[]>('/admin/contact-requests');
+    return apiRequest<ContactRequest[]>('/admin/contact-requests', { cache: 'no-store' });
   },
 
   createEnquiry(input: {
@@ -120,6 +132,7 @@ export const api = {
     phone: string;
     whatsapp_consent: boolean;
     project_title: string;
+    source?: string;
   }) {
     return apiRequest<Enquiry>('/enquiries', {
       method: 'POST',
@@ -129,6 +142,30 @@ export const api = {
 
   listEnquiries() {
     return apiRequest<Enquiry[]>('/admin/enquiries', { cache: 'no-store' });
+  },
+
+  updateEnquiry(id: number, input: { status?: EnquiryStatus; notes?: string }) {
+    return apiRequest<Enquiry>(`/admin/enquiries/${id}`, { method: 'PATCH', body: JSON.stringify(input) });
+  },
+
+  deleteEnquiry(id: number) {
+    return apiRequest<{ ok: true }>(`/admin/enquiries/${id}`, { method: 'DELETE' });
+  },
+
+  markContactRequest(id: number, read: boolean) {
+    return apiRequest<ContactRequest>(`/admin/contact-requests/${id}`, { method: 'PATCH', body: JSON.stringify({ read }) });
+  },
+
+  deleteContactRequest(id: number) {
+    return apiRequest<{ ok: true }>(`/admin/contact-requests/${id}`, { method: 'DELETE' });
+  },
+
+  getAdminCounts() {
+    return apiRequest<{ enquiries: number; contacts: number }>('/admin/counts', { cache: 'no-store' });
+  },
+
+  searchAdmin(q: string) {
+    return apiRequest<{ results: SearchResult[] }>(`/admin/search?q=${encodeURIComponent(q)}`, { cache: 'no-store' });
   },
 
   getDashboardStats() {
@@ -142,7 +179,11 @@ export const api = {
     });
   },
 
-  listBlogs(params: { page?: number; limit?: number; search?: string } = {}) {
+  getBlog(id: number) {
+    return apiRequest<ManagedBlog>(`/admin/blogs/${id}`, { cache: 'no-store' });
+  },
+
+  listBlogs(params: { page?: number; limit?: number; search?: string; status?: string } = {}) {
     const query = new URLSearchParams(Object.entries(params).filter(([, value]) => value !== undefined && value !== "") as [string, string][]);
     return apiRequest<BlogPage>(`/admin/blogs?${query}`, { cache: 'no-store' });
   },
@@ -189,6 +230,8 @@ export const api = {
   },
   createPortfolio(input: PortfolioInput) { return apiRequest<PortfolioProject>('/admin/portfolio', { method: 'POST', body: JSON.stringify(input) }); },
   updatePortfolio(id: number, input: PortfolioInput) { return apiRequest<PortfolioProject>(`/admin/portfolio/${id}`, { method: 'PUT', body: JSON.stringify(input) }); },
+  reorderPortfolio(ids: number[]) { return apiRequest<{ ok: true }>('/admin/portfolio/reorder', { method: 'POST', body: JSON.stringify({ ids }) }); },
+  getPortfolio(id: number) { return apiRequest<PortfolioProject>(`/admin/portfolio/${id}`, { cache: 'no-store' }); },
   deletePortfolio(id: number) { return apiRequest<{ ok: true }>(`/admin/portfolio/${id}`, { method: 'DELETE' }); },
   async uploadPortfolioImage(file: File) {
     const form = new FormData();

@@ -5,6 +5,9 @@ import type { QueryResultRow } from "pg";
 
 const { Pool } = pg;
 
+// BIGSERIAL ids come back as strings by default; they are far below 2^53, so use numbers.
+pg.types.setTypeParser(pg.types.builtins.INT8, (value) => Number(value));
+
 let pool: pg.Pool | null = null;
 let schemaReady: Promise<void> | null = null;
 

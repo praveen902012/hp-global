@@ -34,16 +34,16 @@ export function RichTextEditor({ value, onChange, placeholder = "Write here…",
     if (href && href.trim()) format("createLink", href.trim());
   }
 
-  const tool = "flex h-8 min-w-8 items-center justify-center rounded px-1.5 text-slate-600 transition hover:bg-white hover:text-brand-charcoal";
+  const tool = "flex h-8 min-w-8 items-center justify-center rounded-lg px-1.5 text-ink-muted transition hover:bg-white hover:text-ink";
 
   return (
-    <div className="mt-1.5 overflow-hidden rounded-md border border-slate-300 bg-white focus-within:border-brand-champagne focus-within:ring-2 focus-within:ring-brand-champagne/20">
-      <div className="flex flex-wrap gap-1 border-b border-slate-200 bg-slate-50 p-1.5">
+    <div className="mt-1.5 overflow-hidden rounded-xl border border-line-strong bg-white focus-within:border-navy-900 focus-within:ring-4 focus-within:ring-gold-200/70">
+      <div className="sticky top-0 z-10 flex flex-wrap gap-1 border-b border-line bg-ivory-50 p-1.5">
         {tools.map((item) => <button key={item.label} type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => (item.command === "link" ? addLink() : format(item.command, item.value))} title={item.label} aria-label={item.label} className={tool}>{item.icon}</button>)}
       </div>
       <div ref={editor} contentEditable suppressContentEditableWarning role="textbox" aria-multiline="true" data-placeholder={placeholder}
         onInput={(event) => onChange(event.currentTarget.innerHTML)}
-        className={`${minHeight} px-3 py-3 text-sm leading-relaxed text-slate-900 outline-none empty:before:text-slate-400 empty:before:content-[attr(data-placeholder)] [&_p]:mb-2 [&_a]:text-blue-700 [&_a]:underline [&_blockquote]:border-l-2 [&_blockquote]:border-brand-champagne [&_blockquote]:pl-3 [&_blockquote]:italic [&_h2]:text-lg [&_h2]:font-bold [&_h3]:font-bold [&_ol]:list-decimal [&_ol]:pl-6 [&_ul]:list-disc [&_ul]:pl-6`} />
+        className={`${minHeight} px-4 py-3 text-[15px] leading-[26px] text-ink outline-none empty:before:text-ink-subtle empty:before:content-[attr(data-placeholder)] [&_p]:mb-3 [&_a]:text-gold-700 [&_a]:underline [&_blockquote]:border-l-[3px] [&_blockquote]:border-gold-400 [&_blockquote]:pl-4 [&_blockquote]:italic [&_h2]:mb-2 [&_h2]:mt-4 [&_h2]:font-heading [&_h2]:text-[22px] [&_h3]:mb-2 [&_h3]:mt-3 [&_h3]:font-heading [&_h3]:text-[19px] [&_ol]:mb-3 [&_ol]:list-decimal [&_ol]:pl-6 [&_ul]:mb-3 [&_ul]:list-disc [&_ul]:pl-6`} />
     </div>
   );
 }

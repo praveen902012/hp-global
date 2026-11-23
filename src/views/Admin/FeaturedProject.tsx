@@ -1,44 +1,171 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckCircle2, ChevronDown, ChevronUp, ExternalLink, FilePlus2, ImagePlus, Plus, Trash2, Upload } from "lucide-react";
-import Link from "next/link";
+import { Check, Circle, ExternalLink, Save } from "lucide-react";
 import { api, type FeaturedProjectContent } from "../../lib/api";
 import { iframeUrl } from "../../data/featuredProject";
-import { Button } from "../../components/ui/Button";
 import { ImageEditor } from "../../components/admin/ImageEditor";
+import { DocumentList, MediaField, MediaList, TextList, type DocumentItem } from "../../components/admin/media";
+import { Button, Card, Notice, PageHeader, inputClass, labelClass, useToast } from "../../components/admin/ui";
 
-const input = "mt-1.5 w-full rounded-md border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-brand-champagne focus:ring-2 focus:ring-brand-champagne/20";
 const sections = [["hero", "Hero"], ["home", "Homepage showcase"], ["iframe", "Walkthrough video"], ["gallery", "Gallery"], ["amenities", "Amenities & layout"], ["construction", "Construction"], ["documents", "Documents"], ["sidebar", "Enquiry panel"]] as const;
+type SectionId = (typeof sections)[number][0];
 
-export function AdminFeaturedProject() {
-  const [content, setContent] = useState<FeaturedProjectContent | null>(null);
-  const [active, setActive] = useState("hero"); const [saving, setSaving] = useState(false); const [dirty, setDirty] = useState(false);
-  const [status, setStatus] = useState<{ error?: string; success?: string }>({}); const [editor, setEditor] = useState<{ src: string; apply: (url: string) => void } | null>(null);
-  useEffect(() => { api.getFeaturedProject().then(setContent).catch((error) => setStatus({ error: error instanceof Error ? error.message : "Unable to load the project." })); }, []);
-  if (!content) return <div className="p-10 text-slate-500">Loading featured project…</div>;
-  const update = <K extends keyof FeaturedProjectContent>(key: K, value: FeaturedProjectContent[K]) => { setContent((current) => current ? { ...current, [key]: value } : current); setDirty(true); };
-  const chooseEditor = (src: string, apply: (url: string) => void) => setEditor({ src, apply });
-  async function upload(file: File | undefined, apply: (url: string) => void) { if (!file) return; try { apply((await api.uploadImage(file)).image_url); setDirty(true); } catch (error) { setStatus({ error: error instanceof Error ? error.message : "Unable to upload image." }); } }
-  async function uploadDocument(file: File | undefined, apply: (document: FeaturedProjectContent["documents"][number]) => void) { if (!file) return; try { const document = await api.uploadDocument(file); apply({ name: document.name.replace(/\.pdf$/i, ""), url: document.document_url, size: document.size }); setDirty(true); } catch (error) { setStatus({ error: error instanceof Error ? error.message : "Unable to upload document." }); } }
-  async function save() { setSaving(true); setStatus({}); try { await api.updateFeaturedProject(content!); setDirty(false); setStatus({ success: "Featured Project updated successfully." }); } catch (error) { setStatus({ error: error instanceof Error ? error.message : "Unable to save changes." }); } finally { setSaving(false); } }
-  const move = <T,>(items: T[], index: number, direction: -1 | 1) => { const next = [...items]; const target = index + direction; if (target < 0 || target >= next.length) return items; [next[index], next[target]] = [next[target], next[index]]; return next; };
-  return <div className="p-6 lg:p-10"><div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="mb-2 text-xs font-bold uppercase tracking-[.22em] text-brand-champagne">Content management</p><h1 className="text-3xl font-heading text-brand-charcoal">Featured Project</h1><p className="mt-2 text-sm text-slate-500">Edit the homepage showcase and full project experience.</p></div><Link href="/featured-project" target="_blank" className="inline-flex items-center gap-2 self-start text-sm font-bold text-brand-champagne hover:text-brand-charcoal"><ExternalLink size={16}/> View live page</Link></div>{(status.error || status.success) && <div role="status" className={`mb-6 flex items-center gap-2 rounded-md border px-4 py-3 text-sm ${status.error ? "border-red-200 bg-red-50 text-red-700" : "border-emerald-200 bg-emerald-50 text-emerald-700"}`}>{status.success && <CheckCircle2 size={17}/>} {status.error || status.success}</div>}<div className="grid gap-6 xl:grid-cols-[220px_minmax(0,1fr)]"><aside className="self-start rounded-xl border border-slate-200 bg-white p-3 shadow-sm xl:sticky xl:top-6"><p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-[.18em] text-slate-400">Project sections</p><nav className="space-y-1">{sections.map(([id, label]) => <button key={id} type="button" onClick={() => { setActive(id); document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }); }} className={`w-full rounded-md px-3 py-2.5 text-left text-sm transition ${active === id ? "bg-brand-charcoal font-semibold text-brand-champagne" : "text-slate-600 hover:bg-slate-100"}`}>{label}</button>)}</nav></aside><div className="space-y-6">
-      <Panel id="hero" title="Hero"><div className="grid gap-4 md:grid-cols-2"><Field label="Eyebrow" value={content.hero.eyebrow} onChange={(value) => update("hero", { ...content.hero, eyebrow: value })}/><Field label="Location" value={content.hero.location} onChange={(value) => update("hero", { ...content.hero, location: value })}/><Field label="Title" value={content.hero.title} onChange={(value) => update("hero", { ...content.hero, title: value })}/><Field label="Accent title" value={content.hero.accentTitle} onChange={(value) => update("hero", { ...content.hero, accentTitle: value })}/><MediaField label="Hero image" src={content.hero.image_url} onChange={(url) => update("hero", { ...content.hero, image_url: url })} onUpload={upload} onEdit={chooseEditor}/></div></Panel>
-      <Panel id="home" title="Homepage showcase"><div className="grid gap-4 md:grid-cols-2"><Field label="Eyebrow" value={content.home.eyebrow} onChange={(value) => update("home", { ...content.home, eyebrow: value })}/><Field label="Card title" value={content.home.cardTitle} onChange={(value) => update("home", { ...content.home, cardTitle: value })}/><Field label="Heading" value={content.home.heading} onChange={(value) => update("home", { ...content.home, heading: value })}/><Field label="Accent heading" value={content.home.accentHeading} onChange={(value) => update("home", { ...content.home, accentHeading: value })}/><Field label="Description" value={content.home.description} onChange={(value) => update("home", { ...content.home, description: value })} textarea wide/><Field label="Card description" value={content.home.cardDescription} onChange={(value) => update("home", { ...content.home, cardDescription: value })} textarea wide/><MediaField label="Main card image" src={content.home.cardImage} onChange={(url) => update("home", { ...content.home, cardImage: url })} onUpload={upload} onEdit={chooseEditor}/><TextList label="Tags" values={content.home.tags} onChange={(tags) => update("home", { ...content.home, tags })}/></div><MediaList label="Supporting images" items={content.home.galleryImages.map((src) => ({ src, alt: "" }))} onChange={(items) => update("home", { ...content.home, galleryImages: items.map((item) => item.src) })} onUpload={upload} onEdit={chooseEditor} move={move}/></Panel>
-      <Panel id="iframe" title="Walkthrough video"><div className="grid gap-4 lg:grid-cols-2"><div className="space-y-4"><Field label="YouTube or Vimeo embed URL" value={content.iframe.src} onChange={(value) => update("iframe", { ...content.iframe, src: value })}/><Field label="Iframe title" value={content.iframe.title} onChange={(value) => update("iframe", { ...content.iframe, title: value })}/><label className="block text-sm font-medium text-slate-700">Referrer policy<select value={content.iframe.referrer_policy} onChange={(event) => update("iframe", { ...content.iframe, referrer_policy: event.target.value })} className={input}><option>strict-origin-when-cross-origin</option><option>no-referrer</option><option>origin</option></select></label><div className="flex flex-wrap gap-3">{(["autoplay", "mute", "loop", "controls", "allow_fullscreen"] as const).map((key) => <label key={key} className="flex items-center gap-2 rounded border border-slate-200 px-3 py-2 text-sm text-slate-700"><input type="checkbox" checked={content.iframe[key]} onChange={(event) => update("iframe", { ...content.iframe, [key]: event.target.checked })}/>{key.replace("_", " ")}</label>)}</div></div><div className="aspect-video overflow-hidden rounded-lg bg-brand-charcoal"><iframe src={iframeUrl(content.iframe)} title={content.iframe.title} className="h-full w-full" allowFullScreen={content.iframe.allow_fullscreen}/></div></div></Panel>
-      <Panel id="gallery" title="Gallery"><MediaList label="Gallery images" items={content.gallery} onChange={(gallery) => update("gallery", gallery)} onUpload={upload} onEdit={chooseEditor} move={move} hasAlt/></Panel>
-      <Panel id="amenities" title="Amenities & layout"><MediaList label="Amenities" items={content.amenities.map((item) => ({ src: item.icon, alt: item.name }))} onChange={(items) => update("amenities", items.map((item) => ({ name: item.alt, icon: item.src })))} onUpload={upload} onEdit={chooseEditor} move={move} hasAlt altLabel="Amenity name"/><div className="mt-6"><MediaField label="Layout image" src={content.layout.image_url} onChange={(url) => update("layout", { ...content.layout, image_url: url })} onUpload={upload} onEdit={chooseEditor}/><Field label="Layout alt text" value={content.layout.alt} onChange={(value) => update("layout", { ...content.layout, alt: value })}/></div></Panel>
-      <Panel id="construction" title="Construction media"><div className="grid gap-4 md:grid-cols-2"><Field label="Video URL" value={content.construction.video_url} onChange={(value) => update("construction", { ...content.construction, video_url: value })}/><MediaField label="Video poster" src={content.construction.poster_url} onChange={(url) => update("construction", { ...content.construction, poster_url: url })} onUpload={upload} onEdit={chooseEditor}/></div><MediaList label="Construction images" items={content.construction.images.map((src) => ({ src, alt: "" }))} onChange={(items) => update("construction", { ...content.construction, images: items.map((item) => item.src) })} onUpload={upload} onEdit={chooseEditor} move={move}/></Panel>
-      <Panel id="documents" title="Documents"><p className="mb-4 text-sm text-slate-500">Add a public document URL or upload a PDF up to 25 MB. Uploaded files remain stored on the server.</p><DocumentList items={content.documents} onChange={(documents) => update("documents", documents)} move={move} onUpload={uploadDocument}/></Panel>
-      <Panel id="sidebar" title="Enquiry panel"><div className="grid gap-4 md:grid-cols-2"><Field label="Status" value={content.sidebar.status} onChange={(value) => update("sidebar", { ...content.sidebar, status: value })}/><Field label="Button label" value={content.sidebar.button_label} onChange={(value) => update("sidebar", { ...content.sidebar, button_label: value })}/><Field label="Note" value={content.sidebar.note} onChange={(value) => update("sidebar", { ...content.sidebar, note: value })} textarea wide/></div><TextList label="Highlights" values={content.sidebar.items} onChange={(items) => update("sidebar", { ...content.sidebar, items })}/></Panel>
-      <div className="sticky bottom-4 z-20 flex items-center justify-between rounded-xl border border-slate-200 bg-white/95 p-4 shadow-lg backdrop-blur"><span className="text-sm text-slate-500">{dirty ? "You have unsaved changes" : "All changes saved"}</span><Button type="button" onClick={() => void save()} disabled={saving || !dirty} className="gap-2"><FilePlus2 size={16}/>{saving ? "Saving…" : "Save featured project"}</Button></div>
-    </div></div>{editor && <ImageEditor src={editor.src} onClose={() => setEditor(null)} onSaved={(url) => { editor.apply(url); setDirty(true); }}/>}</div>;
+function filled(content: FeaturedProjectContent): Record<SectionId, boolean> {
+  return {
+    hero: !!(content.hero.title && content.hero.image_url),
+    home: !!(content.home.heading && content.home.cardImage),
+    iframe: !!content.iframe.src,
+    gallery: content.gallery.length > 0,
+    amenities: content.amenities.length > 0 || !!content.layout.image_url,
+    construction: content.construction.images.length > 0 || !!content.construction.video_url,
+    documents: content.documents.length > 0,
+    sidebar: !!content.sidebar.button_label,
+  };
 }
 
-function Panel({ id, title, children }: { id: string; title: string; children: React.ReactNode }) { return <section id={id} className="scroll-mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm"><h2 className="mb-5 text-xl font-heading text-brand-charcoal">{title}</h2>{children}</section>; }
-function Field({ label, value, onChange, textarea, wide }: { label: string; value: string; onChange: (value: string) => void; textarea?: boolean; wide?: boolean }) { return <label className={`block text-sm font-medium text-slate-700 ${wide ? "md:col-span-2" : ""}`}>{label}{textarea ? <textarea rows={3} value={value} onChange={(event) => onChange(event.target.value)} className={`${input} resize-y`}/> : <input value={value} onChange={(event) => onChange(event.target.value)} className={input}/>}</label>; }
-export function MediaField({ label, src, onChange, onUpload, onEdit }: { label: string; src: string; onChange: (url: string) => void; onUpload: (file: File | undefined, apply: (url: string) => void) => void; onEdit: (src: string, apply: (url: string) => void) => void }) { return <div className="md:col-span-2"><p className="text-sm font-medium text-slate-700">{label}</p><div className="mt-2 grid gap-3 sm:grid-cols-[160px_1fr]"><img src={src} alt="" className="h-24 w-full rounded-md bg-slate-100 object-cover"/><div><input value={src} onChange={(event) => onChange(event.target.value)} placeholder="Image URL" className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"/><div className="mt-2 flex flex-wrap gap-2"><label className="inline-flex cursor-pointer items-center gap-1 rounded border border-slate-200 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50"><Upload size={14}/> Upload<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="sr-only" onChange={(event) => onUpload(event.target.files?.[0], onChange)}/></label><button type="button" onClick={() => onEdit(src, onChange)} className="inline-flex items-center gap-1 rounded border border-slate-200 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50"><ImagePlus size={14}/> Edit image</button></div></div></div></div>; }
-export function TextList({ label, values, onChange }: { label: string; values: string[]; onChange: (values: string[]) => void }) { return <div className="mt-5"><p className="mb-2 text-sm font-medium text-slate-700">{label}</p>{values.map((value, index) => <div key={index} className="mb-2 flex gap-2"><input value={value} onChange={(event) => onChange(values.map((item, position) => position === index ? event.target.value : item))} className="w-full rounded border border-slate-300 px-3 py-2 text-sm"/><button type="button" onClick={() => onChange(values.filter((_, position) => position !== index))} className="rounded p-2 text-red-500 hover:bg-red-50"><Trash2 size={16}/></button></div>)}<button type="button" onClick={() => onChange([...values, ""])} className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-brand-champagne"><Plus size={14}/> Add item</button></div>; }
-export function MediaList({ label, items, onChange, onUpload, onEdit, move, hasAlt, altLabel = "Alt text" }: { label: string; items: { src: string; alt: string }[]; onChange: (items: { src: string; alt: string }[]) => void; onUpload: (file: File | undefined, apply: (url: string) => void) => void; onEdit: (src: string, apply: (url: string) => void) => void; move: <T>(items: T[], index: number, direction: -1 | 1) => T[]; hasAlt?: boolean; altLabel?: string }) { const patch = (index: number, value: Partial<{ src: string; alt: string }>) => onChange(items.map((item, position) => position === index ? { ...item, ...value } : item)); return <div className="mt-5"><div className="mb-3 flex items-center justify-between"><p className="text-sm font-medium text-slate-700">{label}</p><button type="button" onClick={() => onChange([...items, { src: "", alt: "" }])} className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-brand-champagne"><Plus size={14}/> Add image</button></div><div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">{items.map((item, index) => <div key={index} className="overflow-hidden rounded-lg border border-slate-200"><img src={item.src} alt="" className="h-32 w-full bg-slate-100 object-cover"/><div className="space-y-2 p-3"><input value={item.src} onChange={(event) => patch(index, { src: event.target.value })} placeholder="Image URL" className="w-full rounded border border-slate-300 px-2 py-1.5 text-xs"/>{hasAlt && <input value={item.alt} onChange={(event) => patch(index, { alt: event.target.value })} placeholder={altLabel} className="w-full rounded border border-slate-300 px-2 py-1.5 text-xs"/>}<div className="flex flex-wrap gap-1"><label className="cursor-pointer rounded border border-slate-200 p-1.5 text-slate-600"><Upload size={13}/><input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="sr-only" onChange={(event) => onUpload(event.target.files?.[0], (url) => patch(index, { src: url }))}/></label><button type="button" onClick={() => onEdit(item.src, (url) => patch(index, { src: url }))} className="rounded border border-slate-200 p-1.5 text-slate-600"><ImagePlus size={13}/></button><button type="button" onClick={() => onChange(move(items, index, -1))} disabled={index === 0} className="rounded border border-slate-200 p-1.5 disabled:opacity-30"><ChevronUp size={13}/></button><button type="button" onClick={() => onChange(move(items, index, 1))} disabled={index === items.length - 1} className="rounded border border-slate-200 p-1.5 disabled:opacity-30"><ChevronDown size={13}/></button><button type="button" onClick={() => onChange(items.filter((_, position) => position !== index))} className="rounded border border-red-100 p-1.5 text-red-500"><Trash2 size={13}/></button></div></div></div>)}</div></div>; }
-export function DocumentList({ items, onChange, move, onUpload }: { items: FeaturedProjectContent["documents"]; onChange: (items: FeaturedProjectContent["documents"]) => void; move: <T>(items: T[], index: number, direction: -1 | 1) => T[]; onUpload: (file: File | undefined, apply: (document: FeaturedProjectContent["documents"][number]) => void) => void }) { const patch = (index: number, value: Partial<FeaturedProjectContent["documents"][number]>) => onChange(items.map((item, position) => position === index ? { ...item, ...value } : item)); return <div className="space-y-3">{items.map((item, index) => <div key={index} className="rounded-lg border border-slate-200 p-3"><div className="grid gap-2 md:grid-cols-[1fr_2fr_100px_auto]"><input value={item.name} onChange={(event) => patch(index, { name: event.target.value })} placeholder="Name" className="rounded border border-slate-300 px-2 py-2 text-sm"/><input value={item.url} onChange={(event) => patch(index, { url: event.target.value })} placeholder="Document URL" className="rounded border border-slate-300 px-2 py-2 text-sm"/><input value={item.size} onChange={(event) => patch(index, { size: event.target.value })} placeholder="Size" className="rounded border border-slate-300 px-2 py-2 text-sm"/><div className="flex gap-1"><a href={item.url} target="_blank" title="Open document" className="rounded border p-2 text-slate-600"><ExternalLink size={14}/></a><button type="button" onClick={() => onChange(move(items, index, -1))} disabled={index === 0} className="rounded border p-2 disabled:opacity-30"><ChevronUp size={14}/></button><button type="button" onClick={() => onChange(move(items, index, 1))} disabled={index === items.length - 1} className="rounded border p-2 disabled:opacity-30"><ChevronDown size={14}/></button><button type="button" onClick={() => onChange(items.filter((_, position) => position !== index))} className="rounded border border-red-100 p-2 text-red-500"><Trash2 size={14}/></button></div></div><label className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded border border-slate-200 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50"><Upload size={14}/> Replace with uploaded PDF<input type="file" accept="application/pdf,.pdf" className="sr-only" onChange={(event) => onUpload(event.target.files?.[0], (document) => patch(index, document))}/></label></div>)}<div className="flex flex-wrap gap-3"><button type="button" onClick={() => onChange([...items, { name: "", url: "", size: "" }])} className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-brand-champagne"><Plus size={14}/> Add URL document</button><label className="inline-flex cursor-pointer items-center gap-1 text-xs font-bold uppercase tracking-wider text-brand-champagne"><Upload size={14}/> Upload PDF<input type="file" accept="application/pdf,.pdf" className="sr-only" onChange={(event) => onUpload(event.target.files?.[0], (document) => onChange([...items, document]))}/></label></div></div>; }
+function TextField({ label, value, onChange, textarea, wide }: { label: string; value: string; onChange: (value: string) => void; textarea?: boolean; wide?: boolean }) {
+  return (
+    <label className={`${labelClass} ${wide ? "md:col-span-2" : ""}`}>{label}
+      {textarea ? <textarea rows={3} value={value} onChange={(event) => onChange(event.target.value)} className={`${inputClass} resize-y`} /> : <input value={value} onChange={(event) => onChange(event.target.value)} className={inputClass} />}
+    </label>
+  );
+}
+
+export function AdminFeaturedProject() {
+  const toast = useToast();
+  const [content, setContent] = useState<FeaturedProjectContent | null>(null);
+  const [active, setActive] = useState<SectionId>("hero");
+  const [saving, setSaving] = useState(false);
+  const [dirty, setDirty] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [editor, setEditor] = useState<{ src: string; apply: (url: string) => void } | null>(null);
+
+  useEffect(() => { api.getFeaturedProject().then(setContent).catch((reason) => setError(reason instanceof Error ? reason.message : "Unable to load the project.")); }, []);
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (event: BeforeUnloadEvent) => { event.preventDefault(); };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty]);
+
+  if (!content) return error ? <Notice tone="error">{error}</Notice> : <p className="text-[14px] text-ink-muted">Loading featured project…</p>;
+
+  const update = <K extends keyof FeaturedProjectContent>(key: K, value: FeaturedProjectContent[K]) => { setContent((current) => (current ? { ...current, [key]: value } : current)); setDirty(true); };
+  const chooseEditor = (src: string, apply: (url: string) => void) => setEditor({ src, apply });
+  async function upload(file: File | undefined, apply: (url: string) => void) {
+    if (!file) return;
+    try { apply((await api.uploadImage(file)).image_url); setDirty(true); } catch (reason) { toast(reason instanceof Error ? reason.message : "Unable to upload image.", "error"); }
+  }
+  async function uploadDocument(file: File | undefined, apply: (document: DocumentItem) => void) {
+    if (!file) return;
+    try { const document = await api.uploadDocument(file); apply({ name: document.name.replace(/\.pdf$/i, ""), url: document.document_url, size: document.size }); setDirty(true); }
+    catch (reason) { toast(reason instanceof Error ? reason.message : "Unable to upload document.", "error"); }
+  }
+  async function save() {
+    setSaving(true); setError(null);
+    try { await api.updateFeaturedProject(content!); setDirty(false); toast("Featured project saved."); }
+    catch (reason) { setError(reason instanceof Error ? reason.message : "Unable to save changes."); }
+    finally { setSaving(false); }
+  }
+  const done = filled(content);
+  const go = (id: SectionId) => { setActive(id); document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }); };
+
+  return (
+    <div className="pb-24">
+      <PageHeader title="Featured project" description="The project shown first on the home page, with its own full page. Choose which project is featured in Projects."
+        actions={<><Button variant="outline" to="/featured-project" target="_blank">View page <ExternalLink size={15} aria-hidden /></Button><Button onClick={() => void save()} disabled={saving || !dirty}><Save size={16} aria-hidden />{saving ? "Saving…" : "Save changes"}</Button></>} />
+      {error && <Notice tone="error" onClose={() => setError(null)}>{error}</Notice>}
+
+      <div className="grid gap-6 xl:grid-cols-[240px_minmax(0,1fr)]">
+        <aside className="self-start xl:sticky xl:top-24">
+          <nav aria-label="Sections" className="no-scrollbar flex gap-1 overflow-x-auto rounded-[20px] border border-line bg-white p-2 xl:flex-col">
+            {sections.map(([id, label]) => (
+              <button key={id} type="button" onClick={() => go(id)} className={`flex shrink-0 items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-[14px] font-medium transition-colors ${active === id ? "bg-ivory-100 text-ink" : "text-ink-muted hover:bg-ivory-50 hover:text-ink"}`}>
+                {done[id] ? <span className="flex h-5 w-5 items-center justify-center rounded-full bg-success-bg text-success"><Check size={12} aria-label="has content" /></span> : <Circle size={20} className="text-line-strong" aria-hidden />}
+                {label}
+              </button>
+            ))}
+          </nav>
+        </aside>
+        <div className="min-w-0 space-y-6">
+          <Card id="hero" title="Hero" description="The large banner at the top of the project page.">
+            <div className="grid gap-4 md:grid-cols-2">
+              <TextField label="Eyebrow" value={content.hero.eyebrow} onChange={(value) => update("hero", { ...content.hero, eyebrow: value })} />
+              <TextField label="Location" value={content.hero.location} onChange={(value) => update("hero", { ...content.hero, location: value })} />
+              <TextField label="Title" value={content.hero.title} onChange={(value) => update("hero", { ...content.hero, title: value })} />
+              <TextField label="Accent title (shown in gold italics)" value={content.hero.accentTitle} onChange={(value) => update("hero", { ...content.hero, accentTitle: value })} />
+              <MediaField label="Hero image" src={content.hero.image_url} onChange={(url) => update("hero", { ...content.hero, image_url: url })} onUpload={upload} onEdit={chooseEditor} />
+            </div>
+          </Card>
+          <Card id="home" title="Homepage showcase" description="The featured block on the home page.">
+            <div className="grid gap-4 md:grid-cols-2">
+              <TextField label="Eyebrow" value={content.home.eyebrow} onChange={(value) => update("home", { ...content.home, eyebrow: value })} />
+              <TextField label="Card title" value={content.home.cardTitle} onChange={(value) => update("home", { ...content.home, cardTitle: value })} />
+              <TextField label="Heading" value={content.home.heading} onChange={(value) => update("home", { ...content.home, heading: value })} />
+              <TextField label="Accent heading" value={content.home.accentHeading} onChange={(value) => update("home", { ...content.home, accentHeading: value })} />
+              <TextField label="Description" value={content.home.description} onChange={(value) => update("home", { ...content.home, description: value })} textarea wide />
+              <TextField label="Card description" value={content.home.cardDescription} onChange={(value) => update("home", { ...content.home, cardDescription: value })} textarea wide />
+              <MediaField label="Main card image" src={content.home.cardImage} onChange={(url) => update("home", { ...content.home, cardImage: url })} onUpload={upload} onEdit={chooseEditor} />
+              <div className="md:col-span-2"><TextList label="Tags" values={content.home.tags} onChange={(tags) => update("home", { ...content.home, tags })} addLabel="Add tag" /></div>
+            </div>
+            <div className="mt-6"><MediaList label="Supporting images" items={content.home.galleryImages.map((src) => ({ src, alt: "" }))} onChange={(items) => update("home", { ...content.home, galleryImages: items.map((item) => item.src) })} onUpload={upload} onEdit={chooseEditor} /></div>
+          </Card>
+          <Card id="iframe" title="Walkthrough video">
+            <div className="grid gap-5 lg:grid-cols-2">
+              <div className="space-y-4">
+                <TextField label="YouTube or Vimeo embed address" value={content.iframe.src} onChange={(value) => update("iframe", { ...content.iframe, src: value })} />
+                <TextField label="Video title (for screen readers)" value={content.iframe.title} onChange={(value) => update("iframe", { ...content.iframe, title: value })} />
+                <label className={labelClass}>Referrer policy<select value={content.iframe.referrer_policy} onChange={(event) => update("iframe", { ...content.iframe, referrer_policy: event.target.value })} className={inputClass}><option>strict-origin-when-cross-origin</option><option>no-referrer</option><option>origin</option></select></label>
+                <div className="flex flex-wrap gap-2">
+                  {(["autoplay", "mute", "loop", "controls", "allow_fullscreen"] as const).map((key) => (
+                    <label key={key} className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-3.5 py-1.5 text-[13px] font-medium capitalize ${content.iframe[key] ? "border-navy-900 bg-navy-900 text-white" : "border-line-strong text-ink"}`}>
+                      <input type="checkbox" className="sr-only" checked={content.iframe[key]} onChange={(event) => update("iframe", { ...content.iframe, [key]: event.target.checked })} />{key.replace("_", " ")}
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div className="aspect-video overflow-hidden rounded-2xl bg-navy-900">{content.iframe.src && <iframe src={iframeUrl(content.iframe)} title={content.iframe.title} className="h-full w-full" allowFullScreen={content.iframe.allow_fullscreen} />}</div>
+            </div>
+          </Card>
+          <Card id="gallery" title="Gallery" description="The first image is the cover. Drag images to reorder."><MediaList label="Images" items={content.gallery} onChange={(gallery) => update("gallery", gallery)} onUpload={upload} onEdit={chooseEditor} hasAlt /></Card>
+          <Card id="amenities" title="Amenities & layout">
+            <div className="space-y-6">
+              <MediaList label="Amenities" altLabel="Amenity name" items={content.amenities.map((item) => ({ src: item.icon, alt: item.name }))} onChange={(items) => update("amenities", items.map((item) => ({ name: item.alt, icon: item.src })))} onUpload={upload} onEdit={chooseEditor} hasAlt />
+              <div className="grid gap-4 md:grid-cols-2">
+                <MediaField label="Layout plan" src={content.layout.image_url} onChange={(url) => update("layout", { ...content.layout, image_url: url })} onUpload={upload} onEdit={chooseEditor} />
+                <TextField label="Layout description (alt text)" value={content.layout.alt} onChange={(value) => update("layout", { ...content.layout, alt: value })} wide />
+              </div>
+            </div>
+          </Card>
+          <Card id="construction" title="Construction updates">
+            <div className="space-y-6">
+              <div className="grid gap-4 md:grid-cols-2">
+                <TextField label="Video address" value={content.construction.video_url} onChange={(value) => update("construction", { ...content.construction, video_url: value })} wide />
+                <MediaField label="Video poster image" src={content.construction.poster_url} onChange={(url) => update("construction", { ...content.construction, poster_url: url })} onUpload={upload} onEdit={chooseEditor} />
+              </div>
+              <MediaList label="Construction photos" items={content.construction.images.map((src) => ({ src, alt: "" }))} onChange={(items) => update("construction", { ...content.construction, images: items.map((item) => item.src) })} onUpload={upload} onEdit={chooseEditor} />
+            </div>
+          </Card>
+          <Card id="documents" title="Documents" description="Brochures, price lists and floor plans (PDF up to 25 MB)."><DocumentList items={content.documents} onChange={(documents) => update("documents", documents)} onUpload={uploadDocument} /></Card>
+          <Card id="sidebar" title="Enquiry panel" description="The box beside the project page with the enquiry button.">
+            <div className="grid gap-4 md:grid-cols-2">
+              <TextField label="Status" value={content.sidebar.status} onChange={(value) => update("sidebar", { ...content.sidebar, status: value })} />
+              <TextField label="Button label" value={content.sidebar.button_label} onChange={(value) => update("sidebar", { ...content.sidebar, button_label: value })} />
+              <TextField label="Note under the button" value={content.sidebar.note} onChange={(value) => update("sidebar", { ...content.sidebar, note: value })} textarea wide />
+              <div className="md:col-span-2"><TextList label="Highlights" values={content.sidebar.items} onChange={(items) => update("sidebar", { ...content.sidebar, items })} addLabel="Add highlight" /></div>
+            </div>
+          </Card>
+        </div>
+      </div>
+
+      <div className={`fixed inset-x-0 bottom-0 z-30 border-t border-line bg-white/95 backdrop-blur transition-transform lg:left-[var(--admin-sidebar,264px)] ${dirty ? "translate-y-0" : "translate-y-full"}`}>
+        <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-3 px-4 py-3 md:px-6 lg:px-8">
+          <span className="text-[14px] text-ink-muted">You have unsaved changes</span>
+          <Button onClick={() => void save()} disabled={saving}><Save size={16} aria-hidden />{saving ? "Saving…" : "Save changes"}</Button>
+        </div>
+      </div>
+      {editor && <ImageEditor src={editor.src} onClose={() => setEditor(null)} onSaved={(url) => { editor.apply(url); setDirty(true); }} />}
+    </div>
+  );
+}

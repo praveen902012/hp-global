@@ -6,13 +6,15 @@ import { BookOpen, Lightbulb, TriangleAlert } from "lucide-react";
 
 const toc = [
   { id: "overview", label: "What's new" },
+  { id: "leads", label: "Enquiries & messages" },
+  { id: "projects", label: "Projects & articles" },
   { id: "menu", label: "Edit the site menu" },
   { id: "pages", label: "Create a new page" },
   { id: "sections", label: "Section types" },
   { id: "publish", label: "Preview & publish" },
   { id: "our-story", label: "Edit Our Story" },
-  { id: "press", label: "Add press clippings" },
-  { id: "press-where", label: "Where clippings appear" },
+  { id: "press", label: "Add press coverage" },
+  { id: "press-where", label: "Where coverage appears" },
   { id: "journal", label: "Home page Journal" },
   { id: "tips", label: "Tips & troubleshooting" },
 ];
@@ -21,58 +23,57 @@ function Shot({ file, alt, caption }: { file: string; alt: string; caption: stri
   const src = `/api/admin/guide/${file}`;
   return (
     <figure className="my-6">
-      <a href={src} target="_blank" rel="noopener noreferrer" title="Open full size" className="block overflow-hidden rounded-lg border border-slate-200 bg-slate-50 shadow-sm transition hover:border-brand-champagne hover:shadow-md">
+      <a href={src} target="_blank" rel="noopener noreferrer" title="Open full size" className="block overflow-hidden rounded-2xl border border-line bg-ivory-50  transition hover:border-navy-900 hover:shadow-md">
         <img src={src} alt={alt} loading="lazy" className="w-full" />
       </a>
-      <figcaption className="mt-2 text-xs text-slate-500">{caption} <span className="text-slate-400">· Click to enlarge</span></figcaption>
+      <figcaption className="mt-2 text-xs text-ink-muted">{caption} <span className="text-ink-subtle">· Click to enlarge</span></figcaption>
     </figure>
   );
 }
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
-    <section id={id} className="scroll-mt-6 border-t border-slate-200 pt-10">
-      <h2 className="mb-4 font-heading text-2xl text-brand-charcoal">{title}</h2>
-      <div className="space-y-4 text-[15px] leading-relaxed text-slate-600">{children}</div>
+    <section id={id} className="scroll-mt-24 border-t border-line pt-10">
+      <h2 className="mb-4 font-heading text-2xl text-ink">{title}</h2>
+      <div className="space-y-4 text-[15px] leading-relaxed text-ink-muted">{children}</div>
     </section>
   );
 }
 
 function Steps({ children }: { children: React.ReactNode }) {
-  return <ol className="list-decimal space-y-2 pl-6 marker:font-semibold marker:text-brand-champagne">{children}</ol>;
+  return <ol className="list-decimal space-y-2 pl-6 marker:font-semibold marker:text-gold-700">{children}</ol>;
 }
 
 function Note({ tone = "tip", children }: { tone?: "tip" | "warn"; children: React.ReactNode }) {
   const warn = tone === "warn";
   const Icon = warn ? TriangleAlert : Lightbulb;
   return (
-    <div className={`flex gap-3 rounded-lg border px-4 py-3 text-sm ${warn ? "border-amber-200 bg-amber-50 text-amber-900" : "border-sky-200 bg-sky-50 text-sky-900"}`}>
+    <div className={`flex gap-3 rounded-2xl border px-4 py-3 text-sm ${warn ? "border-amber-200 bg-amber-50 text-amber-900" : "border-sky-200 bg-sky-50 text-sky-900"}`}>
       <Icon size={18} className="mt-0.5 shrink-0" />
       <div>{children}</div>
     </div>
   );
 }
 
-const B = ({ children }: { children: React.ReactNode }) => <strong className="font-semibold text-brand-charcoal">{children}</strong>;
-const A = ({ href, children }: { href: string; children: React.ReactNode }) => <Link href={href} className="font-medium text-brand-charcoal underline decoration-brand-champagne underline-offset-4 hover:text-brand-champagne">{children}</Link>;
+const B = ({ children }: { children: React.ReactNode }) => <strong className="font-semibold text-ink">{children}</strong>;
+const A = ({ href, children }: { href: string; children: React.ReactNode }) => <Link href={href} className="font-medium text-ink underline decoration-gold-400 underline-offset-4 hover:text-gold-700">{children}</Link>;
 
 export function AdminGuide() {
   return (
-    <div className="p-6 lg:p-10">
-      <div className="mb-10 flex items-start gap-4">
-        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-brand-champagne/15 text-brand-charcoal"><BookOpen size={24} /></span>
+    <div>
+      <div className="mb-8 flex items-start gap-4">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gold-200/60 text-ink"><BookOpen size={24} /></span>
         <div>
-          <p className="mb-1 text-xs font-bold uppercase tracking-[.22em] text-brand-champagne">Help</p>
-          <h1 className="font-heading text-3xl text-brand-charcoal">Admin user guide</h1>
-          <p className="mt-2 max-w-2xl text-sm text-slate-500">How to edit the site menu, build new pages and publish press coverage. This guide is visible only to signed-in admins.</p>
+                    <h1 className="font-heading text-[28px] leading-9 text-ink md:text-[32px] md:leading-10">User guide</h1>
+          <p className="mt-2 max-w-2xl text-sm text-ink-muted">How to edit the site menu, build new pages and publish press coverage. This guide is visible only to signed-in admins.</p>
         </div>
       </div>
 
       <div className="flex flex-col gap-10 xl:flex-row">
-        <nav aria-label="Guide contents" className="xl:sticky xl:top-6 xl:w-56 xl:shrink-0 xl:self-start">
-          <p className="mb-3 text-xs font-bold uppercase tracking-widest text-slate-400">Contents</p>
+        <nav aria-label="Guide contents" className="xl:sticky xl:top-24 xl:w-56 xl:shrink-0 xl:self-start">
+          <p className="mb-3 text-xs font-bold uppercase tracking-widest text-ink-subtle">Contents</p>
           <ol className="grid gap-1 text-sm sm:grid-cols-2 xl:grid-cols-1">
-            {toc.map((item, index) => <li key={item.id}><a href={`#${item.id}`} className="block rounded px-2 py-1.5 text-slate-600 hover:bg-slate-100 hover:text-brand-charcoal"><span className="mr-2 text-slate-400">{index + 1}.</span>{item.label}</a></li>)}
+            {toc.map((item, index) => <li key={item.id}><a href={`#${item.id}`} className="block rounded px-2 py-1.5 text-ink-muted hover:bg-ivory-100 hover:text-ink"><span className="mr-2 text-ink-subtle">{index + 1}.</span>{item.label}</a></li>)}
           </ol>
         </nav>
 
@@ -86,7 +87,42 @@ export function AdminGuide() {
               <li><B>Press</B>: add newspaper clippings, TV/YouTube coverage and online articles. They appear on the <em>In the News</em> page and on the project&apos;s page.</li>
               <li><B>Journal on the home page</B>: the home page now shows your three latest articles automatically.</li>
             </ul>
-            <p>All of these are in the left sidebar. If the sidebar is collapsed, click the panel icon at the top to expand it and see the labels.</p>
+            <p>The admin panel itself has also been redesigned:</p>
+            <ul className="list-disc space-y-1.5 pl-6">
+              <li><B>Dashboard</B>: new leads at a glance, with one-tap Call and WhatsApp buttons, and a <B>Needs attention</B> list (leads waiting over a day, unread messages, project pages without a gallery or brochure, drafts).</li>
+              <li><B>Enquiries</B> now have a status (<em>New</em>, <em>Contacted</em>, <em>Closed</em>) and private notes. <B>Contact requests</B> are marked read or unread.</li>
+              <li><B>Articles</B> can be saved as drafts and unpublished.</li>
+              <li><B>Projects</B> are listed in a compact table, edited on a full page with tabs, and can be reordered by dragging.</li>
+              <li><B>Search everything</B>: the search box at the top (or <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>K</kbd>) finds projects, articles, pages, press and leads, including by phone number.</li>
+              <li><B>Settings</B>: change your password here (it used to be on the dashboard).</li>
+            </ul>
+            <p>Everything is in the left sidebar, grouped into Leads, Content and Help. On a phone, tap the menu button at the top left. The panel icon next to the logo shrinks the sidebar to icons on a computer.</p>
+          </Section>
+
+          <Section id="leads" title="Enquiries & messages">
+            <p><A href="/admin/enquiries">Enquiries</A> lists every lead from the enquiry forms (project pages, the header button and the pop-up). The number next to <B>Enquiries</B> in the sidebar is how many are still <em>New</em>.</p>
+            <Shot file="enquiries.png" alt="Enquiries list with one enquiry open in the side panel" caption="Click an enquiry to open it. Change the status and add notes on the right." />
+            <Steps>
+              <li>Click an enquiry. Use <B>Call</B> or <B>WhatsApp</B> to reach the person straight away.</li>
+              <li>Set the <B>Status</B> to <em>Contacted</em> once you have spoken to them, and to <em>Closed</em> when the lead is finished. It saves immediately.</li>
+              <li>Write anything worth remembering in <B>Notes</B> and click <B>Save notes</B>. Notes are only visible to admins.</li>
+            </Steps>
+            <p><B>Sent from</B> shows the page the visitor was on, e.g. <code>/projects/amrit-aarogyam</code>. Use the tabs to see only New, Contacted or Closed leads, and <B>Export CSV</B> to download the list you are looking at.</p>
+            <p><A href="/admin/contacts">Contact requests</A> works like an inbox: unread messages have a gold dot and are counted in the sidebar. Opening a message marks it as read; <B>Mark unread</B> puts it back. <B>Reply by email</B> opens your email app with the address filled in.</p>
+            <Note>Enquiries received before this update all start as <em>New</em>. Mark the ones you have already handled as Contacted or Closed.</Note>
+          </Section>
+
+          <Section id="projects" title="Projects & articles">
+            <p><A href="/admin/properties">Projects</A> shows every project with its price, status and how much of its page is filled in (for example <em>4/7</em>). The switch in the <B>Visible</B> column shows or hides a project on the website instantly.</p>
+            <Shot file="project-editor.png" alt="Project editor with tabs for details, page content, gallery, amenities and documents" caption="Editing a project. The tabs with a tick already have content." />
+            <ul className="list-disc space-y-1.5 pl-6">
+              <li>Click a project to edit it. The tabs hold the <B>Details</B>, <B>Page content</B> (overview, highlights, key facts), <B>Gallery & video</B>, <B>Amenities & layout</B> and <B>Documents</B>. A bar appears at the bottom when you have unsaved changes.</li>
+              <li>Drop several images onto a gallery at once, and drag them to change the order. The first image is the cover.</li>
+              <li>Click <B>Reorder</B> above the list and drag projects into the order you want on the website, then <B>Save order</B>. The featured project always shows first.</li>
+            </ul>
+            <p>In <A href="/admin/articles">Articles</A>, click <B>Write article</B>. <B>Save draft</B> keeps it private while you work; <B>Publish</B> puts it in the Journal. A published article can be taken down again with <B>Unpublish</B>, which moves it back to drafts.</p>
+            <Shot file="article-editor.png" alt="Article editor with text, publishing options and cover image" caption="Writing an article. Publishing options and the cover image are on the right." />
+            <Note>To publish, an article needs a summary, text and a cover image. A draft only needs a title.</Note>
           </Section>
 
           <Section id="menu" title="1. Edit the site menu">
@@ -126,10 +162,10 @@ export function AdminGuide() {
           </Section>
 
           <Section id="sections" title="Section types">
-            <div className="overflow-x-auto rounded-lg border border-slate-200">
+            <div className="overflow-x-auto rounded-2xl border border-line">
               <table className="w-full text-left text-sm">
-                <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500"><tr><th className="px-4 py-2.5">Section</th><th className="px-4 py-2.5">Use it for</th></tr></thead>
-                <tbody className="divide-y divide-slate-100">
+                <thead className="bg-ivory-50 text-xs uppercase tracking-wider text-ink-muted"><tr><th className="px-4 py-2.5">Section</th><th className="px-4 py-2.5">Use it for</th></tr></thead>
+                <tbody className="divide-y divide-line">
                   {[
                     ["Hero banner", "The big opening image with the page title, an optional gold second line, subtitle and button. Usually the first section."],
                     ["Text", "Headings and paragraphs. The toolbar has bold, italic, H2/H3 headings, lists, quotes and links (select text, then click the link icon)."],
@@ -141,7 +177,7 @@ export function AdminGuide() {
                     ["FAQ", "Questions that open to show the answer when clicked."],
                     ["Call to action", "A banner with a heading, short text and a button, e.g. Book a site visit."],
                     ["Contact form", "Name, email and message form. Submissions arrive in Contact Requests."],
-                  ].map(([name, use]) => <tr key={name}><td className="whitespace-nowrap px-4 py-2.5 font-medium text-brand-charcoal">{name}</td><td className="px-4 py-2.5">{use}</td></tr>)}
+                  ].map(([name, use]) => <tr key={name}><td className="whitespace-nowrap px-4 py-2.5 font-medium text-ink">{name}</td><td className="px-4 py-2.5">{use}</td></tr>)}
                 </tbody>
               </table>
             </div>
@@ -173,11 +209,11 @@ export function AdminGuide() {
             <Note>Site pages are always live: they have no Publish or Unpublish button, can&apos;t be deleted, and their address (<code>/about</code>) can&apos;t be changed, so links in the menu and elsewhere keep working.</Note>
           </Section>
 
-          <Section id="press" title="5. Add press clippings">
-            <p>Open <A href="/admin/press">Press</A>. All clippings are listed newest first, with their type, publication, date and project. Use the search box or the project filter to find one.</p>
-            <Shot file="press-list.png" alt="Press clippings list with print, video and online items" caption="The Press page. Eye icon hides or shows a clipping; pencil edits; bin deletes." />
+          <Section id="press" title="5. Add press coverage">
+            <p>Open <A href="/admin/press">Press</A>. All coverage is listed newest first, with its type, publication, date and project. Use the tabs, the project filter or the search box to find an item.</p>
+            <Shot file="press-list.png" alt="Press clippings list with print, video and online items" caption="The Press page. The eye icon hides or shows an item; the pencil edits; the bin deletes." />
             <Steps>
-              <li>Click <B>Add clipping</B>.</li>
+              <li>Click <B>Add coverage</B>.</li>
               <li>Choose the <B>type of coverage</B>:
                 <ul className="mt-1.5 list-disc space-y-1 pl-5">
                   <li><B>Newspaper / magazine</B>: upload the scan or photo with <B>Upload image</B>, and/or the full page as a <B>PDF</B> (up to 25 MB).</li>
@@ -187,13 +223,13 @@ export function AdminGuide() {
               </li>
               <li>Fill in the <B>publication</B> or channel, the <B>date published</B> and the <B>headline</B>. A short <B>summary</B> is optional.</li>
               <li>Choose the <B>project</B> from the list (start typing to see suggestions). Leave it empty for coverage about the company as a whole.</li>
-              <li>Click <B>Add clipping</B>. It is live on the website immediately, unless you untick <B>Show on the website</B>.</li>
+              <li>Click <B>Add coverage</B>. It is live on the website immediately, unless you switch off <B>Show on the website</B>.</li>
             </Steps>
-            <Shot file="press-form.png" alt="Add clipping form with type, publication, headline, project and image upload" caption="Adding a newspaper clipping." />
+            <Shot file="press-form.png" alt="Add coverage form with type, publication, headline, project and image upload" caption="Adding a newspaper clipping." />
             <Note>Always pick the project name from the suggestions rather than typing it differently. That way all coverage for a project is grouped together.</Note>
           </Section>
 
-          <Section id="press-where" title="Where clippings appear">
+          <Section id="press-where" title="Where coverage appears">
             <p><B>The In the News page</B> (<A href="/media">/media</A>) lists all visible coverage, newest first. Visitors can filter by project and by type. Videos play in a pop-up, newspaper scans and PDFs open full size, and online articles open the news website in a new tab.</p>
             <Shot file="press-media-page.png" alt="Public In the News page listing press coverage" caption="The public In the News page." />
             <p><B>The Featured Project page</B> shows an <B>In the News</B> block automatically once at least one visible clipping is tagged with the featured project&apos;s name (currently <em>Amrit Aarogyam</em>). With more than six, a link to all of them appears.</p>
@@ -207,7 +243,7 @@ export function AdminGuide() {
 
           <Section id="tips" title="Tips & troubleshooting">
             <ul className="list-disc space-y-2 pl-6">
-              <li><B>&quot;You have unsaved changes&quot;</B>: the Menu and page editors warn you before you leave with unsaved work. Save first.</li>
+              <li><B>&quot;You have unsaved changes&quot;</B>: the editors warn you before you leave with unsaved work. Save first.</li>
               <li><B>A save shows a red message</B>: it names the section and field to fix, e.g. a button without a link, or a video link that isn&apos;t YouTube or Vimeo.</li>
               <li><B>Preview shows old content</B>: Preview shows the last <em>saved</em> version. Save, then refresh the preview tab.</li>
               <li><B>&quot;Please sign in again&quot;</B>: your session has ended. Sign in again; unsaved changes in that tab may be lost.</li>
