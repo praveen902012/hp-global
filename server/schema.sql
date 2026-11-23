@@ -110,3 +110,10 @@ CREATE INDEX IF NOT EXISTS press_clippings_project_idx ON press_clippings (lower
 
 ALTER TABLE pages ADD COLUMN IF NOT EXISTS system_key TEXT;
 CREATE UNIQUE INDEX IF NOT EXISTS pages_system_key_idx ON pages (system_key) WHERE system_key IS NOT NULL;
+
+-- Project pages: every portfolio project gets its own URL and optional page content.
+ALTER TABLE portfolio_projects ADD COLUMN IF NOT EXISTS slug TEXT;
+ALTER TABLE portfolio_projects ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT '';
+ALTER TABLE portfolio_projects ADD COLUMN IF NOT EXISTS is_featured BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE portfolio_projects ADD COLUMN IF NOT EXISTS details JSONB NOT NULL DEFAULT '{}'::jsonb;
+CREATE UNIQUE INDEX IF NOT EXISTS portfolio_projects_slug_idx ON portfolio_projects (slug) WHERE slug IS NOT NULL;

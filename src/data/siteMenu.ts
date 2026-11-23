@@ -19,7 +19,7 @@ export const sitePages = [
   { href: "/services", label: "Services" },
   { href: "/about", label: "Our Story" },
   { href: "/investments", label: "Investments" },
-  { href: "/listings", label: "Listings" },
+  { href: "/projects", label: "Projects" },
   { href: "/featured-project", label: "Featured Project" },
   { href: "/blog", label: "Journal" },
   { href: "/media", label: "In the News" },
@@ -31,18 +31,22 @@ const item = (label: string, href: string): MenuItem => ({ label, href, enabled:
 
 export const defaultSiteMenu: SiteMenu = {
   header: [
-    item("Home", "/"),
+    item("Projects", "/projects"),
+    item("Investments", "/investments"),
     item("Services", "/services"),
     item("Our Story", "/about"),
-    item("Investments", "/investments"),
     item("Journal", "/blog"),
+    item("In the News", "/media"),
     item("Contact", "/contact"),
   ],
   footer: [
-    item("Services", "/services"),
+    item("Projects", "/projects"),
     item("Investments", "/investments"),
-    item("About", "/about"),
+    item("Services", "/services"),
+    item("Our Story", "/about"),
     item("Journal", "/blog"),
+    item("In the News", "/media"),
+    item("Contact", "/contact"),
   ],
 };
 

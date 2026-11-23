@@ -60,6 +60,7 @@ export type { FeaturedProjectContent } from "../data/featuredProject";
 
 export interface PortfolioProject {
   id: number; portfolio_category: 'hpg' | 'partner'; project_type: 'commercial' | 'residential'; title: string; location: string; description: string; price: string; image_url: string; tags: string[]; sort_order: number; is_enabled: boolean;
+  slug: string; status: string; is_featured: boolean; details: import("../data/projects").ProjectDetails;
 }
 export type PortfolioInput = Omit<PortfolioProject, 'id'>;
 export interface PortfolioPage { items: PortfolioProject[]; pagination: { page: number; limit: number; total: number }; }

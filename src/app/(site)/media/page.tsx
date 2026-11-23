@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
+import { Mail } from "lucide-react";
 import { listPressClippings, listPressProjects } from "../../../lib/server/press";
 import { PressBrowser } from "../../../components/press/PressBrowser";
+import { PressFeature } from "../../../components/press/PressFeature";
+import { Eyebrow, buttonClass } from "../../../components/site/ui";
+import { company } from "../../../data/company";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -20,18 +24,32 @@ async function load() {
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ project?: string }> }) {
   const [{ clippings, projects }, params] = await Promise.all([load(), searchParams]);
+  const initialProject = typeof params.project === "string" ? params.project : "";
+  const featured = !initialProject ? clippings.find((item) => item.media_type === "video") : undefined;
   return (
-    <div className="min-h-screen bg-brand-white pb-32 pt-40">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-16 max-w-3xl">
-          <span className="mb-8 block text-[10px] font-bold uppercase tracking-[0.3em] text-brand-champagne">Press &amp; Media</span>
-          <div className="mb-10 h-[1px] w-12 bg-brand-charcoal" />
-          <h1 className="mb-8 font-heading text-4xl font-light tracking-tight text-brand-charcoal lg:text-6xl">In the <span className="font-normal italic text-brand-champagne">News</span></h1>
-          <p className="text-lg font-light leading-relaxed text-gray-500">Newspaper, television and online coverage of HP Global Infrra and our projects.</p>
+    <>
+      <section className="bg-ivory-100">
+        <div className="container-page flex flex-col gap-6 py-12 md:py-[72px]">
+          <Eyebrow>In the news</Eyebrow>
+          <h1 className="t-display max-w-[900px] text-ink">HP Global Infrra in the <span className="accent">press</span></h1>
+          <p className="t-body-xl max-w-[600px] text-ink-muted">Newspaper, television and online coverage of HP Global Infrra and our projects.</p>
         </div>
-        {clippings.length ? <PressBrowser clippings={clippings} projects={projects} initialProject={typeof params.project === "string" ? params.project : ""} />
-          : <p className="border-y border-gray-200 py-16 text-center font-light text-gray-500">Press coverage will appear here soon.</p>}
-      </div>
-    </div>
+      </section>
+      <section className="bg-white pb-16 pt-10 md:pb-[88px] md:pt-14 lg:pb-[112px]">
+        <div className="container-page flex flex-col gap-12 md:gap-16">
+          {featured && <PressFeature clipping={featured} />}
+          {clippings.length
+            ? <div><PressBrowser clippings={clippings} projects={projects} initialProject={initialProject} /></div>
+            : <p className="rounded-[20px] border border-dashed border-line-strong py-16 text-center t-body text-ink-muted">Press coverage will appear here soon.</p>}
+          <div className="flex flex-col gap-6 rounded-3xl bg-ivory-50 p-6 md:p-10 lg:flex-row lg:items-center lg:justify-between lg:px-12">
+            <div className="flex items-center gap-5">
+              <span className="hidden h-16 w-16 shrink-0 items-center justify-center rounded-full bg-white text-gold-500 sm:flex"><Mail size={26} /></span>
+              <div className="flex flex-col gap-2"><h2 className="t-h4 text-ink">Press &amp; media enquiries</h2><p className="t-body text-ink-muted">For interviews, project information or high-resolution images, write to {company.email}.</p></div>
+            </div>
+            <a href={`mailto:${company.email}?subject=Press%20enquiry`} className={buttonClass("primary", "l", "w-full lg:w-auto")}>Email the press desk</a>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

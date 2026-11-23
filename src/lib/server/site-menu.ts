@@ -7,7 +7,10 @@ export async function getSiteMenu(): Promise<SiteMenu> {
   const result = await query<{ content: unknown }>("SELECT content FROM site_settings WHERE key = $1", [MENU_KEY]);
   if (!result.rows[0]) return defaultSiteMenu;
   const parsed = normalizeSiteMenu(result.rows[0].content);
-  return "menu" in parsed ? parsed.menu : defaultSiteMenu;
+  if (!("menu" in parsed)) return defaultSiteMenu;
+  // The old Listings page became Projects; point saved links at the new page.
+  const upgrade = (items: SiteMenu["header"]) => items.map((entry) => entry.href === "/listings" ? { ...entry, href: "/projects", label: entry.label === "Listings" ? "Projects" : entry.label } : entry);
+  return { header: upgrade(parsed.menu.header), footer: upgrade(parsed.menu.footer) };
 }
 
 /** For public pages: never let a database problem take the site navigation down. */

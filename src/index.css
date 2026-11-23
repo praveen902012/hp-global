@@ -1,60 +1,135 @@
 @import "tailwindcss";
 
 @theme {
-  /* Deep Navy/Charcoal for a modern, sleek background contrast */
-  --color-brand-charcoal: #0F172A; 
-  /* Crisp, clean off-white background */
-  --color-brand-beige: #F8FAFC; 
-  /* Sophisticated, muted gold accent */
-  --color-brand-champagne: #D4AF37; 
-  /* Absolute white and light slate for subtle contrast layered cards */
+  /* Legacy brand tokens (still used by the admin panel) */
+  --color-brand-charcoal: #0F172A;
+  --color-brand-beige: #F8FAFC;
+  --color-brand-champagne: #D4AF37;
   --color-brand-white: #FFFFFF;
   --color-brand-light-grey: #F1F5F9;
-  
-  --font-sans: "Inter", sans-serif;
-  --font-heading: "Playfair Display", serif;
+
+  /* Design system tokens (Figma: Foundations) */
+  --color-navy-950: #070b14;
+  --color-navy-900: #0f172a;
+  --color-navy-800: #1e293b;
+  --color-navy-700: #334155;
+  --color-ink: #0f172a;
+  --color-ink-muted: #5b6578;
+  --color-ink-subtle: #94a3b8;
+  --color-ivory-50: #fbfaf6;
+  --color-ivory-100: #f4f0e6;
+  --color-gold-200: #f3e7c1;
+  --color-gold-300: #e6cf83;
+  --color-gold-400: #d4af37;
+  --color-gold-500: #b8952a;
+  --color-gold-700: #87660f;
+  --color-line: #e2e8f0;
+  --color-line-strong: #cbd5e1;
+  --color-success: #15803d;
+  --color-success-bg: #ecfdf3;
+  --color-danger: #c62828;
+  --color-danger-bg: #fef2f2;
+  --color-whatsapp: #25d366;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Playfair Display", Georgia, serif;
+
+  --radius-card: 20px;
+  --radius-panel: 28px;
+
+  --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.06), 0 1px 3px rgb(15 23 42 / 0.05);
+  --shadow-card: 0 8px 24px rgb(15 23 42 / 0.08), 0 2px 6px rgb(15 23 42 / 0.04);
+  --shadow-float: 0 24px 56px rgb(15 23 42 / 0.16), 0 6px 16px rgb(15 23 42 / 0.06);
+
+  --animate-fade-in: fade-in 0.3s ease-out both;
+  --animate-fade-in-up: fade-in-up 0.5s ease-out both;
+  --animate-sheet-up: sheet-up 0.3s ease-out both;
+
+  @keyframes fade-in { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes fade-in-up { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: none } }
+  @keyframes sheet-up { from { transform: translateY(100%) } to { transform: none } }
 }
 
 @layer base {
+  html { scroll-behavior: smooth; scroll-padding-top: 96px; }
+
   body {
-    @apply bg-brand-white text-brand-charcoal antialiased font-sans flex flex-col min-h-screen selection:bg-brand-champagne selection:text-white;
+    @apply bg-white text-ink antialiased font-sans flex flex-col min-h-screen selection:bg-gold-200 selection:text-ink;
   }
-  
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-heading tracking-tight text-brand-charcoal font-medium;
+
+  h1, h2, h3, h4 {
+    @apply font-heading font-normal text-ink;
   }
-  
-  p {
-    @apply text-slate-600 font-light leading-relaxed;
+
+  :focus-visible {
+    outline: 2px solid var(--color-gold-500);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
   }
 }
 
+/* Type scale (Figma text styles). Mobile sizes first, desktop from md/lg. */
+@utility t-display { @apply font-heading text-[44px] leading-[50px] tracking-[-0.01em] md:text-[64px] md:leading-[72px] lg:text-[80px] lg:leading-[88px] lg:tracking-[-0.015em]; }
+@utility t-h1 { @apply font-heading text-[36px] leading-[44px] tracking-[-0.005em] md:text-[52px] md:leading-[60px] md:tracking-[-0.01em]; }
+@utility t-h2 { @apply font-heading text-[30px] leading-[38px] tracking-[-0.005em] md:text-[40px] md:leading-[48px]; }
+@utility t-h3 { @apply font-heading text-[24px] leading-[32px] md:text-[30px] md:leading-[38px]; }
+@utility t-h4 { @apply font-heading font-medium text-[22px] leading-[30px] md:text-[24px] md:leading-[32px]; }
+@utility t-h5 { @apply font-sans font-semibold text-[20px] leading-[28px] tracking-[-0.005em]; }
+@utility t-h6 { @apply font-sans font-semibold text-[17px] leading-[24px]; }
+@utility t-body-xl { @apply text-[17px] leading-[28px] md:text-[20px] md:leading-[32px]; }
+@utility t-body-l { @apply text-[16px] leading-[26px] md:text-[18px] md:leading-[30px]; }
+@utility t-body { @apply text-[16px] leading-[26px]; }
+@utility t-body-s { @apply text-[14px] leading-[22px]; }
+@utility t-label { @apply text-[14px] leading-[20px] font-semibold; }
+@utility t-overline { @apply text-[12px] leading-[16px] font-semibold uppercase tracking-[0.14em]; }
+@utility container-page { @apply mx-auto w-full max-w-[1440px] px-5 md:px-10 lg:px-[120px]; }
+@utility section-y { @apply py-16 md:py-[88px] lg:py-[112px]; }
+@utility no-scrollbar { scrollbar-width: none; &::-webkit-scrollbar { display: none; } }
+
+@layer components {
+
+  /* Accent word inside a heading: italic, gold (darker on light for contrast). */
+  .accent { @apply italic text-gold-700; }
+  .on-dark .accent, .accent-on-dark { @apply italic text-gold-400; }
+
+
+  /* Rich text written in the admin (articles, page builder). */
+  .prose-site { @apply text-ink-muted t-body-l; }
+  .prose-site > * + * { @apply mt-6; }
+  .prose-site h2 { @apply font-heading text-ink text-[26px] leading-[34px] md:text-[30px] md:leading-[38px] mt-12; }
+  .prose-site h3 { @apply font-heading text-ink text-[22px] leading-[30px] md:text-[24px] md:leading-[32px] mt-10; }
+  .prose-site strong { @apply font-semibold text-ink; }
+  .prose-site ul { @apply list-disc pl-6 space-y-3; }
+  .prose-site ol { @apply list-decimal pl-6 space-y-3; }
+  .prose-site li::marker { @apply text-gold-500; }
+  .prose-site blockquote { @apply border-l-[3px] border-gold-400 pl-6 md:pl-8 font-heading italic text-ink text-[22px] leading-[32px]; }
+  .prose-site a { @apply text-ink underline decoration-gold-400 underline-offset-4 hover:text-gold-700; }
+  .prose-site img { @apply rounded-2xl; }
+  .prose-dark { @apply text-slate-300; }
+  .prose-dark h2, .prose-dark h3, .prose-dark strong, .prose-dark a, .prose-dark blockquote { @apply text-white; }
+
+}
+
+/* Legacy helpers still referenced by the admin panel. */
 @layer utilities {
-  .subtle-border {
-    @apply border border-slate-200/60;
-  }
-  
-  .image-overlay {
-    @apply absolute inset-0 bg-brand-charcoal/20 transition-opacity duration-700 hover:opacity-10;
-  }
+  .subtle-border { @apply border border-slate-200/60; }
+  .hover-lift { @apply transition-all duration-500 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-brand-charcoal/5; }
+  .glass { @apply bg-white/70 backdrop-blur-lg border border-white/20 shadow-sm; }
+  .glass-dark { @apply bg-brand-charcoal/80 backdrop-blur-xl border border-white/10 shadow-lg; }
+  .text-gradient-gold { @apply bg-clip-text text-transparent bg-gradient-to-r from-[#D4AF37] via-[#F3E5AB] to-[#D4AF37]; }
+  .bg-gradient-gold { @apply bg-gradient-to-r from-[#D4AF37] to-[#B8972E] text-white; }
+}
 
-  .hover-lift {
-    @apply transition-all duration-500 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-brand-charcoal/5;
-  }
-  
-  .glass {
-    @apply bg-white/70 backdrop-blur-lg border border-white/20 shadow-sm;
-  }
-  
-  .glass-dark {
-    @apply bg-brand-charcoal/80 backdrop-blur-xl border border-white/10 shadow-lg;
-  }
+@layer base {
+  .legacy-ui h1, .legacy-ui h2, .legacy-ui h3, .legacy-ui h4, .legacy-ui h5, .legacy-ui h6 { @apply font-heading tracking-tight text-brand-charcoal font-medium; }
+  .legacy-ui p { @apply text-slate-600 font-light leading-relaxed; }
+}
 
-  .text-gradient-gold {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#D4AF37] via-[#F3E5AB] to-[#D4AF37];
-  }
-  
-  .bg-gradient-gold {
-    @apply bg-gradient-to-r from-[#D4AF37] to-[#B8972E] text-white;
-  }
+/* A dark hero that the transparent header sits on top of. */
+@layer components {
+  .hero-overlay { margin-top: -4rem; padding-top: 4rem; }
+  @media (min-width: 64rem) { .hero-overlay { margin-top: -5rem; padding-top: 5rem; } }
 }

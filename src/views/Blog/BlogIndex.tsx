@@ -1,39 +1,22 @@
-import { Card } from "../../components/ui/Card";
 import type { BlogEntry } from "../../data/blogData";
+import { Eyebrow } from "../../components/site/ui";
+import { JournalBrowser } from "../../components/blog/JournalBrowser";
+import { CtaBand } from "../../components/site/CtaBand";
 
 export function BlogIndex({ blogs }: { blogs: BlogEntry[] }) {
   return (
-    <div className="pt-40 pb-32 bg-brand-light-grey min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        <div className="mb-24 flex flex-col items-center text-center animate-fade-in-up">
-          <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-brand-champagne mb-6 block">Journal</span>
-          <div className="w-12 h-[1px] bg-brand-charcoal mb-10"></div>
-
-          <h1 className="text-4xl md:text-5xl font-heading font-light text-brand-charcoal mb-8 tracking-tight">
-            Market Insights &<br />
-            Industry News
-          </h1>
-          <p className="text-lg text-gray-500 font-light leading-relaxed max-w-2xl">
-            Read the latest reports, trends, and success stories from HP Global Infrra experts.
-          </p>
+    <>
+      <section className="bg-ivory-100">
+        <div className="container-page flex flex-col gap-6 py-12 md:py-[72px]">
+          <Eyebrow>The Journal</Eyebrow>
+          <h1 className="t-display max-w-[900px] text-ink">Insights for <span className="accent">smarter</span> property decisions</h1>
+          <p className="t-body-xl max-w-[600px] text-ink-muted">Market updates, buying guides and investment ideas from the HP Global Infrra team.</p>
         </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-14">
-          {blogs.map((blog) => (
-            <Card
-              key={blog.slug}
-              title={blog.title}
-              description={blog.snippet}
-              imageSrc={blog.image}
-              linkTo={`/blog/${blog.slug}`}
-              author={blog.author}
-              date={blog.date}
-            />
-          ))}
-        </div>
-
-      </div>
-    </div>
+      </section>
+      <section className="bg-white pb-16 pt-8 md:pb-[88px] md:pt-12 lg:pb-[112px]">
+        <div className="container-page"><JournalBrowser blogs={blogs} /></div>
+      </section>
+      <CtaBand title="Have a question about a market?" accent="question" text="Our advisors are happy to talk through any location or project — no obligation." />
+    </>
   );
 }

@@ -1,70 +1,64 @@
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
 import { type MenuItem } from "../../data/siteMenu";
+import { company } from "../../data/company";
 import { MenuLink } from "./MenuLink";
+import { FacebookIcon, InstagramIcon, WhatsAppIcon } from "../site/brand-icons";
 
-export function Footer({ links }: { links: MenuItem[] }) {
+export interface FooterProject { title: string; location: string; href: string }
+
+const heading = "t-overline text-gold-400";
+const link = "text-[15px] leading-6 text-slate-300 transition-colors hover:text-white";
+
+export function Footer({ links, projects = [] }: { links: MenuItem[]; projects?: FooterProject[] }) {
   return (
-    <footer className="bg-brand-light-grey border-t border-gray-200 text-brand-charcoal pt-32 pb-16 relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-16 mb-24">
-
-          {/* Brand & Intro */}
-          <div className="md:col-span-5 pr-8">
-            <h3 className="text-2xl font-heading font-normal mb-8 uppercase tracking-widest text-brand-charcoal">
-              <span className="text-brand-champagne">HP</span> Global Infrra
-            </h3>
-            <p className="text-gray-500 max-w-sm mb-10 leading-loose font-light">
-              Shaping the Future of Real Estate.<br />
-              Partner in Vision. Invest in Growth.
-            </p>
-            <a href="mailto:info@hpglobalinfra.com" className="inline-block text-sm uppercase tracking-widest font-semibold border-b border-brand-charcoal pb-1 hover:text-brand-champagne hover:border-brand-champagne transition-colors duration-500">
-              info@hpglobalinfra.com
-            </a>
-          </div>
-
-          {/* Quick Links */}
-          <div className="md:col-span-3">
-            <h4 className="text-xs font-semibold mb-8 text-brand-charcoal tracking-[0.2em] uppercase">Navigation</h4>
-            <ul className="space-y-6">
-              {links.map((item) => (
-                <li key={`${item.href}-${item.label}`}>
-                  <MenuLink
-                    item={item}
-                    className="group inline-flex items-center text-gray-500 hover:text-brand-charcoal transition-colors duration-500"
-                  >
-                    <span className="text-sm font-light tracking-wide">{item.label}</span>
-                    <ArrowUpRight size={14} className="ml-2 opacity-0 -translate-x-2 translate-y-2 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-300 text-brand-champagne" />
-                  </MenuLink>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div className="md:col-span-4">
-            <h4 className="text-xs font-semibold mb-8 text-brand-charcoal tracking-[0.2em] uppercase">Headquarters</h4>
-            <ul className="space-y-8">
-              <li className="text-gray-500 font-light leading-relaxed">
-                D-184, D Block, Sector-63,<br />
-                Noida-201309, Uttar Pradesh
-              </li>
-              <li className="text-gray-500 font-light">
-                <span className="block text-xs uppercase tracking-widest font-semibold text-brand-charcoal mb-2">Direct Line</span>
-                +91 7827955579
-              </li>
-            </ul>
+    <footer className="bg-navy-950 text-white">
+      <div className="container-page grid gap-12 pb-10 pt-16 md:grid-cols-2 lg:grid-cols-[1.4fr_0.8fr_1fr_1.1fr] lg:gap-10 lg:pt-20">
+        <div className="flex max-w-sm flex-col gap-6">
+          <Link href="/" className="flex items-center gap-3" aria-label="HP Global Infrra — home">
+            <img src="/images/hpg-logo.png" alt="" className="h-10 w-auto" />
+            <span className="flex flex-col leading-none"><span className="font-heading text-[20px]">HP Global</span><span className="mt-1 text-[10px] font-semibold tracking-[0.32em] text-gold-400">INFRRA</span></span>
+          </Link>
+          <p className="t-body text-slate-300">{company.tagline}</p>
+          <div className="flex gap-3">
+            <a href={company.social[0].href} target="_blank" rel="noopener noreferrer" aria-label="HP Global Infrra on Instagram" className="flex h-10 w-10 items-center justify-center rounded-full border border-navy-700 text-white transition-colors hover:border-gold-400 hover:text-gold-400"><InstagramIcon size={18} /></a>
+            <a href={company.social[1].href} target="_blank" rel="noopener noreferrer" aria-label="HP Global Infrra on Facebook" className="flex h-10 w-10 items-center justify-center rounded-full border border-navy-700 text-white transition-colors hover:border-gold-400 hover:text-gold-400"><FacebookIcon size={18} /></a>
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center text-[10px] tracking-[0.2em] uppercase text-gray-400 font-semibold gap-6">
-          <p>© 2025 HP Global Infrra. All Rights Reserved.</p>
-          <div className="flex space-x-10">
-            <a href="https://www.instagram.com/hpglobalinfra/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-charcoal transition-colors duration-500">Instagram</a>
-            <a href="https://www.facebook.com/hpglobalinfra/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-charcoal transition-colors duration-500">Facebook</a>
-            <Link href="/privacy" className="hover:text-brand-charcoal transition-colors duration-500">Privacy Policy</Link>
+        {links.length > 0 && (
+          <nav aria-label="Footer" className="flex flex-col gap-4">
+            <p className={heading}>Explore</p>
+            <ul className="flex flex-col gap-3">
+              {links.map((item) => <li key={`${item.href}-${item.label}`}><MenuLink item={item} className={link}>{item.label}</MenuLink></li>)}
+            </ul>
+          </nav>
+        )}
+
+        {projects.length > 0 && (
+          <div className="flex flex-col gap-4">
+            <p className={heading}>Projects</p>
+            <ul className="flex flex-col gap-3">
+              {projects.slice(0, 5).map((project) => <li key={project.href}><Link href={project.href} className={link}>{project.title}{project.location ? `, ${project.location.split(",")[0]}` : ""}</Link></li>)}
+              <li><Link href="/projects" className={`${link} font-semibold text-white`}>View all projects</Link></li>
+            </ul>
           </div>
+        )}
+
+        <div className="flex flex-col gap-4">
+          <p className={heading}>Get in touch</p>
+          <ul className="flex flex-col gap-4 text-[15px] leading-6 text-slate-300">
+            <li><a href={company.mapsHref} target="_blank" rel="noopener noreferrer" className="flex gap-3 hover:text-white"><MapPin size={18} className="mt-0.5 shrink-0 text-gold-400" /><span>{company.addressLines.join(" ")}</span></a></li>
+            <li><a href={company.phoneHref} className="flex gap-3 hover:text-white"><Phone size={18} className="mt-0.5 shrink-0 text-gold-400" />{company.phoneDisplay}</a></li>
+            <li><a href={`mailto:${company.email}`} className="flex gap-3 hover:text-white"><Mail size={18} className="mt-0.5 shrink-0 text-gold-400" />{company.email}</a></li>
+            <li><a href={company.whatsappHref} target="_blank" rel="noopener noreferrer" className="flex gap-3 hover:text-white"><WhatsAppIcon size={18} className="mt-0.5 shrink-0 text-gold-400" />Chat on WhatsApp</a></li>
+          </ul>
+        </div>
+      </div>
+      <div className="container-page">
+        <div className="flex flex-col gap-4 border-t border-navy-800 py-6 text-[13px] text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+          <p>© {new Date().getFullYear()} HP Global Infrra. All rights reserved.</p>
+          <div className="flex gap-6"><Link href="/privacy" className="hover:text-white">Privacy policy</Link><Link href="/contact" className="hover:text-white">Contact</Link></div>
         </div>
       </div>
     </footer>

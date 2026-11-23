@@ -136,7 +136,7 @@ export const systemPageByKey = (key: string | null | undefined) => systemPages.f
 
 /** Top-level paths already used by the site; a page cannot take these slugs. */
 export const reservedSlugs = new Set([
-  "about", "services", "investments", "listings", "featured-project", "blog", "contact", "privacy",
+  "about", "services", "investments", "projects", "listings", "featured-project", "blog", "contact", "privacy",
   "admin", "api", "assets", "images", "uploads", "media", "_next", "favicon", "icons", "login", "logout",
   "sitemap", "robots", "search", "page", "pages", "preview", "404", "500",
 ]);

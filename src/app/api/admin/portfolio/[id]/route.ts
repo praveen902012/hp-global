@@ -1,8 +1,27 @@
 import { NextResponse } from "next/server";
 import { requireAdminSession } from "../../../../../lib/server/auth";
 import { query } from "../../../../../lib/server/db";
-import type { PortfolioProject } from "../../../../../lib/server/portfolio";
+import { portfolioInput, portfolioInputError, savePortfolioProject } from "../../../../../lib/server/portfolio";
+
 interface Props { params: Promise<{ id: string }> }
-function input(body: Record<string, unknown>) { const tags = Array.isArray(body.tags) ? body.tags.map(String).filter(Boolean) : String(body.tags || "").split(",").map((tag) => tag.trim()).filter(Boolean); return { portfolio_category: String(body.portfolio_category || ""), project_type: String(body.project_type || ""), title: String(body.title || "").trim(), location: String(body.location || "").trim(), description: String(body.description || "").trim(), price: String(body.price || "").trim(), image_url: String(body.image_url || "").trim(), tags, sort_order: Number(body.sort_order || 0), is_enabled: body.is_enabled !== false }; }
-export async function PUT(request: Request, { params }: Props) { if (!await requireAdminSession()) return NextResponse.json({ error: "Please sign in again." }, { status: 401 }); const { id } = await params; const value = input(await request.json().catch(() => ({}))); if (!/^\d+$/.test(id) || !["hpg", "partner"].includes(value.portfolio_category) || !["commercial", "residential"].includes(value.project_type) || !value.title || !value.location || !value.description || !value.image_url || !Number.isFinite(value.sort_order)) return NextResponse.json({ error: "Complete all required project fields." }, { status: 400 }); const result = await query<PortfolioProject>(`UPDATE portfolio_projects SET portfolio_category=$1, project_type=$2, title=$3, location=$4, description=$5, price=$6, image_url=$7, tags=$8, sort_order=$9, is_enabled=$10, updated_at=NOW() WHERE id=$11 RETURNING id, portfolio_category, project_type, title, location, description, price, image_url, tags, sort_order, is_enabled`, [...Object.values(value), id]); return result.rowCount ? NextResponse.json(result.rows[0]) : NextResponse.json({ error: "Project not found." }, { status: 404 }); }
-export async function DELETE(_request: Request, { params }: Props) { if (!await requireAdminSession()) return NextResponse.json({ error: "Please sign in again." }, { status: 401 }); const { id } = await params; if (!/^\d+$/.test(id)) return NextResponse.json({ error: "Invalid project." }, { status: 400 }); const result = await query("DELETE FROM portfolio_projects WHERE id=$1 RETURNING id", [id]); return result.rowCount ? NextResponse.json({ ok: true }) : NextResponse.json({ error: "Project not found." }, { status: 404 }); }
+
+export async function PUT(request: Request, { params }: Props) {
+  if (!await requireAdminSession()) return NextResponse.json({ error: "Please sign in again." }, { status: 401 });
+  const { id } = await params;
+  if (!/^\d+$/.test(id)) return NextResponse.json({ error: "Invalid project." }, { status: 400 });
+  const value = portfolioInput(await request.json().catch(() => ({})));
+  const error = portfolioInputError(value);
+  if (error) return NextResponse.json({ error }, { status: 400 });
+  const project = await savePortfolioProject(Number(id), value);
+  if (!project) return NextResponse.json({ error: "Project not found." }, { status: 404 });
+  return NextResponse.json(project);
+}
+
+export async function DELETE(_request: Request, { params }: Props) {
+  if (!await requireAdminSession()) return NextResponse.json({ error: "Please sign in again." }, { status: 401 });
+  const { id } = await params;
+  if (!/^\d+$/.test(id)) return NextResponse.json({ error: "Invalid project." }, { status: 400 });
+  const result = await query("DELETE FROM portfolio_projects WHERE id=$1 RETURNING id", [id]);
+  if (!result.rowCount) return NextResponse.json({ error: "Project not found." }, { status: 404 });
+  return NextResponse.json({ ok: true });
+}
