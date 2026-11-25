@@ -30,7 +30,11 @@ export async function ensureSchema() {
   schemaReady ??= (async () => {
     const schema = fs.readFileSync(path.join(process.cwd(), "server", "schema.sql"), "utf8");
     await getPool().query(schema);
-  })();
+  })().catch((error) => {
+    // Don't cache a failure (e.g. the database was still starting): retry on the next query.
+    schemaReady = null;
+    throw error;
+  });
 
   return schemaReady;
 }
