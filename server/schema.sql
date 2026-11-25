@@ -135,3 +135,26 @@ ALTER TABLE enquiries ADD COLUMN IF NOT EXISTS notes TEXT NOT NULL DEFAULT '';
 ALTER TABLE enquiries ADD COLUMN IF NOT EXISTS source TEXT NOT NULL DEFAULT '';
 ALTER TABLE enquiries ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
 ALTER TABLE blogs ADD COLUMN IF NOT EXISTS is_draft BOOLEAN NOT NULL DEFAULT FALSE;
+
+-- AI access: personal access tokens for the content MCP endpoint (/api/mcp).
+-- Only a SHA-256 hash of each token is stored; the token itself is shown once.
+CREATE TABLE IF NOT EXISTS mcp_tokens (
+  id BIGSERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  token_hash TEXT NOT NULL UNIQUE,
+  token_hint TEXT NOT NULL,
+  scope TEXT NOT NULL CHECK (scope IN ('read', 'write')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  expires_at TIMESTAMPTZ,
+  last_used_at TIMESTAMPTZ,
+  revoked_at TIMESTAMPTZ
+);
+CREATE TABLE IF NOT EXISTS mcp_audit (
+  id BIGSERIAL PRIMARY KEY,
+  token_id BIGINT REFERENCES mcp_tokens(id) ON DELETE SET NULL,
+  tool TEXT NOT NULL,
+  ok BOOLEAN NOT NULL,
+  detail TEXT NOT NULL DEFAULT '',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS mcp_audit_created_idx ON mcp_audit (created_at DESC);

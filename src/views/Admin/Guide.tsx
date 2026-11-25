@@ -14,6 +14,7 @@ const toc = [
   { id: "publish", label: "Preview & publish" },
   { id: "website-pages", label: "Edit any website page" },
   { id: "site-details", label: "Site details" },
+  { id: "ai-access", label: "AI access" },
   { id: "press", label: "Add press coverage" },
   { id: "press-where", label: "Where coverage appears" },
   { id: "journal", label: "Home page Journal" },
@@ -236,6 +237,17 @@ export function AdminGuide() {
               <li><B>Search &amp; sharing defaults</B>: the website name added to page titles on Google, and the default picture for shared links.</li>
             </ul>
             <p>Click <B>Save changes</B>. The header, footer, Contact page and WhatsApp buttons update straight away.</p>
+          </Section>
+
+          <Section id="ai-access" title="AI access">
+            <p>AI access lets people you trust update the website by asking an AI assistant, for example &quot;add a FAQ about home loans to the Investments page&quot; in Claude. The assistant connects to the website through a secure <B>MCP</B> connection and makes the same changes you could make in this panel, with the same checks.</p>
+            <ul className="list-disc space-y-1.5 pl-6">
+              <li>Open <A href="/admin/ai-access">AI access</A> (under Help in the sidebar), give the token a name and choose <B>Read only</B> or <B>Read and edit</B>, then click <B>Create token</B>.</li>
+              <li>Copy the token straight away: it is shown only once. The page also shows the command to connect Claude Code and the settings for other apps.</li>
+              <li>Create one token per person or tool. The <B>Recent activity</B> list shows what each one did, and <B>Revoke</B> stops a token at once.</li>
+            </ul>
+            <p>An assistant can read and edit pages, sections, menus, site details, articles, press and projects. It <B>can&apos;t</B> delete anything, and it never sees enquiries or contact requests. Changes to website pages go live immediately, just like saving here, so review what the assistant plans before you let it proceed.</p>
+            <Note tone="warn">A token works like a password. Send it only to the person who needs it, never post it in a group chat or email thread, and revoke it when they no longer need access.</Note>
           </Section>
 
           <Section id="press" title="5. Add press coverage">

@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import {
   changeAdminPassword,
-  requireAdminSession,
+  getAdminSession,
   validateAdminCredentials,
 } from "../../../../lib/server/auth";
 
 export async function POST(request: Request) {
-  const session = await requireAdminSession();
+  const session = await getAdminSession();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }

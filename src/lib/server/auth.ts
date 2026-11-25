@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import { cookies } from "next/headers";
 import { query } from "./db";
+import { mcpPrincipal } from "./mcp-context";
 
 const sessionCookieName = "hpg_admin_session";
 const sessionDuration = 24 * 60 * 60 * 1000;
@@ -145,7 +146,14 @@ export async function getAdminSession() {
   return { email: session.email };
 }
 
+/**
+ * Session check used by the admin API routes. Inside an MCP tool call (see
+ * mcp-context.ts) the caller is the access token instead of a browser session.
+ */
 export async function requireAdminSession() {
+  const principal = mcpPrincipal.getStore();
+  if (principal) return { email: `AI access: ${principal.name}` };
+
   const session = await getAdminSession();
 
   if (!session) {
