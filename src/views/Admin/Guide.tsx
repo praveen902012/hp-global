@@ -130,13 +130,14 @@ export function AdminGuide() {
           </Section>
 
           <Section id="menu" title="1. Edit the site menu">
-            <p>Open <A href="/admin/menu">Menu</A> in the sidebar. There are two lists: the <B>Header menu</B> (top navigation, desktop and mobile) and the <B>Footer menu</B> (the Navigation column in the footer).</p>
+            <p>Open <A href="/admin/menu">Menu</A> in the sidebar. There are two lists: the <B>Header menu</B> (top navigation, desktop and mobile) and the <B>Footer menu</B> (the Explore column in the footer). Above each list is a <B>Preview</B> that updates as you type, so you can see the result before saving. For the header, switch between <B>Desktop</B> and <B>Mobile</B>.</p>
             <Shot file="menu-editor.png" alt="Menu editor with header and footer menu lists" caption="The Menu page. Each row is one link with its label, its address and action buttons." />
             <p>For each link you can:</p>
             <ul className="list-disc space-y-1.5 pl-6">
               <li><B>Change the label</B>: the text visitors see, e.g. &quot;Our Story&quot;.</li>
               <li><B>Change the link</B>: click the box to pick a site page from the list, or type a full web address (<code>https://…</code>), an email (<code>mailto:info@hpglobalinfra.com</code>) or a phone number (<code>tel:+91…</code>).</li>
-              <li>Use the buttons on the right to <B>hide/show</B> the link (eye icon), <B>open it in a new tab</B>, <B>move it up or down</B>, or <B>remove</B> it.</li>
+              <li>Turn on <B>Open in a new tab</B> under the link box for links that should open in a separate browser tab (handy for outside websites). In the preview these links are marked ↗.</li>
+              <li>Use the buttons on the right to <B>hide/show</B> the link (eye icon), <B>visit</B> the link to check it works (arrow icon), <B>move it up or down</B>, or <B>remove</B> it.</li>
               <li>Click <B>Add link</B> to add a new one (up to 12 per menu).</li>
             </ul>
             <p>Nothing changes on the website until you click <B>Save menu</B> at the bottom. To start over, <B>Reset to default</B> restores the original links (again, only once you save).</p>

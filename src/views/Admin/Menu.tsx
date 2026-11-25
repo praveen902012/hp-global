@@ -1,17 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronDown, ChevronUp, ExternalLink, Eye, EyeOff, Plus, RotateCcw, Save, Trash2 } from "lucide-react";
+import { ArrowUpRight, ChevronDown, ChevronRight, ChevronUp, ExternalLink, Eye, EyeOff, Menu as MenuIcon, Monitor, Plus, RotateCcw, Save, Smartphone, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { api } from "../../lib/api";
 import { Button, PageHeader, fieldInput } from "../../components/admin/ui";
 import { defaultSiteMenu, isValidMenuHref, MAX_MENU_ITEMS, MAX_MENU_LABEL_LENGTH, sitePages, type MenuItem, type SiteMenu } from "../../data/siteMenu";
+import { buttonClass } from "../../components/site/ui";
 
 const input = `${fieldInput} py-2 text-[14px]`;
 
 const sections = [
   { key: "header", title: "Header menu", help: "The links in the top navigation bar, on desktop and mobile." },
-  { key: "footer", title: "Footer menu", help: "The links in the footer's Navigation column." },
+  { key: "footer", title: "Footer menu", help: "The links in the footer's Explore column." },
 ] as const;
 
 export function AdminMenu() {
@@ -69,11 +70,14 @@ export function AdminMenu() {
               <span className="text-xs text-ink-subtle">{menu[key].length} / {MAX_MENU_ITEMS} links</span>
             </div>
 
+            {key === "header" ? <HeaderPreview items={menu.header} /> : <FooterPreview items={menu.footer} />}
+
             {menu[key].length === 0 && <p className="mb-4 rounded-xl border border-dashed border-line-strong p-4 text-center text-sm text-ink-muted">No links. This menu will be empty on the site.</p>}
 
             <ol className="space-y-3">
               {menu[key].map((item, index) => {
-                const hrefInvalid = item.href.trim() !== "" && !isValidMenuHref(item.href.trim());
+                const href = item.href.trim();
+                const hrefInvalid = href !== "" && !isValidMenuHref(href);
                 return (
                   <li key={index} className={`rounded-2xl border p-3 ${item.enabled ? "border-line" : "border-dashed border-line-strong bg-ivory-50"}`}>
                     <div className="grid gap-3 md:grid-cols-[2rem_1fr_1.4fr_auto] md:items-start">
@@ -81,19 +85,24 @@ export function AdminMenu() {
                       <label className="block text-[13px] font-semibold text-ink">Label
                         <input className={`${input} mt-1`} value={item.label} maxLength={MAX_MENU_LABEL_LENGTH} placeholder="e.g. Our Story" onChange={(event) => patch(key, index, { label: event.target.value })} />
                       </label>
-                      <label className="block text-[13px] font-semibold text-ink">Link
-                        <input className={`${input} mt-1 ${hrefInvalid ? "border-red-400" : ""}`} list="site-pages" value={item.href} placeholder="/about or https://…" onChange={(event) => patch(key, index, { href: event.target.value })} />
-                        {hrefInvalid && <span className="mt-1 block text-xs font-normal text-red-600">Use a site path like /about, a full https:// URL, or a mailto:/tel: link.</span>}
-                      </label>
+                      <div>
+                        <label className="block text-[13px] font-semibold text-ink">Link
+                          <input className={`${input} mt-1 ${hrefInvalid ? "border-red-400" : ""}`} list="site-pages" value={item.href} placeholder="/about or https://…" onChange={(event) => patch(key, index, { href: event.target.value })} />
+                        </label>
+                        {hrefInvalid && <span className="mt-1 block text-xs text-red-600">Use a site path like /about, a full https:// URL, or a mailto:/tel: link.</span>}
+                        <NewTabSwitch checked={item.new_tab} onChange={(new_tab) => patch(key, index, { new_tab })} />
+                      </div>
                       <div className="flex items-center gap-1 md:pt-5">
-                        <IconButton label={item.enabled ? "Hide from site" : "Show on site"} onClick={() => patch(key, index, { enabled: !item.enabled })}>{item.enabled ? <Eye size={16} /> : <EyeOff size={16} />}</IconButton>
-                        <IconButton label={item.new_tab ? "Opens in a new tab (click to change)" : "Opens in the same tab (click to change)"} active={item.new_tab} onClick={() => patch(key, index, { new_tab: !item.new_tab })}><ExternalLink size={16} /></IconButton>
+                        <IconButton label={item.enabled ? "Shown on the site (click to hide)" : "Hidden on the site (click to show)"} active={!item.enabled} onClick={() => patch(key, index, { enabled: !item.enabled })}>{item.enabled ? <Eye size={16} /> : <EyeOff size={16} />}</IconButton>
+                        {href && !hrefInvalid && !href.startsWith("mailto:") && !href.startsWith("tel:")
+                          ? <a href={href} target="_blank" rel="noopener noreferrer" aria-label="Visit this link (opens in a new browser tab)" title="Visit this link (opens in a new browser tab)" className={iconButtonClass()}><ExternalLink size={16} /></a>
+                          : <span aria-hidden className={`${iconButtonClass()} pointer-events-none opacity-30`}><ExternalLink size={16} /></span>}
                         <IconButton label="Move up" disabled={index === 0} onClick={() => move(key, index, -1)}><ChevronUp size={16} /></IconButton>
                         <IconButton label="Move down" disabled={index === menu[key].length - 1} onClick={() => move(key, index, 1)}><ChevronDown size={16} /></IconButton>
                         <IconButton label="Remove link" danger onClick={() => remove(key, index)}><Trash2 size={16} /></IconButton>
                       </div>
                     </div>
-                    {(!item.enabled || item.new_tab) && <p className="mt-2 text-xs text-ink-muted md:pl-8">{[!item.enabled && "Hidden on the site", item.new_tab && "Opens in a new tab"].filter(Boolean).join(" · ")}</p>}
+                    {!item.enabled && <p className="mt-2 text-xs text-ink-muted md:pl-8">Hidden on the site</p>}
                   </li>
                 );
               })}
@@ -114,10 +123,125 @@ export function AdminMenu() {
   );
 }
 
+/** A labelled on/off switch, so the link's target can't be mistaken for a "visit" button. */
+function NewTabSwitch({ checked, onChange }: { checked: boolean; onChange: (value: boolean) => void }) {
+  return (
+    <button type="button" role="switch" aria-checked={checked} onClick={() => onChange(!checked)} className="group mt-2 inline-flex items-center gap-2 text-[13px] text-ink-muted hover:text-ink">
+      <span className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${checked ? "bg-navy-900" : "bg-line-strong"}`}>
+        <span className={`absolute h-4 w-4 rounded-full bg-white shadow transition-transform ${checked ? "translate-x-[18px]" : "translate-x-0.5"}`} />
+      </span>
+      Open in a new tab
+    </button>
+  );
+}
+
+/* ---------- Previews ---------- */
+
+const visible = (items: MenuItem[]) => items.filter((item) => item.enabled && item.label.trim());
+
+function PreviewLabel({ item }: { item: MenuItem }) {
+  return <>{item.label.trim()}{item.new_tab && <ArrowUpRight size={12} aria-label="opens in a new tab" className="ml-0.5 inline-block align-[-1px] opacity-60" />}</>;
+}
+
+function PreviewFrame({ caption, tabs, children }: { caption: string; tabs?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div className="mb-6 overflow-hidden rounded-2xl border border-line bg-ivory-50">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-2.5">
+        <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-ink-subtle">Preview</span>
+        {tabs}
+      </div>
+      <div className="p-4">{children}</div>
+      <p className="border-t border-line px-4 py-2 text-xs text-ink-muted">{caption}</p>
+    </div>
+  );
+}
+
+function Brand({ dark }: { dark?: boolean }) {
+  return (
+    <span className="flex shrink-0 items-center gap-2.5">
+      <img src="/images/hpg-logo.png" alt="" className="h-8 w-auto" />
+      <span className={`flex flex-col leading-none ${dark ? "text-white" : "text-ink"}`}>
+        <span className="font-heading text-[17px]">HP Global</span>
+        <span className={`mt-1 text-[9px] font-semibold tracking-[0.32em] ${dark ? "text-gold-400" : "text-gold-700"}`}>INFRRA</span>
+      </span>
+    </span>
+  );
+}
+
+function HeaderPreview({ items }: { items: MenuItem[] }) {
+  const [device, setDevice] = useState<"desktop" | "mobile">("desktop");
+  const links = visible(items);
+  const desktopLinks = links.filter((item) => item.href.trim() !== "/");
+  const tab = (value: typeof device, label: string, Icon: typeof Monitor) => (
+    <button type="button" onClick={() => setDevice(value)} aria-pressed={device === value} className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium transition ${device === value ? "bg-white text-ink shadow-sm ring-1 ring-line" : "text-ink-muted hover:text-ink"}`}><Icon size={13} />{label}</button>
+  );
+
+  return (
+    <PreviewFrame
+      tabs={<div className="flex gap-1">{tab("desktop", "Desktop", Monitor)}{tab("mobile", "Mobile", Smartphone)}</div>}
+      caption={device === "desktop"
+        ? "Updates as you edit. Hidden links are left out, and a Home link (/) only appears in the mobile menu, as on the live site. ↗ marks links that open in a new tab."
+        : "Updates as you edit. This is the menu that opens from the menu button on phones and tablets. ↗ marks links that open in a new tab."}>
+      {device === "desktop" ? (
+        <div className="overflow-x-auto rounded-xl border border-line bg-white shadow-[var(--shadow-soft)]">
+          <div className="flex h-16 min-w-max items-center justify-between gap-6 px-5">
+            <Brand />
+            <nav className="flex items-center gap-0.5">
+              {desktopLinks.length === 0 && <span className="text-sm italic text-ink-subtle">No links</span>}
+              {desktopLinks.map((item, index) => <span key={index} className="whitespace-nowrap rounded-full px-3 py-2 text-[15px] font-medium text-ink-muted"><PreviewLabel item={item} /></span>)}
+            </nav>
+            <span className={`${buttonClass("accent", "m")} pointer-events-none shrink-0`}>Enquire now</span>
+          </div>
+        </div>
+      ) : (
+        <div className="mx-auto w-full max-w-[360px] overflow-hidden rounded-[28px] border-[6px] border-navy-900 bg-navy-950 px-5 pb-6 pt-3 shadow-[var(--shadow-soft)]">
+          <div className="flex h-12 items-center justify-between">
+            <Brand dark />
+            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-navy-700 text-white"><MenuIcon size={16} /></span>
+          </div>
+          <nav className="mt-3 flex flex-col">
+            {links.length === 0 && <span className="py-4 text-sm italic text-slate-400">No links</span>}
+            {links.map((item, index) => (
+              <span key={index} className="flex items-center justify-between border-b border-navy-700 py-3 font-heading text-[20px] leading-7 text-white">
+                <span><PreviewLabel item={item} /></span><ChevronRight size={18} className="text-slate-400" />
+              </span>
+            ))}
+          </nav>
+          <span className={`${buttonClass("accent", "m", "mt-5 w-full")} pointer-events-none`}>Enquire now</span>
+        </div>
+      )}
+    </PreviewFrame>
+  );
+}
+
+function FooterPreview({ items }: { items: MenuItem[] }) {
+  const links = visible(items);
+  return (
+    <PreviewFrame caption={links.length ? "Updates as you edit. Hidden links are left out. ↗ marks links that open in a new tab." : "With no visible links, the Explore column is removed from the footer."}>
+      <div className="rounded-xl bg-navy-950 px-6 py-6 text-white">
+        <div className="grid gap-8 sm:grid-cols-[1.2fr_1fr_1fr]">
+          <div className="flex flex-col gap-3"><Brand dark /><span className="h-2 w-40 rounded-full bg-navy-800" /><span className="h-2 w-28 rounded-full bg-navy-800" /></div>
+          <div className={`flex flex-col gap-3 ${links.length ? "" : "opacity-40"}`}>
+            <p className="t-overline text-gold-400">Explore</p>
+            <ul className="flex flex-col gap-2.5">
+              {links.length === 0 && <li className="text-sm italic text-slate-400">No links</li>}
+              {links.map((item, index) => <li key={index} className="text-[15px] leading-6 text-slate-300"><PreviewLabel item={item} /></li>)}
+            </ul>
+          </div>
+          <div className="hidden flex-col gap-3 sm:flex"><p className="t-overline text-gold-400">Get in touch</p><span className="h-2 w-36 rounded-full bg-navy-800" /><span className="h-2 w-28 rounded-full bg-navy-800" /><span className="h-2 w-32 rounded-full bg-navy-800" /></div>
+        </div>
+      </div>
+    </PreviewFrame>
+  );
+}
+
+function iconButtonClass(danger?: boolean, active?: boolean) {
+  return `inline-flex rounded-xl p-2 transition disabled:cursor-not-allowed disabled:opacity-30 ${danger ? "text-red-500 hover:bg-red-50" : active ? "bg-gold-200/60 text-ink" : "text-ink-muted hover:bg-ivory-100 hover:text-ink"}`;
+}
+
 function IconButton({ label, onClick, disabled, danger, active, children }: { label: string; onClick: () => void; disabled?: boolean; danger?: boolean; active?: boolean; children: React.ReactNode }) {
   return (
-    <button type="button" aria-label={label} title={label} onClick={onClick} disabled={disabled}
-      className={`rounded-xl p-2 transition disabled:cursor-not-allowed disabled:opacity-30 ${danger ? "text-red-500 hover:bg-red-50" : active ? "bg-gold-200/60 text-ink" : "text-ink-muted hover:bg-ivory-100 hover:text-ink"}`}>
+    <button type="button" aria-label={label} title={label} onClick={onClick} disabled={disabled} className={iconButtonClass(danger, active)}>
       {children}
     </button>
   );
