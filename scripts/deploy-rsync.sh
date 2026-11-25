@@ -89,7 +89,7 @@ APP_PORT="${APP_PORT}" docker compose -p "${COMPOSE_PROJECT}" up -d hp-global-db
 
 for attempt in {1..30}; do
   if APP_PORT="${APP_PORT}" docker compose -p "${COMPOSE_PROJECT}" exec -T hp-global-db \
-    sh -c 'exec psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT 1"' >/dev/null; then
+    sh -c 'exec psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT 1"' >/dev/null </dev/null; then
     break
   fi
   if [[ "${attempt}" == "30" ]]; then
