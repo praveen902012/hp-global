@@ -4,6 +4,7 @@ import { deletePage, getPageById, PageConflictError, updatePage } from "../../..
 import { menusLinkingTo, removeMenuLinks, retargetMenuLinks } from "../../../../../lib/server/site-menu";
 import { sanitizePageHtml } from "../../../../../lib/server/page-content";
 import { normalizePageContent } from "../../../../../data/pages";
+import { systemPagePath } from "../../../../../data/systemPages";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -18,7 +19,7 @@ export async function GET(_request: Request, { params }: Props) {
   const id = await parseId(params);
   const page = id === null ? null : await getPageById(id);
   if (!page) return notFound();
-  return NextResponse.json({ ...page, menus: await menusLinkingTo(`/${page.slug}`) }, { headers: { "Cache-Control": "no-store" } });
+  return NextResponse.json({ ...page, menus: await menusLinkingTo(systemPagePath(page.system_key, page.slug)) }, { headers: { "Cache-Control": "no-store" } });
 }
 
 export async function PUT(request: Request, { params }: Props) {
@@ -27,13 +28,13 @@ export async function PUT(request: Request, { params }: Props) {
   if (id === null) return notFound();
   const existing = await getPageById(id);
   if (!existing) return notFound();
-  const parsed = normalizePageContent(await request.json().catch(() => null), sanitizePageHtml, existing.system_key ? { fixedSlug: existing.slug } : {});
+  const parsed = normalizePageContent(await request.json().catch(() => null), sanitizePageHtml, existing.system_key ? { fixedSlug: existing.slug, systemKey: existing.system_key } : {});
   if ("error" in parsed) return NextResponse.json({ error: parsed.error }, { status: 400 });
   try {
     const page = await updatePage(id, parsed.content);
     if (!page) return notFound();
     if (existing.slug !== page.slug) await retargetMenuLinks(`/${existing.slug}`, `/${page.slug}`);
-    return NextResponse.json({ ...page, menus: await menusLinkingTo(`/${page.slug}`) });
+    return NextResponse.json({ ...page, menus: await menusLinkingTo(systemPagePath(page.system_key, page.slug)) });
   } catch (error) {
     if (error instanceof PageConflictError) return NextResponse.json({ error: error.message }, { status: 409 });
     throw error;

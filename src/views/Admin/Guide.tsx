@@ -12,7 +12,8 @@ const toc = [
   { id: "pages", label: "Create a new page" },
   { id: "sections", label: "Section types" },
   { id: "publish", label: "Preview & publish" },
-  { id: "our-story", label: "Edit Our Story" },
+  { id: "website-pages", label: "Edit any website page" },
+  { id: "site-details", label: "Site details" },
   { id: "press", label: "Add press coverage" },
   { id: "press-where", label: "Where coverage appears" },
   { id: "journal", label: "Home page Journal" },
@@ -81,6 +82,9 @@ export function AdminGuide() {
           <Section id="overview" title="What's new">
             <p>These things can now be managed from the admin panel without a developer:</p>
             <ul className="list-disc space-y-1.5 pl-6">
+              <li><B>Every website page</B>: Home, Services, Investments, Projects, In the news, Journal, Contact and the Privacy policy now open in the page builder, so you can change their headings, text, photos and sections. See <A href="#website-pages">Edit any website page</A>.</li>
+              <li><B>Site details</B>: the phone number, WhatsApp number, email, office address, social links and footer tagline are edited in one place and update the whole website. See <A href="#site-details">Site details</A>.</li>
+              <li><B>Google &amp; sharing</B>: every page has its own title and description for Google, and its own picture for when the link is shared on WhatsApp.</li>
               <li><B>Menu</B>: rename, reorder, hide or add the links in the website&apos;s header and footer.</li>
               <li><B>Pages</B>: create brand-new pages (for example an NRI desk or a project launch page) from ready-made sections, preview them as drafts and publish when ready.</li>
               <li><B>Our Story</B>: edit the text and image of the Our Story (<code>/about</code>) page, and add more sections to it.</li>
@@ -157,7 +161,8 @@ export function AdminGuide() {
             </ul>
             <p>To add a section, click <B>Add section</B> at the bottom, or hover between two sections and click <B>Insert section here</B>. Then choose the type:</p>
             <Shot file="page-section-picker.png" alt="Add a section dialog listing the ten section types" caption="Choosing a section type." />
-            <p><B>Page settings</B> (at the top of the editor) holds the page title, the URL and an optional <B>search description</B>, the short text Google shows under the page title.</p>
+            <p>The panel on the right of the editor holds the <B>Page settings</B> (page name and address), <B>Google &amp; sharing</B> (see below) and a quick <B>Add a section</B> list, which adds the new section below the one you have open.</p>
+            <p><B>Google &amp; sharing</B> shows a preview of how the page appears on Google. <B>Title on Google</B> can be left blank (the page name plus &quot;| HP Global Infrra&quot; is used). Keep the <B>Description on Google</B> to about 160 characters: the counter turns amber when Google may cut it off. The <B>Share image</B> is the picture shown when the link is sent on WhatsApp or social media; without one, the default from <A href="/admin/site-details">Site details</A> is used.</p>
             <Note>Images: click <B>Upload image</B> next to any image field (JPG, PNG, WebP or GIF, up to 10 MB). Wide landscape photos around 1600–2400 px work best for hero banners.</Note>
           </Section>
 
@@ -167,21 +172,30 @@ export function AdminGuide() {
                 <thead className="bg-ivory-50 text-xs uppercase tracking-wider text-ink-muted"><tr><th className="px-4 py-2.5">Section</th><th className="px-4 py-2.5">Use it for</th></tr></thead>
                 <tbody className="divide-y divide-line">
                   {[
-                    ["Hero banner", "The big opening image with the page title, an optional gold second line, subtitle and button. Usually the first section."],
+                    ["Hero banner", "The opening of a page: a big photo with the title, or a Plain heading on a light background. Gold words, a subtitle and up to two buttons. Usually the first section."],
                     ["Text", "Headings and paragraphs. The toolbar has bold, italic, H2/H3 headings, lists, quotes and links (select text, then click the link icon)."],
                     ["Image + text", "A photo beside a heading, text and an optional button. Choose whether the image is on the left or right."],
                     ["Image gallery", "A grid of photos (2, 3 or 4 per row). Upload several images at once with Upload images."],
-                    ["Cards", "A row of cards, each with an image, title, short text and optional link, e.g. project highlights."],
+                    ["Cards", "Photo cards side by side, or Large photo rows (big photo beside numbered text, alternating sides) — as on Investments, “Four ways to invest”."],
+                    ["Icon cards (new)", "Short points with an icon: as Cards, as a List beside the heading, or as Numbered steps — e.g. “What we do”, “Why HP Global Infrra”, “How it works”."],
+                    ["Service (new)", "A service with photo, description, a “What’s included” list, a button and an optional Call link. Services placed one after another share one block, with photos alternating sides."],
                     ["Key figures", "Big numbers with labels, e.g. 25+ Years of experience."],
                     ["Video", "Paste a normal YouTube or Vimeo link; it is converted automatically."],
                     ["FAQ", "Questions that open to show the answer when clicked."],
-                    ["Call to action", "A banner with a heading, short text and a button, e.g. Book a site visit."],
+                    ["Call to action", "Simple (centred heading and button), Photo banner (dark banner with Book a consultation and WhatsApp buttons) or Box with icon (e.g. “Investing from outside India?”)."],
                     ["Contact form", "Name, email and message form. Submissions arrive in Contact Requests."],
+                    ["Legal text (new)", "Long text such as a privacy policy. Each H2 heading is listed in a contents column beside the text."],
+                    ["Projects (live)", "Your published projects with the filter chips. Choose which projects and how many; the cards update by themselves."],
+                    ["Featured project (live)", "The project chosen in Featured project, with its photos, highlights and brochure."],
+                    ["Press (live)", "Your latest press coverage. Hidden while there is none."],
+                    ["Articles (live)", "Your latest Journal articles."],
                   ].map(([name, use]) => <tr key={name}><td className="whitespace-nowrap px-4 py-2.5 font-medium text-ink">{name}</td><td className="px-4 py-2.5">{use}</td></tr>)}
                 </tbody>
               </table>
             </div>
-            <p>If a button label is filled in, the button also needs a link, otherwise saving shows a message telling you which section to fix.</p>
+            <p>Buttons have a <B>When clicked</B> choice: go to a page or link, or <B>Open the enquiry form</B> (the same form as “Enquire now”). If a button has text, it also needs a link, otherwise saving shows a message telling you which section to fix.</p>
+            <p><B>Gold words</B>: type one or more words that appear in the heading (for example <em>future</em> in “Shaping the future of real estate”) and they are shown in gold italics. Words that aren&apos;t in the heading are added after it.</p>
+            <p><B>Live</B> sections are marked with a gold <em>Live</em> label. You choose their heading and how many items to show; the projects, press and articles themselves come from their own screens and stay up to date.</p>
           </Section>
 
           <Section id="publish" title="3. Preview & publish">
@@ -198,15 +212,29 @@ export function AdminGuide() {
             <Note tone="warn">Changing the URL of a published page breaks the old address (for example, links already shared on WhatsApp). Menu links are updated automatically, but anything shared elsewhere is not.</Note>
           </Section>
 
-          <Section id="our-story" title="4. Edit the Our Story page">
-            <p>Our Story is a built-in <B>site page</B>. Open <A href="/admin/pages">Pages</A> and click <B>Our Story</B> (marked <em>Site page</em>, always at the top of the list). It opens in the same editor as your own pages, already filled with the current text and photo.</p>
-            <Shot file="about-editor.png" alt="Our Story page open in the page editor" caption="Our Story in the page editor. Edit the heading, gold second line, text and image." />
+          <Section id="website-pages" title="4. Edit any website page">
+            <span id="our-story" />
+            <p>Every page of the website is listed at the top of <A href="/admin/pages">Pages</A> under <B>Website pages</B>: Home, Our Story, Services, Investments, Projects, In the news, Journal, Contact and Privacy policy. Click one to open it in the same editor as your own pages. Each one starts with exactly what is on the website today, so nothing changes until you save.</p>
             <ul className="list-disc space-y-1.5 pl-6">
-              <li>Change the <B>heading</B>, the <B>gold second line</B> (e.g. &quot;Excellence&quot;), the <B>text</B> and the <B>photo</B>, then click <B>Save &amp; update live page</B>. Changes appear on the website immediately.</li>
-              <li>Use <B>Add section</B> to extend the story, for example <em>Key figures</em> for years of experience, an <em>Image gallery</em> of the team, or a <em>Call to action</em> at the end.</li>
-              <li>Click <B>View</B> to open the live page and check it.</li>
+              <li>Change headings, text, photos and buttons, move sections up or down, hide one by removing it, or add new sections. Click <B>Save &amp; update live page</B>; changes appear on the website immediately.</li>
+              <li>The <B>Home</B> page is made of live sections (Featured project, Projects, Press, Articles) plus the banner, key figures, “What we do”, “Why HP Global Infrra” and the closing banner.</li>
+              <li>The key figures on Home count your projects by themselves: <code>{"{projects}"}</code>, <code>{"{hpg}"}</code> and <code>{"{partner}"}</code> in a figure are replaced with live numbers.</li>
+              <li>Projects, In the news, Journal and Contact each have one <B>locked</B> section (the project list, the press list, the article list and the contact details). It is marked <em>Live · always on this page</em> and can&apos;t be removed, but you can edit the heading above it and the banner below it.</li>
+              <li>The <B>Privacy policy</B> is a <em>Legal text</em> section. Use the H2 button for each heading; the contents list beside the text updates by itself.</li>
             </ul>
-            <Note>Site pages are always live: they have no Publish or Unpublish button, can&apos;t be deleted, and their address (<code>/about</code>) can&apos;t be changed, so links in the menu and elsewhere keep working.</Note>
+            <Note>Website pages are always live: they have no Publish or Unpublish button, can&apos;t be deleted, and keep their address, so links in the menu and elsewhere keep working. Use <B>Duplicate</B> in the Pages list to start a new page from one of them.</Note>
+          </Section>
+
+          <Section id="site-details" title="Site details">
+            <p>Open <A href="/admin/site-details">Site details</A> (under Content in the sidebar) to change the details used across the whole website:</p>
+            <ul className="list-disc space-y-1.5 pl-6">
+              <li><B>Contact</B>: phone number (shown in the header), email, office address (one line per row) and the Google Maps link.</li>
+              <li><B>WhatsApp</B>: the number used by every WhatsApp button, and the first message filled in for visitors.</li>
+              <li><B>Social links</B>: Instagram, Facebook, LinkedIn and YouTube. Leave one empty to hide its icon.</li>
+              <li><B>Footer</B>: the tagline under the logo.</li>
+              <li><B>Search &amp; sharing defaults</B>: the website name added to page titles on Google, and the default picture for shared links.</li>
+            </ul>
+            <p>Click <B>Save changes</B>. The header, footer, Contact page and WhatsApp buttons update straight away.</p>
           </Section>
 
           <Section id="press" title="5. Add press coverage">

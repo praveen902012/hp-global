@@ -3,17 +3,23 @@ import { listPublicProjectsSafe } from "../../../lib/server/portfolio";
 import { ProjectsBrowser } from "../../../components/projects/ProjectsBrowser";
 import { Eyebrow } from "../../../components/site/ui";
 import { CtaBand } from "../../../components/site/CtaBand";
+import { PageSections } from "../../../components/sections/PageSections";
+import { loadSystemPage, systemPageMetadata } from "../../../lib/server/site-pages";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
-  title: "Projects | HP Global Infrra",
-  description: "Residential and commercial projects across NCR and Uttarakhand — HPG developments and handpicked partner projects.",
-};
+export function generateMetadata(): Promise<Metadata> {
+  return systemPageMetadata("projects", {
+    title: "Projects | HP Global Infrra",
+    description: "Residential and commercial projects across NCR and Uttarakhand — HPG developments and handpicked partner projects.",
+  });
+}
 
 type Props = { searchParams: Promise<{ developer?: string; type?: string }> };
 
 export default async function Page({ searchParams }: Props) {
-  const [projects, params] = await Promise.all([listPublicProjectsSafe(), searchParams]);
+  const [page, params] = await Promise.all([loadSystemPage("projects"), searchParams]);
+  if (page) return <PageSections sections={page.sections} searchParams={{ developer: params.developer, type: params.type }} />;
+  const projects = await listPublicProjectsSafe();
   const developer = params.developer === "hpg" || params.developer === "partner" ? params.developer : "all";
   const kind = params.type === "residential" || params.type === "commercial" ? params.type : "all";
   return (

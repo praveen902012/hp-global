@@ -1,16 +1,19 @@
 import { ArrowRight, CalendarDays, Clock, ExternalLink, Mail, MapPin, Phone } from "lucide-react";
-import { company } from "../data/company";
+import { getSiteLinks } from "../lib/server/site-details";
+import type { SiteLinks } from "../data/siteDetails";
 import { ContactForm } from "../components/site/ContactForm";
 import { Eyebrow, buttonClass } from "../components/site/ui";
 import { WhatsAppIcon } from "../components/site/brand-icons";
 
-const channels = [
+const channelsFor = (company: SiteLinks) => [
   { icon: <Phone size={22} />, label: "Call us", value: company.phoneDisplay, action: "Call now", href: company.phoneHref, external: false },
   { icon: <WhatsAppIcon size={22} />, label: "WhatsApp", value: company.phoneDisplay, action: "Start chat", href: company.whatsappHref, external: true },
   { icon: <Mail size={22} />, label: "Email", value: company.email, action: "Write to us", href: `mailto:${company.email}`, external: false },
 ];
 
-export function Contact() {
+export async function Contact() {
+  const company = await getSiteLinks();
+  const channels = channelsFor(company);
   return (
     <>
       <section className="bg-ivory-100">

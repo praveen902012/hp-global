@@ -29,3 +29,29 @@ export function FacebookIcon({ size = 20, ...props }: IconProps) {
     </svg>
   );
 }
+
+export function LinkedInIcon({ size = 20, ...props }: IconProps) {
+  return (
+    <svg {...base(size, props)}>
+      <rect x="3" y="3" width="18" height="18" rx="3" />
+      <path d="M8 10.5V16M8 7.8v.1M11.5 16v-3.2c0-1.4.9-2.3 2.1-2.3s2 .9 2 2.3V16M11.5 10.5V16" />
+    </svg>
+  );
+}
+
+export function YouTubeIcon({ size = 20, ...props }: IconProps) {
+  return (
+    <svg {...base(size, props)}>
+      <rect x="2.5" y="5.5" width="19" height="13" rx="4" />
+      <path d="M10.2 9.3v5.4l4.6-2.7z" />
+    </svg>
+  );
+}
+
+/** Icon for a social network saved in Site details. */
+export function SocialIcon({ network, size = 18 }: { network: "instagram" | "facebook" | "linkedin" | "youtube"; size?: number }) {
+  if (network === "instagram") return <InstagramIcon size={size} />;
+  if (network === "facebook") return <FacebookIcon size={size} />;
+  if (network === "linkedin") return <LinkedInIcon size={size} />;
+  return <YouTubeIcon size={size} />;
+}

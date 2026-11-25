@@ -4,13 +4,14 @@ import { listPressClippings, listPressProjects } from "../../../lib/server/press
 import { PressBrowser } from "../../../components/press/PressBrowser";
 import { PressFeature } from "../../../components/press/PressFeature";
 import { Eyebrow, buttonClass } from "../../../components/site/ui";
-import { company } from "../../../data/company";
+import { getSiteLinks } from "../../../lib/server/site-details";
+import { PageSections } from "../../../components/sections/PageSections";
+import { loadSystemPage, systemPageMetadata } from "../../../lib/server/site-pages";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
-  title: "In the News | HP Global Infrra",
-  description: "Newspaper, TV and online coverage of HP Global Infrra and its projects.",
-};
+export function generateMetadata(): Promise<Metadata> {
+  return systemPageMetadata("media", { title: "In the News | HP Global Infrra", description: "Newspaper, TV and online coverage of HP Global Infrra and its projects." });
+}
 
 async function load() {
   try {
@@ -23,7 +24,9 @@ async function load() {
 }
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ project?: string }> }) {
-  const [{ clippings, projects }, params] = await Promise.all([load(), searchParams]);
+  const [page, params] = await Promise.all([loadSystemPage("media"), searchParams]);
+  if (page) return <PageSections sections={page.sections} searchParams={{ project: typeof params.project === "string" ? params.project : undefined }} />;
+  const [{ clippings, projects }, company] = await Promise.all([load(), getSiteLinks()]);
   const initialProject = typeof params.project === "string" ? params.project : "";
   const featured = !initialProject ? clippings.find((item) => item.media_type === "video") : undefined;
   return (

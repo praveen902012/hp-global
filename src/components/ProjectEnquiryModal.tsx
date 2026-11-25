@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { Check, ShieldCheck, X } from "lucide-react";
 import { api } from "../lib/api";
-import { whatsappFor } from "../data/company";
+import { useSiteLinks } from "./site/SiteDetailsProvider";
 import { Badge, Button, ButtonLink, Eyebrow, Field, fieldControl } from "./site/ui";
 import { WhatsAppIcon } from "./site/brand-icons";
 
@@ -27,6 +27,7 @@ const randomNumber = () => Math.floor(Math.random() * 10) + 1;
 export function ProjectEnquiryModal({ isOpen, onClose, project }: ModalProps) {
   const id = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
+  const { whatsappFor } = useSiteLinks();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [consent, setConsent] = useState(true);

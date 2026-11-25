@@ -218,6 +218,8 @@ export const api = {
   updatePage(id: number, content: import("../data/pages").PageContent) { return apiRequest<AdminPage>(`/admin/pages/${id}`, { method: "PUT", body: JSON.stringify(content) }); },
   setPagePublished(id: number, input: { published: boolean; add_to_menu?: ("header" | "footer")[]; menu_label?: string }) { return apiRequest<AdminPage & { menu_full: ("header" | "footer")[]; removed_menu_links: number }>(`/admin/pages/${id}/publish`, { method: "POST", body: JSON.stringify(input) }); },
   deletePage(id: number) { return apiRequest<{ ok: true; removed_menu_links: number }>(`/admin/pages/${id}`, { method: "DELETE" }); },
+  getSiteDetails() { return apiRequest<import("../data/siteDetails").SiteDetails>("/admin/site-details", { cache: "no-store" }); },
+  saveSiteDetails(details: import("../data/siteDetails").SiteDetails) { return apiRequest<import("../data/siteDetails").SiteDetails>("/admin/site-details", { method: "PUT", body: JSON.stringify(details) }); },
 
   listPress() { return apiRequest<{ items: import("../data/press").PressClipping[]; projects: string[]; featured_project: string }>("/admin/press", { cache: "no-store" }); },
   createPress(input: import("../data/press").PressClippingInput) { return apiRequest<import("../data/press").PressClipping>("/admin/press", { method: "POST", body: JSON.stringify(input) }); },

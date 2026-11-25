@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Home } from "../../views/Home";
 import { blogs as builtInBlogs } from "../../data/blogData";
 import { defaultFeaturedProject } from "../../data/featuredProject";
@@ -5,8 +6,14 @@ import { getAllBlogs } from "../../lib/server/blogs";
 import { getFeaturedProject } from "../../lib/server/featured-project";
 import { getFeaturedProjectSlug, listPublicProjectsSafe } from "../../lib/server/portfolio";
 import { listPressClippings } from "../../lib/server/press";
+import { loadSystemPage, systemPageMetadata } from "../../lib/server/site-pages";
+import { PageSections } from "../../components/sections/PageSections";
 
 export const dynamic = "force-dynamic";
+
+export function generateMetadata(): Promise<Metadata> {
+  return systemPageMetadata("home");
+}
 
 /** Each block falls back gracefully so a database problem never takes the home page down. */
 async function safe<T>(label: string, load: () => Promise<T>, fallback: T) {
@@ -19,6 +26,9 @@ async function safe<T>(label: string, load: () => Promise<T>, fallback: T) {
 }
 
 export default async function Page() {
+  // Edited in Admin → Pages → Home.
+  const page = await loadSystemPage("home");
+  if (page) return <PageSections sections={page.sections} />;
   const [latestBlogs, projects, featured, featuredSlug, press] = await Promise.all([
     safe("blogs", async () => (await getAllBlogs()).slice(0, 3), builtInBlogs.slice(0, 3)),
     listPublicProjectsSafe(),

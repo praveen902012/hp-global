@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "../index.css";
 
 export const metadata: Metadata = {
+  // Lets share images saved as site paths (e.g. /api/media/…) become full links. Set SITE_URL if the domain changes.
+  metadataBase: new URL(process.env.SITE_URL || "https://hpglobalinfra.com"),
   title: "HP Global Infrra",
   description: "Premier real estate services and investment advisory across NCR and Uttarakhand.",
 };

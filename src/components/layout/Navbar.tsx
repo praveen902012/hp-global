@@ -5,11 +5,11 @@ import { usePathname } from "next/navigation";
 import { ChevronRight, Menu, Phone, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { isInternalHref, type MenuItem } from "../../data/siteMenu";
-import { company } from "../../data/company";
+import { useSiteLinks } from "../site/SiteDetailsProvider";
 import { MenuLink } from "./MenuLink";
 import { buttonClass } from "../site/ui";
 import { useEnquiry } from "../site/EnquiryProvider";
-import { FacebookIcon, InstagramIcon } from "../site/brand-icons";
+import { SocialIcon } from "../site/brand-icons";
 
 /**
  * Site header. It sits transparently over a dark hero when the page marks one with
@@ -17,6 +17,7 @@ import { FacebookIcon, InstagramIcon } from "../site/brand-icons";
  */
 export function Navbar({ links }: { links: MenuItem[] }) {
   const pathname = usePathname() || "/";
+  const site = useSiteLinks();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [overlay, setOverlay] = useState(false);
@@ -79,10 +80,10 @@ export function Navbar({ links }: { links: MenuItem[] }) {
           </nav>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <a href={company.phoneHref} className={`hidden items-center gap-2 whitespace-nowrap text-[15px] font-semibold md:max-[1359px]:inline-flex 2xl:inline-flex ${transparent ? "text-white" : "text-ink"}`}>
-              <Phone size={17} className={transparent ? "text-gold-400" : "text-gold-500"} />{company.phoneDisplay}
+            <a href={site.phoneHref} className={`hidden items-center gap-2 whitespace-nowrap text-[15px] font-semibold md:max-[1359px]:inline-flex 2xl:inline-flex ${transparent ? "text-white" : "text-ink"}`}>
+              <Phone size={17} className={transparent ? "text-gold-400" : "text-gold-500"} />{site.phoneDisplay}
             </a>
-            <a href={company.phoneHref} aria-label={`Call ${company.phoneDisplay}`} className={`flex h-10 w-10 items-center justify-center rounded-full border sm:hidden ${transparent ? "border-white/30 text-white" : "border-line-strong text-ink"}`}><Phone size={17} /></a>
+            <a href={site.phoneHref} aria-label={`Call ${site.phoneDisplay}`} className={`flex h-10 w-10 items-center justify-center rounded-full border sm:hidden ${transparent ? "border-white/30 text-white" : "border-line-strong text-ink"}`}><Phone size={17} /></a>
             <span className="hidden sm:block"><button type="button" onClick={() => enquire()} className={buttonClass("accent", "m")}>Enquire now</button></span>
             <button type="button" onClick={() => setOpen(true)} aria-label="Open menu" aria-expanded={open} aria-controls="mobile-menu" className={`flex h-10 w-10 items-center justify-center rounded-full border min-[1360px]:hidden ${transparent ? "border-white/30 text-white" : "border-line-strong text-ink"}`}>
               <Menu size={19} />
@@ -112,11 +113,10 @@ export function Navbar({ links }: { links: MenuItem[] }) {
           </nav>
           <div className="mt-8 flex flex-col gap-3">
             <button type="button" onClick={() => { setOpen(false); enquire(); }} className={buttonClass("accent", "l", "w-full")}>Enquire now</button>
-            <a href={company.phoneHref} className={buttonClass("outline-inverse", "l", "w-full")}><Phone size={17} />Call {company.phoneDisplay}</a>
+            <a href={site.phoneHref} className={buttonClass("outline-inverse", "l", "w-full")}><Phone size={17} />Call {site.phoneDisplay}</a>
           </div>
           <div className="mt-8 flex gap-3">
-            <a href={company.social[0].href} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="flex h-10 w-10 items-center justify-center rounded-full border border-navy-700 text-white"><InstagramIcon size={18} /></a>
-            <a href={company.social[1].href} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="flex h-10 w-10 items-center justify-center rounded-full border border-navy-700 text-white"><FacebookIcon size={18} /></a>
+            {site.social.map((item) => <a key={item.key} href={item.href} target="_blank" rel="noopener noreferrer" aria-label={item.label} className="flex h-10 w-10 items-center justify-center rounded-full border border-navy-700 text-white"><SocialIcon network={item.key} size={18} /></a>)}
           </div>
         </div>
       )}

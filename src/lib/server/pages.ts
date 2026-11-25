@@ -1,4 +1,5 @@
-import { type PageContent, type PageSection, type PageSummary, type SitePage, starterSections, systemPageByKey, systemPages } from "../../data/pages";
+import { type PageContent, type PageSection, type PageSummary, type SitePage, starterSections } from "../../data/pages";
+import { systemPageByKey, systemPages } from "../../data/systemPages";
 import { query } from "./db";
 
 interface PageRow {
@@ -6,6 +7,8 @@ interface PageRow {
   slug: string;
   title: string;
   meta_description: string;
+  seo_title: string;
+  share_image: string;
   sections: PageSection[];
   status: "draft" | "published";
   system_key: string | null;
@@ -15,11 +18,11 @@ interface PageRow {
 }
 
 const iso = (value: Date | string | null) => (value === null ? null : new Date(value).toISOString());
-const columns = "id, slug, title, meta_description, sections, status, system_key, published_at, created_at, updated_at";
+const columns = "id, slug, title, meta_description, seo_title, share_image, sections, status, system_key, published_at, created_at, updated_at";
 
 function mapPage(row: PageRow): SitePage {
   return {
-    id: Number(row.id), slug: row.slug, title: row.title, meta_description: row.meta_description,
+    id: Number(row.id), slug: row.slug, title: row.title, meta_description: row.meta_description, seo_title: row.seo_title ?? "", share_image: row.share_image ?? "",
     sections: Array.isArray(row.sections) ? row.sections : [], status: row.status, system_key: row.system_key ?? null,
     published_at: iso(row.published_at), created_at: iso(row.created_at)!, updated_at: iso(row.updated_at)!,
   };
@@ -35,7 +38,7 @@ function rethrowUnique(error: unknown, slug: string): never {
 }
 
 /**
- * Creates the editable records for built-in site pages (e.g. Our Story) the first time,
+ * Creates the editable records for built-in website pages (Home, Services, …) the first time,
  * pre-filled with the page's original content. Safe to call repeatedly.
  */
 let systemPagesReady: Promise<void> | null = null;
@@ -56,6 +59,7 @@ export function ensureSystemPages() {
 /** The stored content of a built-in site page, or null if it hasn't been created yet. */
 export async function getSystemPage(key: string) {
   if (!systemPageByKey(key)) return null;
+  await ensureSystemPages();
   const result = await query<PageRow>(`SELECT ${columns} FROM pages WHERE system_key = $1`, [key]);
   return result.rows[0] ? mapPage(result.rows[0]) : null;
 }
@@ -66,6 +70,9 @@ export async function listPages(): Promise<PageSummary[]> {
     `SELECT id, slug, title, status, system_key, published_at, created_at, updated_at, jsonb_array_length(sections)::int AS section_count
      FROM pages ORDER BY (system_key IS NULL), updated_at DESC`,
   );
+  // Website pages first, in menu order; then the editor's own pages, most recently edited first.
+  const order = (key: string | null) => { const index = systemPages.findIndex((page) => page.key === key); return index < 0 ? systemPages.length : index; };
+  result.rows.sort((a, b) => order(a.system_key) - order(b.system_key));
   return result.rows.map((row) => ({
     id: Number(row.id), slug: row.slug, title: row.title, status: row.status, system_key: row.system_key ?? null, section_count: row.section_count,
     published_at: iso(row.published_at), created_at: iso(row.created_at)!, updated_at: iso(row.updated_at)!,
@@ -97,8 +104,8 @@ export async function createPage(title: string, slug: string) {
 export async function updatePage(id: number, content: PageContent) {
   try {
     const result = await query<PageRow>(
-      `UPDATE pages SET title = $1, slug = $2, meta_description = $3, sections = $4, updated_at = NOW() WHERE id = $5 RETURNING ${columns}`,
-      [content.title, content.slug, content.meta_description, JSON.stringify(content.sections), id],
+      `UPDATE pages SET title = $1, slug = $2, meta_description = $3, sections = $4, seo_title = $5, share_image = $6, updated_at = NOW() WHERE id = $7 RETURNING ${columns}`,
+      [content.title, content.slug, content.meta_description, JSON.stringify(content.sections), content.seo_title, content.share_image, id],
     );
     return result.rows[0] ? mapPage(result.rows[0]) : null;
   } catch (error) {

@@ -6,6 +6,7 @@ import { Eye } from "lucide-react";
 import { getPageBySlug } from "../../../lib/server/pages";
 import { getAdminSession } from "../../../lib/server/auth";
 import { PageSections } from "../../../components/sections/PageSections";
+import { pageMetadata } from "../../../lib/server/site-pages";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +15,9 @@ type Props = { params: Promise<{ slug: string }> };
 const loadPage = cache(async (slug: string) => {
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return null;
   try {
-    return await getPageBySlug(slug);
+    const page = await getPageBySlug(slug);
+    // Built-in website pages have their own addresses.
+    return page && page.system_key === null ? page : null;
   } catch (error) {
     console.error(`Failed to load page "${slug}"`, error);
     return null;
@@ -33,8 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const result = await loadVisiblePage((await params).slug);
   if (!result) return {};
   return {
-    title: `${result.page.title} | HP Global Infrra`,
-    description: result.page.meta_description || undefined,
+    ...await pageMetadata(result.page),
     ...(result.preview ? { robots: { index: false, follow: false } } : {}),
   };
 }

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  Bell, BookOpen, Building2, ExternalLink, FilePen, Inbox, Layers, LayoutDashboard, List, LogOut, Menu as MenuIcon,
+  Bell, BookOpen, Globe, Building2, ExternalLink, FilePen, Inbox, Layers, LayoutDashboard, List, LogOut, Menu as MenuIcon,
   MessageSquare, Newspaper, PanelLeftClose, PanelLeftOpen, Search, Settings, Star, X, type LucideIcon,
 } from "lucide-react";
 import { api, type SearchResult } from "../../lib/api";
@@ -24,6 +24,7 @@ const navGroups: { label?: string; items: NavItem[] }[] = [
     { href: "/admin/press", label: "Press", icon: Newspaper },
     { href: "/admin/pages", label: "Pages", icon: Layers },
     { href: "/admin/menu", label: "Menu", icon: List },
+    { href: "/admin/site-details", label: "Site details", icon: Globe },
   ] },
   { label: "Help", items: [
     { href: "/admin/guide", label: "User guide", icon: BookOpen },

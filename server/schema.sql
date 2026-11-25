@@ -110,6 +110,9 @@ CREATE INDEX IF NOT EXISTS press_clippings_project_idx ON press_clippings (lower
 
 ALTER TABLE pages ADD COLUMN IF NOT EXISTS system_key TEXT;
 CREATE UNIQUE INDEX IF NOT EXISTS pages_system_key_idx ON pages (system_key) WHERE system_key IS NOT NULL;
+-- Google & sharing settings per page (blank = use the defaults from Site details).
+ALTER TABLE pages ADD COLUMN IF NOT EXISTS seo_title TEXT NOT NULL DEFAULT '';
+ALTER TABLE pages ADD COLUMN IF NOT EXISTS share_image TEXT NOT NULL DEFAULT '';
 
 -- Project pages: every portfolio project gets its own URL and optional page content.
 ALTER TABLE portfolio_projects ADD COLUMN IF NOT EXISTS slug TEXT;

@@ -4,12 +4,14 @@ import { categoryLabel, typeLabel, type ProjectPage, type PublicProject } from "
 import { Accented, Badge, SectionHeading, buttonClass } from "../site/ui";
 import { EnquireButton } from "../site/EnquiryProvider";
 import { WhatsAppIcon } from "../site/brand-icons";
-import { company, whatsappFor } from "../../data/company";
+import { getSiteLinks } from "../../lib/server/site-details";
 import { ProjectCard } from "./ProjectCard";
 import { Gallery, SectionNav, MobileActionBar, ConstructionVideo } from "./ProjectPageClient";
 import { ProjectPress } from "../press/ProjectPress";
 
-export function ProjectPageView({ project, related }: { project: ProjectPage; related: PublicProject[] }) {
+export async function ProjectPageView({ project, related }: { project: ProjectPage; related: PublicProject[] }) {
+  const company = await getSiteLinks();
+  const { whatsappFor } = company;
   const enquiryProject = { title: project.title, location: project.location, category: `${typeLabel(project.project_type)} · ${categoryLabel(project.portfolio_category)}`, image: project.image_url, status: project.status };
   const brochure = project.documents[0];
   const sections = [

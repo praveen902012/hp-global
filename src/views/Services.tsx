@@ -1,5 +1,5 @@
 import { ArrowRight, Check, Globe, Layers, UserRound } from "lucide-react";
-import { company } from "../data/company";
+import { getSiteLinks } from "../lib/server/site-details";
 import { Eyebrow, IconCircle, SectionHeading, buttonClass } from "../components/site/ui";
 import { EnquireButton } from "../components/site/EnquiryProvider";
 import { CtaBand } from "../components/site/CtaBand";
@@ -29,7 +29,8 @@ const audiences = [
   { icon: <Layers size={22} />, title: "Portfolio investors", text: "Diversify across residential, commercial and plots with research-backed advice." },
 ];
 
-export function Services() {
+export async function Services() {
+  const company = await getSiteLinks();
   return (
     <>
       <section className="bg-ivory-100">

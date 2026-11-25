@@ -1,12 +1,13 @@
 "use client";
 
-import { type FormEvent, useEffect, useState } from "react";
+import { type FormEvent, Fragment, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Copy, ExternalLink, FilePlus2, Files, Pencil, Plus, Trash2, X } from "lucide-react";
 import { api } from "../../lib/api";
 import { Button, EmptyState, IconButton, Notice, PageHeader, StatusPill, inputClass, tdClass, thClass, useToast } from "../../components/admin/ui";
-import { slugError, slugify, type PageSummary } from "../../data/pages";
+import { fixedSectionPage, slugError, slugify, type PageSummary } from "../../data/pages";
+import { systemPagePath } from "../../data/systemPages";
 
 const formatDate = (value: string) => new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(value));
 
@@ -34,10 +35,11 @@ export function AdminPages() {
   async function duplicate(page: PageSummary) {
     try {
       const source = await api.getPage(page.id);
-      let slug = `${source.slug}-copy`;
-      for (let n = 2; pages?.some((item) => item.slug === slug); n += 1) slug = `${source.slug}-copy-${n}`;
+      const base = source.slug || "home";
+      let slug = `${base}-copy`;
+      for (let n = 2; pages?.some((item) => item.slug === slug); n += 1) slug = `${base}-copy-${n}`;
       const created = await api.createPage({ title: `${source.title} (copy)`, slug });
-      await api.updatePage(created.id, { title: `${source.title} (copy)`, slug, meta_description: source.meta_description, sections: source.sections });
+      await api.updatePage(created.id, { title: `${source.title} (copy)`, slug, meta_description: source.meta_description, seo_title: "", share_image: source.share_image, sections: source.sections.filter((section) => !fixedSectionPage[section.type]) });
       toast("Page duplicated as a draft.");
       router.push(`/admin/pages/${created.id}`);
     } catch (duplicateError) { toast(duplicateError instanceof Error ? duplicateError.message : "Unable to duplicate the page.", "error"); }
@@ -45,7 +47,7 @@ export function AdminPages() {
 
   return (
     <div>
-      <PageHeader title="Pages" description="Build new pages from ready-made sections, or edit built-in pages like Our Story. New pages start as drafts."
+      <PageHeader title="Pages" description="Every page on your website. Edit the words and pictures of any page, or build a new one from ready-made sections."
         actions={<><Button variant="ghost" to="/admin/guide#pages">How it works</Button><Button onClick={() => setCreating(true)}><Plus size={16} aria-hidden />New page</Button></>} />
       {error && <Notice tone="error" onClose={() => setError(null)}>{error}</Notice>}
       {notice && <Notice tone="success" onClose={() => setNotice(null)}>{notice}</Notice>}
@@ -58,28 +60,39 @@ export function AdminPages() {
             <table className="w-full min-w-[720px] text-left text-[14px]">
               <thead><tr><th className={thClass}>Page</th><th className={thClass}>Status</th><th className={thClass}>Sections</th><th className={thClass}>Last edited</th><th className={thClass}><span className="sr-only">Actions</span></th></tr></thead>
               <tbody>
-                {pages.map((page) => (
-                  <tr key={page.id} className="hover:bg-ivory-50">
-                    <td className={tdClass}><Link href={`/admin/pages/${page.id}`} className="font-semibold text-ink hover:text-gold-700">{page.title}</Link>{page.system_key && <span className="ml-2 rounded-full bg-ivory-100 px-2 py-0.5 text-[11px] font-semibold text-gold-700">Site page</span>}<p className="text-[13px] text-ink-muted">/{page.slug}</p></td>
-                    <td className={tdClass}><StatusPill status={page.status === "published" ? "published" : "draft"} /></td>
-                    <td className={`${tdClass} text-ink-muted`}>{page.section_count}</td>
-                    <td className={`${tdClass} whitespace-nowrap text-ink-muted`}>{formatDate(page.updated_at)}</td>
-                    <td className={tdClass}>
-                      <div className="flex justify-end gap-1">
-                        <IconButton label={page.status === "published" ? "View page" : "Preview draft"} href={`/${page.slug}`} target="_blank"><ExternalLink size={16} /></IconButton>
-                        <Link href={`/admin/pages/${page.id}`} title="Edit" aria-label={`Edit ${page.title}`} className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-ink-muted hover:bg-ivory-100 hover:text-ink"><Pencil size={16} /></Link>
-                        {!page.system_key && <IconButton label={`Duplicate ${page.title}`} onClick={() => void duplicate(page)}><Copy size={16} /></IconButton>}
-                        {page.system_key ? <span className="w-9" aria-hidden="true" /> : <IconButton label={`Delete ${page.title}`} tone="danger" onClick={() => void remove(page)}><Trash2 size={16} /></IconButton>}
-                      </div>
-                    </td>
-                  </tr>
+                {[
+                  { label: "Website pages", hint: "Always on your website. Edit their words, pictures and sections; they can't be deleted.", rows: pages.filter((page) => page.system_key) },
+                  { label: "Your pages", hint: "Pages you created. Publish them and add them to the menu when ready.", rows: pages.filter((page) => !page.system_key) },
+                ].filter((group) => group.rows.length).map((group) => (
+                  <Fragment key={group.label}>
+                    <tr><td colSpan={5} className="border-b border-line bg-ivory-50 px-5 py-2.5"><span className="text-[12px] font-semibold uppercase tracking-[0.06em] text-gold-700">{group.label} · {group.rows.length}</span><span className="ml-3 text-[13px] text-ink-muted">{group.hint}</span></td></tr>
+                    {group.rows.map((page) => {
+                      const path = systemPagePath(page.system_key, page.slug);
+                      return (
+                        <tr key={page.id} className="hover:bg-ivory-50">
+                          <td className={tdClass}><Link href={`/admin/pages/${page.id}`} className="font-semibold text-ink hover:text-gold-700">{page.title}</Link>{page.system_key && <span className="ml-2 rounded-full bg-ivory-100 px-2 py-0.5 text-[11px] font-semibold text-gold-700">Website page</span>}<p className="text-[13px] text-ink-muted">{path}</p></td>
+                          <td className={tdClass}><StatusPill status={page.status === "published" ? "published" : "draft"} /></td>
+                          <td className={`${tdClass} text-ink-muted`}>{page.section_count}</td>
+                          <td className={`${tdClass} whitespace-nowrap text-ink-muted`}>{page.system_key && page.updated_at === page.created_at ? "Not edited yet" : formatDate(page.updated_at)}</td>
+                          <td className={tdClass}>
+                            <div className="flex justify-end gap-1">
+                              <IconButton label={page.status === "published" ? "View page" : "Preview draft"} href={path} target="_blank"><ExternalLink size={16} /></IconButton>
+                              <Link href={`/admin/pages/${page.id}`} title="Edit" aria-label={`Edit ${page.title}`} className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-ink-muted hover:bg-ivory-100 hover:text-ink"><Pencil size={16} /></Link>
+                              <IconButton label={`Duplicate ${page.title} as a new page`} onClick={() => void duplicate(page)}><Copy size={16} /></IconButton>
+                              {page.system_key ? <span className="w-9" aria-hidden="true" /> : <IconButton label={`Delete ${page.title}`} tone="danger" onClick={() => void remove(page)}><Trash2 size={16} /></IconButton>}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </Fragment>
                 ))}
               </tbody>
             </table>
           </div>
         )}
       </section>
-      <p className="mt-4 text-[13px] text-ink-muted">Tip: publish a page, then add it to the header or footer from the page builder or the Menu screen.</p>
+      <p className="mt-4 text-[13px] text-ink-muted">Website pages start with what is on the site today, so nothing changes until you edit and save. Tip: publish your own pages, then add them to the header or footer from the page builder or the Menu screen.</p>
 
       {creating && <NewPageDialog onClose={() => setCreating(false)} onCreated={(id) => router.push(`/admin/pages/${id}`)} />}
     </div>

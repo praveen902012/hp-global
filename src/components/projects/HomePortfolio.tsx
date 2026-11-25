@@ -14,11 +14,11 @@ const filters = [
 ] as const;
 
 /** Home page portfolio: filter chips over a grid of up to six project cards. */
-export function HomePortfolio({ projects }: { projects: PublicProject[] }) {
+export function HomePortfolio({ projects, limit = 6 }: { projects: PublicProject[]; limit?: number }) {
   const [filter, setFilter] = useState<(typeof filters)[number]["value"]>("all");
   const options = filters.filter((option) => option.value === "all" || projects.some(option.test));
   const active = filters.find((option) => option.value === filter) ?? filters[0];
-  const visible = projects.filter(active.test).slice(0, 6);
+  const visible = projects.filter(active.test).slice(0, limit);
   return (
     <>
       {options.length > 2 && (

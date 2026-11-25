@@ -1,11 +1,12 @@
 import { Accented, ButtonLink, Eyebrow, buttonClass } from "./ui";
 import { EnquireButton } from "./EnquiryProvider";
 import { WhatsAppIcon } from "./brand-icons";
-import { company } from "../../data/company";
+import { getSiteLinks } from "../../lib/server/site-details";
 import { ArrowRight } from "lucide-react";
 
 /** Dark call-to-action card used near the end of most pages. */
-export function CtaBand({ title, accent, text, eyebrow = "Talk to an advisor", className = "" }: { title: string; accent?: string; text: string; eyebrow?: string; className?: string }) {
+export async function CtaBand({ title, accent, text, eyebrow = "Talk to an advisor", className = "" }: { title: string; accent?: string; text: string; eyebrow?: string; className?: string }) {
+  const company = await getSiteLinks();
   return (
     <section className={`pb-16 md:pb-[88px] lg:pb-[112px] ${className}`}>
       <div className="container-page">

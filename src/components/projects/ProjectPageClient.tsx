@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight, Phone, X } from "lucide-react";
 import { buttonClass } from "../site/ui";
 import { useEnquiry } from "../site/EnquiryProvider";
 import { WhatsAppIcon } from "../site/brand-icons";
-import { company } from "../../data/company";
+import { useSiteLinks } from "../site/SiteDetailsProvider";
 import type { Project } from "../ProjectEnquiryModal";
 
 /** Sticky in-page navigation that highlights the section in view. */
@@ -89,6 +89,7 @@ export function ConstructionVideo({ src, poster }: { src: string; poster: string
 /** Phone-only bar with the main actions, fixed to the bottom of the screen. */
 export function MobileActionBar({ project, whatsapp }: { project: Project; whatsapp: string }) {
   const enquire = useEnquiry();
+  const company = useSiteLinks();
   return (
     <div className="fixed inset-x-0 bottom-0 z-[45] flex items-center gap-3 border-t border-line bg-white/95 px-5 py-3 shadow-[var(--shadow-float)] backdrop-blur lg:hidden">
       <button type="button" onClick={() => enquire(project)} className={buttonClass("accent", "l", "flex-1")}>Enquire now</button>
